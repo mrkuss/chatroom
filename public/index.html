@@ -85,7 +85,6 @@
     .room-btn.active { background:var(--room-active-bg);color:white;font-weight:bold; }
     .room-btn .room-unread { float:right;background:#cc0000;color:white;font-size:12px;padding:0 4px;border-radius:2px; }
     .room-private-icon { font-size:11px;margin-right:2px; }
-    /* Room code badge shown under the room name for owners */
     .room-code-badge { display:block;font-size:11px;color:#ffd700;letter-spacing:1px;padding:0 8px 4px;line-height:1.2;opacity:0.85; }
     body.theme-rose .room-code-badge { color:#cc5588; }
     body.theme-dark .room-code-badge { color:#8888cc; }
@@ -107,6 +106,10 @@
     .icon-btn.danger { background:#800000;color:white;border-color:#ff8080 #400000 #400000 #ff8080; }
     .icon-btn[title]:hover::after { content:attr(title);position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);background:#000;color:#fff;font-size:12px;padding:2px 6px;white-space:nowrap;z-index:100;pointer-events:none;border:1px solid #555; }
     #user-count-btn { width:auto;padding:0 8px;font-size:14px; }
+
+    /* ── RECONNECT BANNER ── */
+    #reconnect-banner { display:none;background:#cc6600;color:white;font-size:14px;text-align:center;padding:4px 8px;flex-shrink:0;letter-spacing:1px; }
+    #reconnect-banner.visible { display:block; }
 
     #users-panel { display:none;flex-wrap:wrap;gap:4px 16px;padding:6px 8px;background:var(--bg-users-panel);border-bottom:2px inset var(--border-inset);font-size:15px;flex-shrink:0; }
     #users-panel.visible { display:flex; }
@@ -196,11 +199,9 @@
     /* ── KEYPAD MODAL ── */
     #keypad-modal .modal-box { max-width:280px; }
     .keypad-room-name { text-align:center;font-size:17px;color:var(--text-system);margin-bottom:10px; }
-    /* Dot display — shows entered digits as filled/empty circles */
     .keypad-dots { display:flex;justify-content:center;gap:8px;margin-bottom:12px;min-height:24px; }
     .keypad-dot { width:14px;height:14px;border-radius:50%;border:2px solid var(--border-inset);background:transparent;transition:background 0.1s; }
     .keypad-dot.filled { background:var(--poll-bar); }
-    /* 3×3 grid + bottom row */
     .keypad-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px; }
     .keypad-btn { font-family:'VT323',monospace;font-size:28px;padding:10px 0;background:var(--btn-bg);color:var(--text-main);border:2px solid;border-color:var(--btn-border);cursor:pointer;text-align:center;user-select:none;transition:opacity 0.07s; }
     .keypad-btn:active { border-color:var(--border-inset) white white var(--border-inset);opacity:0.7; }
@@ -345,7 +346,7 @@
 <!-- Auth -->
 <div id="auth-screen">
   <div class="auth-titlebar"><span>chatroom</span><span class="auth-version">v2.0</span></div>
-  <div class="auth-disclaimer">a small project by mce. no ads, no data selling, no nonsense.</div>
+  <div class="auth-disclaimer">a small project by mce.</div>
   <div class="auth-tabs">
     <button class="auth-tab active" onclick="switchTab('login')">Login</button>
     <button class="auth-tab" onclick="switchTab('register')">Register</button>
@@ -385,6 +386,7 @@
       <button class="icon-btn danger" onclick="doLogout()" title="Exit">✕</button>
     </div>
   </div>
+  <div id="reconnect-banner">⚠ Connection lost — reconnecting...</div>
   <div id="chat-layout">
     <div id="rooms-sidebar">
       <h3>ROOMS</h3>
@@ -395,7 +397,7 @@
       <ul id="messages"></ul>
       <div id="typing-bar"></div>
       <div id="bottom">
-        <input id="input" placeholder="Message, /me, /msg, /poll, /duel, /give, /create, /kick, /changepass, claim..." autocomplete="off" />
+        <input id="input" placeholder="Message, /me, /msg, /poll, /duel, /give, /create, /kick, /ban, /changepass, claim..." autocomplete="off" />
         <button id="send-btn" onclick="send()">Send</button>
       </div>
     </div>
@@ -411,9 +413,7 @@
     </div>
     <div class="modal-body">
       <div class="keypad-room-name" id="keypad-room-label"></div>
-      <!-- Dots showing how many digits entered (up to 9) -->
       <div class="keypad-dots" id="keypad-dots"></div>
-      <!-- 1–9 grid -->
       <div class="keypad-grid">
         <button class="keypad-btn" onclick="keypadPress('1')">1</button>
         <button class="keypad-btn" onclick="keypadPress('2')">2</button>
@@ -425,7 +425,6 @@
         <button class="keypad-btn" onclick="keypadPress('8')">8</button>
         <button class="keypad-btn" onclick="keypadPress('9')">9</button>
       </div>
-      <!-- Bottom row: clear, 0, enter -->
       <div class="keypad-bottom-row">
         <button class="keypad-btn keypad-clear" onclick="keypadClear()">⌫</button>
         <button class="keypad-btn" onclick="keypadPress('0')">0</button>
@@ -553,7 +552,9 @@
             <div class="help-section-title">🔒 Private Rooms</div>
             <div class="help-cmd"><code>/create roomname code</code> — create a room with a numeric code</div>
             <div class="help-cmd"><code>/joinroom roomname</code> — open the keypad to join a private room</div>
-            <div class="help-cmd"><code>/kick username</code> — (owner) kick someone from your room</div>
+            <div class="help-cmd"><code>/kick username</code> — (owner) kick someone; revokes their access</div>
+            <div class="help-cmd"><code>/ban username</code> — (owner) permanently ban a user from the room</div>
+            <div class="help-cmd"><code>/unban username</code> — (owner) remove a ban</div>
             <div class="help-cmd"><code>/changepass newcode</code> — (owner) change the room code; kicks all members</div>
             <div class="help-cmd"><code>/deleteroom roomname</code> — (owner) delete your private room</div>
             <div class="help-cmd">Your room code always shows under the room name in the sidebar</div>
@@ -652,17 +653,26 @@ function soundKeypad(){playTone(1000,'square',0.04,0.08)}
 function toggleSound(){ soundEnabled=!soundEnabled; const btn=document.getElementById('sound-btn'); btn.textContent=soundEnabled?'🔊':'🔇'; btn.classList.toggle('on',soundEnabled); }
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
-const socket = io({ autoConnect: false });
+// Socket configured with aggressive reconnection so silent drops are recovered
+const socket = io({
+  autoConnect: false,
+  reconnection: true,
+  reconnectionAttempts: Infinity,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 10000,
+  timeout: 20000,
+});
 let myUsername=null, myColor='#000080', myCoins=0, selectedTheme='classic';
 let currentRoom='general', pendingRoom=null, usersVisible=false, isTyping=false, typingTimer;
+let myToken=null; // stored so we can re-auth after reconnect
 const unreadCounts={}, polls={};
 let shopItems=[], selectedSettingsColor='#000080', selectedSettingsTheme='classic';
 
 // Keypad state
 let keypadRoom=null, keypadCode='';
 // Changepass pending
-let pendingChangepass=null; // { room, newCode }
-// Owner room codes cache: roomName -> code string (so we can show it in sidebar)
+let pendingChangepass=null;
+// Owner room codes: roomName -> code (populated from server on rooms list + room created events)
 const ownerRoomCodes={};
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
@@ -703,7 +713,7 @@ async function doRegister(){
 async function doLogout(){await fetch('/logout',{method:'POST'});socket.disconnect();location.reload()}
 
 function enterChat(username,color,theme,coins,token,dailyAvailable){
-  myUsername=username;myColor=color||'#000080';myCoins=coins||0;
+  myUsername=username;myColor=color||'#000080';myCoins=coins||0;myToken=token;
   applyTheme(theme||'classic');
   document.getElementById('auth-screen').style.display='none';
   document.getElementById('chat-screen').style.display='block';
@@ -715,6 +725,30 @@ function enterChat(username,color,theme,coins,token,dailyAvailable){
   if(dailyAvailable)setTimeout(()=>showDailyModal(),1500);
 }
 
+// ── RECONNECTION ──────────────────────────────────────────────────────────────
+socket.on('disconnect', (reason) => {
+  // If the server explicitly kicked us (e.g. logged in elsewhere), don't reconnect
+  if (reason === 'io server disconnect') return;
+  document.getElementById('reconnect-banner').classList.add('visible');
+  document.getElementById('input').disabled = true;
+  document.getElementById('send-btn').disabled = true;
+});
+
+socket.on('connect', () => {
+  document.getElementById('reconnect-banner').classList.remove('visible');
+  document.getElementById('input').disabled = false;
+  document.getElementById('send-btn').disabled = false;
+  // Re-authenticate on every (re)connect so the server has our session
+  if (myToken) socket.emit('join', myToken);
+});
+
+socket.on('reconnect', () => {
+  // After reconnect, switch back to the room we were in
+  if (currentRoom && currentRoom !== 'general') {
+    socket.emit('switch room', { room: currentRoom });
+  }
+});
+
 // ── ROOMS ─────────────────────────────────────────────────────────────────────
 function renderRooms(rooms){
   const list=document.getElementById('rooms-list');list.innerHTML='';
@@ -722,21 +756,23 @@ function renderRooms(rooms){
     const name=typeof r==='string'?r:r.name;
     const isPrivate=typeof r==='object'&&r.isPrivate;
     const isOwner=typeof r==='object'&&r.isOwner;
+    // Server sends ownerCode for rooms the user owns
+    const serverCode=typeof r==='object'&&r.ownerCode?r.ownerCode:null;
+    if(serverCode) ownerRoomCodes[name]=serverCode;
 
     const btn=document.createElement('button');
     btn.className='room-btn'+(name===currentRoom?' active':'');
     btn.dataset.room=name;
     btn.innerHTML=(isPrivate?'<span class="room-private-icon">🔒</span>':'')+`#${name}`;
     if(unreadCounts[name])btn.innerHTML+=`<span class="room-unread">${unreadCounts[name]}</span>`;
-
-    // All rooms in the list the user can already access — click to switch directly
     btn.onclick=()=>switchRoom(name);
     list.appendChild(btn);
 
-    // Show the code underneath for owners
+    // Show the code badge for owners
     if(isOwner && ownerRoomCodes[name]){
       const badge=document.createElement('span');
       badge.className='room-code-badge';
+      badge.dataset.roomCodeFor=name;
       badge.textContent=`code: ${ownerRoomCodes[name]}`;
       list.appendChild(badge);
     }
@@ -760,11 +796,11 @@ function openKeypad(room){
 function closeKeypad(){
   document.getElementById('keypad-modal').classList.remove('open');
   keypadRoom=null;keypadCode='';
+  pendingRoom=null;
 }
 function renderKeypadDots(){
   const wrap=document.getElementById('keypad-dots');
   wrap.innerHTML='';
-  // Show up to 9 dots
   const len=Math.max(keypadCode.length,1);
   for(let i=0;i<Math.min(len,9);i++){
     const d=document.createElement('div');
@@ -788,9 +824,7 @@ function keypadSubmit(){
   if(!keypadCode){document.getElementById('keypad-error').textContent='Enter a code first.';return;}
   pendingRoom=keypadRoom;
   socket.emit('switch room',{room:keypadRoom,code:keypadCode});
-  // Don't close yet — wait for success (room changed) or error (keypad error)
 }
-// Keyboard support for keypad
 document.addEventListener('keydown',e=>{
   if(!document.getElementById('keypad-modal').classList.contains('open'))return;
   if(e.key>='0'&&e.key<='9')keypadPress(e.key);
@@ -909,7 +943,6 @@ function renderHistory(history){
   history.forEach(row=>{
     const ts=new Date(row.created_at).getTime();
     if(row.type==='poll'){
-      // Poll rows carry their full data in poll_data
       const poll=row.poll_data;
       if(!poll)return;
       polls[poll.id]=poll;
@@ -941,42 +974,34 @@ socket.on('room changed',room=>{
   pendingRoom=null;
   unreadCounts[room]=0;
   document.getElementById('messages').innerHTML='';
-  // Close keypad on success
   if(document.getElementById('keypad-modal').classList.contains('open'))closeKeypad();
   document.querySelectorAll('.room-btn').forEach(b=>b.classList.toggle('active',b.dataset.room===room));
 });
 
 socket.on('history',history=>renderHistory(history));
 
-// Server asks client to show keypad (triggered by /joinroom or clicking a locked room)
-socket.on('room requires code',room=>{openKeypad(room)});
+socket.on('room requires code',room=>{
+  pendingRoom=room;
+  openKeypad(room);
+});
 
-// Wrong code entered
 socket.on('keypad error',msg=>{
   document.getElementById('keypad-error').textContent=msg||'Wrong code.';
   keypadCode='';renderKeypadDots();
-  playTone(200,'sawtooth',0.15,0.15); // error buzz
+  playTone(200,'sawtooth',0.15,0.15);
 });
 
-// Server sends back confirmation request for /changepass
 socket.on('confirm changepass',({room,newCode})=>{openChangepassConfirm(room,newCode)});
 
-// After changepass confirmed + executed, server tells owner the new code
 socket.on('room code changed',({room,newCode})=>{
   ownerRoomCodes[room]=String(newCode);
-  // Re-render sidebar so the new code badge appears
-  socket.emit('rooms list refresh'); // not needed — sidebar will update on next rooms list
-  // Force a sidebar refresh by re-requesting rooms — we can't do that directly,
-  // so we update the badge if the element exists
-  document.querySelectorAll('.room-code-badge').forEach(el=>{
-    // find the preceding room button
-    const prev=el.previousElementSibling;
-    if(prev&&prev.dataset&&prev.dataset.room===room)el.textContent=`code: ${newCode}`;
+  // Update badge in sidebar if present
+  document.querySelectorAll(`[data-room-code-for="${room}"]`).forEach(el=>{
+    el.textContent=`code: ${newCode}`;
   });
   addMessage(`<span class="msg-system">✅ Room code changed to: ${newCode}</span>`);
 });
 
-// Owner created a room — show the code modal and cache the code for the sidebar
 socket.on('room created',({room,code})=>{
   ownerRoomCodes[room]=String(code);
   openRoomCreated(room,code);
@@ -1029,7 +1054,13 @@ socket.on('user list',list=>{
 });
 
 socket.on('typing',({text})=>{const bar=document.getElementById('typing-bar');bar.innerHTML=text?text+' <span class="dots"><span></span><span></span><span></span></span>':''});
-socket.on('kicked',reason=>{addMessage(`<span class="msg-kicked">⚠ ${reason||'You were signed in from another device.'}</span>`);document.getElementById('input').disabled=true;document.getElementById('send-btn').disabled=true;socket.disconnect()});
+socket.on('kicked',reason=>{
+  addMessage(`<span class="msg-kicked">⚠ ${reason||'You were signed in from another device.'}</span>`);
+  document.getElementById('input').disabled=true;
+  document.getElementById('send-btn').disabled=true;
+  // Prevent auto-reconnect when explicitly kicked
+  socket.disconnect();
+});
 
 // ── DAILY ─────────────────────────────────────────────────────────────────────
 function showDailyModal(){document.getElementById('daily-modal').classList.add('open')}
@@ -1241,7 +1272,6 @@ setInterval(()=>{document.querySelectorAll('.poll-timer').forEach(el=>{const lef
 let activityThrottle=0;
 document.addEventListener('keydown',e=>{
   const now=Date.now();if(now-activityThrottle>30000){activityThrottle=now;socket.emit('activity')}
-  // Global Escape
   if(e.key==='Escape'){closeSettings();closeGames();closeShop();closeProfile();closeKeypad();closeRoomCreated();closeChangepass();}
 });
 document.getElementById('input').addEventListener('keydown',e=>{if(e.key==='Enter')send()});

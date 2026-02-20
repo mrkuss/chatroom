@@ -13,7 +13,60 @@ const typingTimeouts  = {};
 const typingByRoom    = {};
 const pendingDuels    = {};
 const sessionStartTimes = {};
+
+// privateRoomAccess is now ONLY an in-session cache; the source of truth is the DB.
+// We populate it on join from the DB, and write to DB whenever access is granted.
 const privateRoomAccess = {}; // socketId → Set of room names
+
+// ─── DB helpers for persistent room access ────────────────────────────────────
+async function loadRoomAccessFromDb(username) {
+  const r = await db.query(
+    `SELECT room_name FROM private_room_access WHERE LOWER(username) = LOWER($1)`,
+    [username]
+  );
+  return new Set(r.rows.map(row => row.room_name));
+}
+
+async function grantRoomAccessDb(username, roomName) {
+  await db.query(
+    `INSERT INTO private_room_access (username, room_name)
+     VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+    [username, roomName]
+  );
+}
+
+async function revokeRoomAccessDb(username, roomName) {
+  await db.query(
+    `DELETE FROM private_room_access WHERE LOWER(username) = LOWER($1) AND room_name = $2`,
+    [username, roomName]
+  );
+}
+
+// ─── DB helpers for bans ──────────────────────────────────────────────────────
+async function banUserFromRoom(roomName, targetUsername, bannedBy) {
+  await db.query(
+    `INSERT INTO room_bans (room_name, banned_username, banned_by)
+     VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
+    [roomName, targetUsername.toLowerCase(), bannedBy]
+  );
+  // Also revoke access
+  await revokeRoomAccessDb(targetUsername, roomName);
+}
+
+async function isUserBanned(roomName, username) {
+  const r = await db.query(
+    `SELECT 1 FROM room_bans WHERE room_name = $1 AND banned_username = LOWER($2)`,
+    [roomName, username]
+  );
+  return r.rows.length > 0;
+}
+
+async function unbanUserFromRoom(roomName, targetUsername) {
+  await db.query(
+    `DELETE FROM room_bans WHERE room_name = $1 AND banned_username = LOWER($2)`,
+    [roomName, targetUsername]
+  );
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function broadcastUserList(io, room) {
@@ -67,7 +120,7 @@ async function saveMessage({ room, sender, recipient, type, text, clientId }) {
   return r.rows[0].id;
 }
 
-async function getHistory(room, username, limit = 5) {
+async function getHistory(room, username, limit = 30) {
   const result = await db.query(
     `SELECT combined.id, combined.sender, combined.recipient, combined.type,
             combined.text, combined.created_at, combined.reactions, combined.poll_data
@@ -137,6 +190,35 @@ function formatPollData(poll) {
   return { id: poll.id, question: poll.question, options: poll.options, votes: poll.votes, creator: poll.creator, endsAt: poll.ends_at, concluded: poll.concluded };
 }
 
+// ─── Build rooms list for a user ──────────────────────────────────────────────
+// Returns the rooms the user can see, including their code for rooms they own.
+async function buildRoomsList(username, accessSet) {
+  const rooms = await db.query('SELECT name, is_private, creator, owner_code FROM rooms ORDER BY id');
+
+  const result = [];
+  for (const r of rooms.rows) {
+    const isOwner = r.creator?.toLowerCase() === username?.toLowerCase();
+    const hasAccess = isOwner || !r.is_private || accessSet.has(r.name);
+    if (!hasAccess) continue;
+
+    const entry = {
+      name: r.name,
+      isPrivate: r.is_private,
+      isOwner,
+      // Only send the code to the owner; others get null
+      ownerCode: isOwner ? (r.owner_code || null) : null,
+    };
+
+    result.push(entry);
+  }
+  return result;
+}
+
+async function sendRoomsList(socket, username, accessSet) {
+  const list = await buildRoomsList(username, accessSet);
+  socket.emit('rooms list', list);
+}
+
 // ─── Shared room switch logic ──────────────────────────────────────────────────
 async function performRoomSwitch(io, socket, user, newRoom) {
   const oldRoom = user.room;
@@ -147,9 +229,8 @@ async function performRoomSwitch(io, socket, user, newRoom) {
   user.room = newRoom;
   socket.join(newRoom);
 
-  // Private rooms get large history; public rooms get 5
   const roomInfo = await db.query('SELECT is_private FROM rooms WHERE name = $1', [newRoom]);
-  const historyLimit = roomInfo.rows[0]?.is_private ? 1000 : 5;
+  const historyLimit = roomInfo.rows[0]?.is_private ? 1000 : 30;
 
   const history = await getHistory(newRoom, user.username, historyLimit);
   const historyWithColors = await enrichHistoryWithColors(history);
@@ -190,6 +271,7 @@ function initChat(io) {
         color = r.rows[0]?.color || '#000080';
       } catch {}
 
+      // Kick any existing socket for this user
       const existingId = userSocketMap[key];
       if (existingId && existingId !== socket.id) {
         const existingSocket = io.sockets.sockets.get(existingId);
@@ -207,15 +289,19 @@ function initChat(io) {
         delete privateRoomAccess[existingId];
       }
 
+      // Load persistent room access from DB
+      const dbAccess = await loadRoomAccessFromDb(username);
+      privateRoomAccess[socket.id] = dbAccess;
+
       const defaultRoom = 'general';
       connectedUsers[socket.id] = { username, color, room: defaultRoom, joinedAt: Date.now(), lastActivity: Date.now() };
       userSocketMap[key] = socket.id;
       sessionStartTimes[socket.id] = Date.now();
       socket.join(defaultRoom);
 
-      await sendRoomsList(socket, username);
+      await sendRoomsList(socket, username, dbAccess);
 
-      const history = await getHistory(defaultRoom, username, 5);
+      const history = await getHistory(defaultRoom, username, 30);
       const historyWithColors = await enrichHistoryWithColors(history);
       socket.emit('history', historyWithColors);
 
@@ -223,36 +309,33 @@ function initChat(io) {
       io.to(defaultRoom).emit('system message', `${username} has joined #${defaultRoom}`);
     });
 
-    async function sendRoomsList(socket, username) {
-      const rooms = await db.query('SELECT name, is_private, creator FROM rooms ORDER BY id');
-      const visible = rooms.rows.filter(r =>
-        !r.is_private ||
-        r.creator?.toLowerCase() === username?.toLowerCase() ||
-        privateRoomAccess[socket.id]?.has(r.name)
-      );
-      socket.emit('rooms list', visible.map(r => ({
-        name: r.name,
-        isPrivate: r.is_private,
-        isOwner: r.creator?.toLowerCase() === username?.toLowerCase()
-      })));
-    }
-
-    // ── Switch room (code replaces password) ────────────────────────────────
+    // ── Switch room ─────────────────────────────────────────────────────────
     socket.on('switch room', async ({ room: newRoom, code }) => {
       const user = connectedUsers[socket.id];
       if (!user) return;
 
-      const r = await db.query('SELECT name, is_private, password_hash FROM rooms WHERE name = $1', [newRoom]);
+      const r = await db.query('SELECT name, is_private, password_hash, creator FROM rooms WHERE name = $1', [newRoom]);
       if (!r.rows.length) { socket.emit('system message', 'Room not found.'); return; }
 
       const roomRow = r.rows[0];
+      const isOwner = roomRow.creator?.toLowerCase() === user.username.toLowerCase();
 
-      if (roomRow.is_private && !privateRoomAccess[socket.id].has(newRoom)) {
+      if (roomRow.is_private && !isOwner && !privateRoomAccess[socket.id].has(newRoom)) {
+        // Check if the user is banned from this room
+        const banned = await isUserBanned(newRoom, user.username);
+        if (banned) {
+          socket.emit('system message', `You are banned from #${newRoom}.`);
+          return;
+        }
+
         if (!code) { socket.emit('room requires code', newRoom); return; }
         const match = await require('bcrypt').compare(String(code), roomRow.password_hash);
         if (!match) { socket.emit('keypad error', 'Wrong code. Try again.'); return; }
+
+        // Grant access persistently
         privateRoomAccess[socket.id].add(newRoom);
-        await sendRoomsList(socket, user.username);
+        await grantRoomAccessDb(user.username, newRoom);
+        await sendRoomsList(socket, user.username, privateRoomAccess[socket.id]);
       }
 
       await performRoomSwitch(io, socket, user, newRoom);
@@ -364,11 +447,13 @@ function initChat(io) {
           const bcrypt = require('bcrypt');
           const hash = await bcrypt.hash(roomCode, 10);
           await db.query(
-            `INSERT INTO rooms (name, is_private, password_hash, creator) VALUES ($1, true, $2, $3)`,
-            [roomName, hash, user.username]
+            `INSERT INTO rooms (name, is_private, password_hash, creator, owner_code) VALUES ($1, true, $2, $3, $4)`,
+            [roomName, hash, user.username, roomCode]
           );
+          // Grant owner access persistently
           privateRoomAccess[socket.id].add(roomName);
-          await sendRoomsList(socket, user.username);
+          await grantRoomAccessDb(user.username, roomName);
+          await sendRoomsList(socket, user.username, privateRoomAccess[socket.id]);
           socket.emit('room created', { room: roomName, code: roomCode });
         } catch (err) {
           if (err.code === '23505') socket.emit('system message', `A room named "${roomName}" already exists. Choose a different name.`);
@@ -386,6 +471,10 @@ function initChat(io) {
           socket.emit('system message', 'Only the creator can delete this room.'); return;
         }
         await db.query(`DELETE FROM rooms WHERE name = $1`, [roomName]);
+        // Clean up access records and bans for this room
+        await db.query(`DELETE FROM private_room_access WHERE room_name = $1`, [roomName]);
+        await db.query(`DELETE FROM room_bans WHERE room_name = $1`, [roomName]);
+
         Object.entries(connectedUsers).forEach(([sid, u]) => {
           if (u.room === roomName) {
             const s = io.sockets.sockets.get(sid);
@@ -397,8 +486,9 @@ function initChat(io) {
               s.emit('system message', `The room #${roomName} was deleted.`);
             }
           }
+          if (privateRoomAccess[sid]) privateRoomAccess[sid].delete(roomName);
         });
-        await sendRoomsList(socket, user.username);
+        await sendRoomsList(socket, user.username, privateRoomAccess[socket.id]);
         socket.emit('system message', `🗑️ Room #${roomName} deleted.`);
         return;
       }
@@ -428,17 +518,88 @@ function initChat(io) {
 
         const targetSocket = io.sockets.sockets.get(targetSocketId);
         if (targetSocket) {
-          if (privateRoomAccess[targetSocketId]) privateRoomAccess[targetSocketId].delete(room);
+          // Revoke access so they can't just rejoin
+          privateRoomAccess[targetSocketId]?.delete(room);
+          await revokeRoomAccessDb(targetUser.username, room);
+
           targetUser.room = 'general';
           targetSocket.leave(room);
           targetSocket.join('general');
           targetSocket.emit('room changed', 'general');
           targetSocket.emit('system message', `👢 You were kicked from #${room} by ${user.username}.`);
-          sendRoomsList(targetSocket, targetUser.username);
+          await sendRoomsList(targetSocket, targetUser.username, privateRoomAccess[targetSocketId] || new Set());
         }
         io.to(room).emit('system message', `👢 ${targetName} was kicked from #${room}.`);
         broadcastUserList(io, room);
         broadcastUserList(io, 'general');
+        return;
+      }
+
+      // ── /ban ──────────────────────────────────────────────────────────────
+      if (raw.startsWith('/ban ')) {
+        const targetName = raw.slice(5).trim().replace(/^@/, '');
+        if (!targetName) { socket.emit('system message', 'Usage: /ban username'); return; }
+
+        const roomRes = await db.query(
+          `SELECT creator FROM rooms WHERE name = $1 AND is_private = true`, [room]
+        );
+        if (!roomRes.rows.length) { socket.emit('system message', 'You can only /ban in a private room.'); return; }
+        if (roomRes.rows[0].creator.toLowerCase() !== user.username.toLowerCase()) {
+          socket.emit('system message', 'Only the room owner can ban users.'); return;
+        }
+        if (targetName.toLowerCase() === user.username.toLowerCase()) {
+          socket.emit('system message', 'You cannot ban yourself.'); return;
+        }
+
+        // Check if they even exist
+        const targetDbRes = await db.query(`SELECT username FROM users WHERE LOWER(username) = LOWER($1)`, [targetName]);
+        if (!targetDbRes.rows.length) {
+          socket.emit('system message', `User "${escapeHtml(targetName)}" does not exist.`); return;
+        }
+        const realTargetName = targetDbRes.rows[0].username;
+
+        // Persist the ban
+        await banUserFromRoom(room, realTargetName, user.username);
+
+        // If the target is currently online, kick them out too
+        const targetSocketId = userSocketMap[realTargetName.toLowerCase()];
+        if (targetSocketId) {
+          const targetUser = connectedUsers[targetSocketId];
+          const targetSocket = io.sockets.sockets.get(targetSocketId);
+          if (targetSocket && targetUser && targetUser.room === room) {
+            privateRoomAccess[targetSocketId]?.delete(room);
+            targetUser.room = 'general';
+            targetSocket.leave(room);
+            targetSocket.join('general');
+            targetSocket.emit('room changed', 'general');
+            targetSocket.emit('system message', `🚫 You have been banned from #${room} by ${user.username}.`);
+            await sendRoomsList(targetSocket, targetUser.username, privateRoomAccess[targetSocketId] || new Set());
+          }
+          // Revoke from their in-memory access even if not in the room currently
+          privateRoomAccess[targetSocketId]?.delete(room);
+        }
+
+        io.to(room).emit('system message', `🚫 ${realTargetName} has been banned from #${room}.`);
+        broadcastUserList(io, room);
+        broadcastUserList(io, 'general');
+        return;
+      }
+
+      // ── /unban ────────────────────────────────────────────────────────────
+      if (raw.startsWith('/unban ')) {
+        const targetName = raw.slice(7).trim().replace(/^@/, '');
+        if (!targetName) { socket.emit('system message', 'Usage: /unban username'); return; }
+
+        const roomRes = await db.query(
+          `SELECT creator FROM rooms WHERE name = $1 AND is_private = true`, [room]
+        );
+        if (!roomRes.rows.length) { socket.emit('system message', 'You can only /unban in a private room.'); return; }
+        if (roomRes.rows[0].creator.toLowerCase() !== user.username.toLowerCase()) {
+          socket.emit('system message', 'Only the room owner can unban users.'); return;
+        }
+
+        await unbanUserFromRoom(room, targetName);
+        socket.emit('system message', `✅ ${escapeHtml(targetName)} has been unbanned from #${room}. They can rejoin with the code.`);
         return;
       }
 
@@ -455,7 +616,6 @@ function initChat(io) {
         if (roomRes.rows[0].creator.toLowerCase() !== user.username.toLowerCase()) {
           socket.emit('system message', 'Only the room owner can change the code.'); return;
         }
-        // Tell client to show confirmation dialog before we proceed
         socket.emit('confirm changepass', { room, newCode });
         return;
       }
@@ -578,20 +738,26 @@ function initChat(io) {
 
       const bcrypt = require('bcrypt');
       const hash = await bcrypt.hash(String(newCode), 10);
-      await db.query(`UPDATE rooms SET password_hash = $1 WHERE name = $2`, [hash, roomName]);
+      await db.query(`UPDATE rooms SET password_hash = $1, owner_code = $2 WHERE name = $3`, [hash, String(newCode), roomName]);
 
-      // Kick all non-owner users out and revoke their access
+      // Revoke ALL non-owner access from DB and in-memory
+      await db.query(
+        `DELETE FROM private_room_access WHERE room_name = $1 AND LOWER(username) != LOWER($2)`,
+        [roomName, user.username]
+      );
+
       Object.entries(connectedUsers).forEach(([sid, u]) => {
-        if (u.room === roomName && sid !== socket.id) {
+        if (sid === socket.id) return;
+        if (privateRoomAccess[sid]) privateRoomAccess[sid].delete(roomName);
+        if (u.room === roomName) {
           const s = io.sockets.sockets.get(sid);
           if (s) {
-            if (privateRoomAccess[sid]) privateRoomAccess[sid].delete(roomName);
             u.room = 'general';
             s.leave(roomName);
             s.join('general');
             s.emit('room changed', 'general');
             s.emit('system message', `🔒 The code for #${roomName} was changed. You have been removed.`);
-            sendRoomsList(s, u.username);
+            sendRoomsList(s, u.username, privateRoomAccess[sid] || new Set());
           }
         }
       });
