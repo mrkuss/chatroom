@@ -478,7 +478,7 @@ async function saveMessage({ room, sender, recipient, type, text }) {
   await db.query('INSERT INTO messages (room, sender, recipient, type, text) VALUES ($1,$2,$3,$4,$5)', [room || null, sender, recipient || null, type, text]);
 }
 
-async function getHistory(room, username, limit = 50) {
+async function getHistory(room, username, limit = 5) {
   const result = await db.query(
     `SELECT sender, recipient, type, text, created_at FROM messages
      WHERE room = $1 OR (type = 'dm' AND (LOWER(sender) = LOWER($2) OR LOWER(recipient) = LOWER($2)))
@@ -573,7 +573,7 @@ io.on('connection', (socket) => {
     const roomsResult = await db.query('SELECT name FROM rooms ORDER BY id');
     socket.emit('rooms list', roomsResult.rows.map(r => r.name));
 
-    const history = await getHistory(defaultRoom, username, 50);
+    const history = await getHistory(defaultRoom, username, 5);
     const historyWithColors = await enrichHistoryWithColors(history);
     socket.emit('history', historyWithColors);
 
@@ -596,7 +596,7 @@ io.on('connection', (socket) => {
     io.to(oldRoom).emit('system message', `${user.username} left #${oldRoom}`);
     user.room = newRoom;
     socket.join(newRoom);
-    const history = await getHistory(newRoom, user.username, 50);
+    const history = await getHistory(newRoom, user.username, 5);
     const historyWithColors = await enrichHistoryWithColors(history);
     socket.emit('history', historyWithColors);
     const pollsResult = await db.query('SELECT * FROM polls WHERE room = $1 ORDER BY created_at DESC LIMIT 20', [newRoom]);
