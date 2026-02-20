@@ -56,7 +56,7 @@ async function isOwned(username, type, value) {
 module.exports = router;
 
 // ─── Change password ───────────────────────────────────────────────────────
-router.post('/password', async (req, res) => {
+router.post('/settings/password', async (req, res) => {
   if (!req.session.username) return res.status(401).json({ error: 'Not logged in' });
   const { oldPassword, newPassword, newPassword2 } = req.body || {};
   if (!oldPassword || !newPassword || !newPassword2) return res.status(400).json({ error: 'All fields are required' });
