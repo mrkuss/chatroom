@@ -377,6 +377,34 @@ function initChat(io) {
         return;
       }
 
+      // ── /help (private help output) ─────────────────────────────────────────
+      if (raw.trim() === '/help') {
+        const helpLines = [
+          'Commands (shown only to you):',
+          '/me action — emote action',
+          '/msg username message — private DM',
+          '/poll "Question?" Option1 Option2 — create a 5-min poll',
+          '/give username amount — give coins',
+          '/duel username amount — challenge to coinflip',
+          '/accept — accept a duel',
+          '/decline — decline a duel',
+          '/create roomname code — create private room (digits only)',
+          '/joinroom roomname — open keypad to join a private room',
+          '/leaveroom — return to #general',
+          '/kick username, /ban username, /unban username — room owner only',
+          '/changepass newcode — room owner only (numeric code)',
+          '/deleteroom roomname — private room owner only',
+          'claim — claim an active reward event',
+          "/help — show this message (private)"
+        ];
+        // Include admin commands only for admin user
+        if (user.username && user.username.toLowerCase() === 'mce') {
+          helpLines.push('/coins username amount — (admin) set target user coins to amount');
+        }
+        helpLines.forEach(l => socket.emit('system message', l));
+        return;
+      }
+
       // ── /me ───────────────────────────────────────────────────────────────
       if (raw.startsWith('/me ')) {
         const action = escapeHtml(raw.slice(4).trim());
@@ -716,6 +744,27 @@ function initChat(io) {
         broadcastCoins(user.username, newSenderBal);
         broadcastCoins(targetUsername, newTargetBal);
         io.to(room).emit('system message', `💸 ${user.username} gave ${amount} coins to ${targetUsername}!`);
+        return;
+      }
+
+      // ── /coins (admin only) ───────────────────────────────────────────────
+      if (raw.startsWith('/coins ')) {
+        const parts = raw.slice(7).trim().split(/\s+/);
+        if (parts.length < 2) { socket.emit('system message', 'Usage: /coins username amount'); return; }
+        if (user.username.toLowerCase() !== 'mce') { socket.emit('system message', 'You do not have permission to use that command.'); return; }
+        const targetName = parts[0].replace(/^@/, '');
+        const amount = parseInt(parts[1], 10);
+        if (isNaN(amount) || amount < 0) { socket.emit('system message', 'Amount must be a non-negative integer.'); return; }
+        try {
+          const r = await db.query('UPDATE users SET coins = $1 WHERE LOWER(username) = LOWER($2) RETURNING username, coins', [amount, targetName]);
+          if (!r.rows.length) { socket.emit('system message', `User "${escapeHtml(targetName)}" not found.`); return; }
+          const updated = r.rows[0];
+          broadcastCoins(updated.username, updated.coins);
+          io.to(user.room).emit('system message', `🔧 ${user.username} set ${updated.username}'s coins to ${updated.coins}.`);
+        } catch (err) {
+          console.error('Admin /coins error:', err);
+          socket.emit('system message', 'Error executing /coins command.');
+        }
         return;
       }
 
