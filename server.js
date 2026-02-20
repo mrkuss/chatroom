@@ -44,17 +44,16 @@ initDb().catch((err) => {
   process.exit(1);
 });
 
-// ─── Middleware ───────────────────────────────────────────────────────────────
+// ─── Session store (shared between HTTP and Socket lookup) ────────────────────
 
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+const store = new pgSession({
+  pool: db,
+  tableName: 'session',
+  pruneSessionInterval: 60 * 15,
+});
 
 const sessionMiddleware = session({
-  store: new pgSession({
-    pool: db,
-    tableName: 'session',
-    pruneSessionInterval: 60 * 15,
-  }),
+  store,
   secret: process.env.SESSION_SECRET || 'change-this-in-production',
   resave: false,
   saveUninitialized: false,
@@ -65,8 +64,11 @@ const sessionMiddleware = session({
   },
 });
 
+// ─── Middleware ───────────────────────────────────────────────────────────────
+
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(sessionMiddleware);
-io.engine.use(sessionMiddleware);
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -77,6 +79,31 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+// Parse session from a raw cookie string using the store directly
+function getSessionUsername(cookieHeader) {
+  return new Promise((resolve) => {
+    if (!cookieHeader) return resolve(null);
+
+    // Extract the connect.sid value from the cookie header
+    const cookies = {};
+    cookieHeader.split(';').forEach(part => {
+      const [k, ...v] = part.trim().split('=');
+      cookies[k.trim()] = decodeURIComponent(v.join('='));
+    });
+
+    const raw = cookies['connect.sid'];
+    if (!raw) return resolve(null);
+
+    // Strip the signature added by cookie-parser (s:SESSIONID.SIGNATURE)
+    const sid = raw.startsWith('s:') ? raw.slice(2).split('.')[0] : raw;
+
+    store.get(sid, (err, sessionData) => {
+      if (err || !sessionData) return resolve(null);
+      resolve(sessionData.username || null);
+    });
+  });
 }
 
 // ─── Auth Routes ──────────────────────────────────────────────────────────────
@@ -97,6 +124,9 @@ app.post('/register', async (req, res) => {
     const hash = await bcrypt.hash(password, 12);
     await db.query('INSERT INTO users (username, password_hash) VALUES ($1, $2)', [username, hash]);
     req.session.username = username;
+    await new Promise((resolve, reject) =>
+      req.session.save(err => err ? reject(err) : resolve())
+    );
     res.json({ ok: true, username });
   } catch (err) {
     if (err.code === '23505')
@@ -127,6 +157,9 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid username or password' });
 
     req.session.username = user.username;
+    await new Promise((resolve, reject) =>
+      req.session.save(err => err ? reject(err) : resolve())
+    );
     res.json({ ok: true, username: user.username });
   } catch (err) {
     console.error('Login error:', err);
@@ -151,54 +184,34 @@ app.get('/me', (req, res) => {
 
 // ─── Socket State ─────────────────────────────────────────────────────────────
 
-// socket.id -> { username, joinedAt }
-const connectedUsers = {};
-
-// username lowercase -> socket.id
-const userSocketMap = {};
-
-// socket.id -> { count, resetTime }
-const rateLimits = {};
-
-// socket.id -> timeout handle
-const typingTimeouts = {};
-
-// Set of socket.ids currently typing
-const typingUsers = new Set();
+const connectedUsers = {};  // socket.id -> { username, joinedAt }
+const userSocketMap  = {};  // username lowercase -> socket.id
+const rateLimits     = {};  // socket.id -> { count, resetTime }
+const typingTimeouts = {};  // socket.id -> timeout handle
+const typingUsers    = new Set();
 
 // ─── Broadcast Helpers ────────────────────────────────────────────────────────
 
 function broadcastUserList() {
-  const list = Object.values(connectedUsers).map(({ username, joinedAt }) => ({
-    username,
-    joinedAt,
-  }));
+  const list = Object.values(connectedUsers).map(({ username, joinedAt }) => ({ username, joinedAt }));
   io.emit('user list', list);
 }
 
 function broadcastTyping() {
-  const names = [...typingUsers]
-    .map((id) => connectedUsers[id]?.username)
-    .filter(Boolean);
-
-  if (names.length === 0) {
-    io.emit('typing', { text: '' });
-  } else if (names.length === 1) {
-    io.emit('typing', { text: `${names[0]} is typing` });
-  } else {
-    io.emit('typing', { text: 'Multiple users are typing' });
-  }
+  const names = [...typingUsers].map((id) => connectedUsers[id]?.username).filter(Boolean);
+  if (names.length === 0)      io.emit('typing', { text: '' });
+  else if (names.length === 1) io.emit('typing', { text: `${names[0]} is typing` });
+  else                         io.emit('typing', { text: 'Multiple users are typing' });
 }
 
 // ─── Socket.io ────────────────────────────────────────────────────────────────
 
 io.on('connection', (socket) => {
 
-  // ── Join ──────────────────────────────────────────────────────────────────
-
-  socket.on('join', (clientUsername) => {
-    // Verify the username against the server session — client can't spoof it
-    const sessionUsername = socket.request.session?.username;
+  socket.on('join', async () => {
+    // Read session directly from the store using the cookie on the socket's request
+    const cookieHeader = socket.request.headers.cookie;
+    const sessionUsername = await getSessionUsername(cookieHeader);
 
     if (!sessionUsername) {
       socket.emit('kicked', 'Not authenticated. Please log in again.');
@@ -206,11 +219,10 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // Use the session username (authoritative), ignore what client sent
     const username = escapeHtml(sessionUsername.slice(0, 20));
     const key = username.toLowerCase();
 
-    // Kick any existing session for this user
+    // Kick any existing socket for this user
     const existingId = userSocketMap[key];
     if (existingId && existingId !== socket.id) {
       const existingSocket = io.sockets.sockets.get(existingId);
@@ -231,13 +243,10 @@ io.on('connection', (socket) => {
     io.emit('system message', `${username} has joined the chat`);
   });
 
-  // ── Chat message ──────────────────────────────────────────────────────────
-
   socket.on('chat message', (msg) => {
     const user = connectedUsers[socket.id];
     if (!user) return;
 
-    // Rate limiting: max 5 messages per 3 seconds
     const now = Date.now();
     if (!rateLimits[socket.id] || now > rateLimits[socket.id].resetTime) {
       rateLimits[socket.id] = { count: 0, resetTime: now + 3000 };
@@ -253,15 +262,12 @@ io.on('connection', (socket) => {
     const sanitized = escapeHtml(msg.trim().slice(0, 500));
     if (!sanitized) return;
 
-    // Clear typing state when they send
     typingUsers.delete(socket.id);
     clearTimeout(typingTimeouts[socket.id]);
     broadcastTyping();
 
     io.emit('chat message', { user: user.username, text: sanitized });
   });
-
-  // ── Typing ────────────────────────────────────────────────────────────────
 
   socket.on('typing start', () => {
     if (!connectedUsers[socket.id]) return;
@@ -280,15 +286,11 @@ io.on('connection', (socket) => {
     broadcastTyping();
   });
 
-  // ── Disconnect ────────────────────────────────────────────────────────────
-
   socket.on('disconnect', () => {
     const user = connectedUsers[socket.id];
     if (user) {
       const key = user.username.toLowerCase();
-      if (userSocketMap[key] === socket.id) {
-        delete userSocketMap[key];
-      }
+      if (userSocketMap[key] === socket.id) delete userSocketMap[key];
       delete connectedUsers[socket.id];
       delete rateLimits[socket.id];
       typingUsers.delete(socket.id);
