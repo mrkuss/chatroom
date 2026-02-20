@@ -333,12 +333,14 @@ async function saveMessage({ room, sender, recipient, type, text }) {
   );
 }
 
-async function getHistory(room, limit = 50) {
+async function getHistory(room, username, limit = 50) {
   const result = await db.query(
     `SELECT sender, recipient, type, text, created_at
-     FROM messages WHERE room = $1
-     ORDER BY created_at DESC LIMIT $2`,
-    [room, limit]
+     FROM messages
+     WHERE room = $1
+        OR (type = 'dm' AND (LOWER(sender) = LOWER($2) OR LOWER(recipient) = LOWER($2)))
+     ORDER BY created_at DESC LIMIT $3`,
+    [room, username, limit]
   );
   return result.rows.reverse();
 }
@@ -413,7 +415,7 @@ io.on('connection', (socket) => {
     pollsResult.rows.forEach(poll => socket.emit('poll update', formatPollData(poll)));
 
     // Send history
-    const history = await getHistory(defaultRoom, 50);
+    const history = await getHistory(defaultRoom, username, 50);
     const historyWithColors = await enrichHistoryWithColors(history);
     socket.emit('history', historyWithColors);
 
@@ -443,7 +445,7 @@ io.on('connection', (socket) => {
     pollsResult.rows.forEach(poll => socket.emit('poll update', formatPollData(poll)));
 
     // Send history
-    const history = await getHistory(newRoom, 50);
+    const history = await getHistory(newRoom, user.username, 50);
     const historyWithColors = await enrichHistoryWithColors(history);
     socket.emit('history', historyWithColors);
 
