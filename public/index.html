@@ -195,13 +195,23 @@
     @keyframes sparkle { 0%,100%{text-shadow:0 0 0 rgba(100,200,255,0)}25%{text-shadow:0 0 8px rgba(100,200,255,0.6)}50%{text-shadow:0 0 16px rgba(200,255,255,0.8)}75%{text-shadow:0 0 8px rgba(100,200,255,0.6)} }
     @keyframes rainbow { 0%{color:#ff0000}16%{color:#ff7f00}33%{color:#ffff00}50%{color:#00ff00}66%{color:#0000ff}83%{color:#4b0082}100%{color:#ff0000} }
     @keyframes nebula { 0%,100%{text-shadow:0 0 20px rgba(138,43,226,0.5),0 0 40px rgba(75,0,130,0.3)}50%{text-shadow:0 0 30px rgba(138,43,226,0.8),0 0 60px rgba(75,0,130,0.6)} }
-    @keyframes infinity { 0%,100%{text-shadow:0 0 10px #ffd700,0 0 20px rgba(255,215,0,0.8)}25%{text-shadow:0 0 20px #ffd700,0 0 40px rgba(255,215,0,0.6)}50%{text-shadow:0 0 30px #ffed4e,0 0 60px rgba(255,237,74,0.8)}75%{text-shadow:0 0 20px #ffd700,0 0 40px rgba(255,215,0,0.6)} }
+    @keyframes infinity { 0%{text-shadow:0 0 10px #ffd700,0 0 20px rgba(255,215,0,0.8),0 0 40px rgba(255,215,0,0.4);transform:scale(1)}20%{text-shadow:0 0 20px #ffed4e,0 0 40px rgba(255,237,74,0.8),0 0 80px rgba(255,237,74,0.5);transform:scale(1.02)}40%{text-shadow:0 0 30px #ffd700,0 0 60px rgba(255,215,0,0.9),0 0 100px rgba(255,215,0,0.6);transform:scale(1.05)}60%{text-shadow:0 0 25px #ffed4e,0 0 50px rgba(255,237,74,0.8),0 0 80px rgba(255,237,74,0.5);transform:scale(1.03)}80%{text-shadow:0 0 15px #ffd700,0 0 30px rgba(255,215,0,0.7),0 0 50px rgba(255,215,0,0.4);transform:scale(1.01)}100%{text-shadow:0 0 10px #ffd700,0 0 20px rgba(255,215,0,0.8),0 0 40px rgba(255,215,0,0.4);transform:scale(1)} }
+    @keyframes prism { 0%{color:#ff0000;text-shadow:0 0 15px #ff0000,0 0 30px rgba(255,0,0,0.6),0 0 50px rgba(255,0,0,0.4)}14%{color:#ff7f00;text-shadow:0 0 15px #ff7f00,0 0 30px rgba(255,127,0,0.6),0 0 50px rgba(255,127,0,0.4)}28%{color:#ffff00;text-shadow:0 0 15px #ffff00,0 0 30px rgba(255,255,0,0.6),0 0 50px rgba(255,255,0,0.4)}42%{color:#00ff00;text-shadow:0 0 15px #00ff00,0 0 30px rgba(0,255,0,0.6),0 0 50px rgba(0,255,0,0.4)}56%{color:#0099ff;text-shadow:0 0 15px #0099ff,0 0 30px rgba(0,153,255,0.6),0 0 50px rgba(0,153,255,0.4)}70%{color:#6600ff;text-shadow:0 0 15px #6600ff,0 0 30px rgba(102,0,255,0.6),0 0 50px rgba(102,0,255,0.4)}85%{color:#ff00ff;text-shadow:0 0 15px #ff00ff,0 0 30px rgba(255,0,255,0.6),0 0 50px rgba(255,0,255,0.4)}100%{color:#ff0000;text-shadow:0 0 15px #ff0000,0 0 30px rgba(255,0,0,0.6),0 0 50px rgba(255,0,0,0.4)} }
     .user-shimmer { animation:shimmer 1.5s ease-in-out infinite; }
     .user-gleam { animation:gleam 2s ease-in-out infinite; }
     .user-sparkle { animation:sparkle 2s ease-in-out infinite; }
     .user-rainbow { animation:rainbow 3s linear infinite; }
     .user-nebula { animation:nebula 3s ease-in-out infinite; }
     .user-infinity { animation:infinity 2s ease-in-out infinite; }
+    .user-prism { animation:prism 2s linear infinite; }
+
+    /* ── ROULETTE NUMBER GRID ── */
+    #roulette-number-grid { display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin:8px 0;max-height:180px;overflow-y:auto;padding:4px; }
+    .roulette-num-btn { padding:6px;font-family:'VT323',monospace;font-size:14px;border:2px solid;cursor:pointer;font-weight:bold;color:#fff;border-color:var(--border-main); }
+    .roulette-num-btn.red { background:#cc0000; }
+    .roulette-num-btn.black { background:#222222; }
+    .roulette-num-btn.selected { outline:2px solid yellow;outline-offset:1px;box-shadow:inset 0 0 0 2px yellow; }
+    #roulette-selected-info { text-align:center;font-size:14px;color:var(--text-system);margin:8px 0;min-height:20px; }
 
     /* ── MODALS ── */
     .modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center; }
@@ -258,9 +268,13 @@
     .theme-btn.theme-opt-rose { background:#7a2d52;color:#ffe0ee;border-color:#f0a0c0 #3d1428 #3d1428 #f0a0c0; }
     .theme-btn.theme-opt-amber { background:#2a1800;color:#ff9900;border-color:#cc7700 #442200 #442200 #cc7700; }
     .theme-btn.selected { outline:2px solid white;outline-offset:1px; }
-    #settings-color-swatches { display:flex;flex-wrap:wrap;gap:5px; }
-    .color-swatch { width:24px;height:24px;border:2px solid transparent;cursor:pointer;border-radius:2px; }
-    .color-swatch.selected { border-color:black;outline:1px solid white; }
+    #settings-color-swatches { display:flex;flex-direction:column;gap:0;max-height:280px;overflow-y:auto;border:2px inset var(--border-inset);background:var(--bg-messages);padding:0; }
+    .color-swatch { display:flex;align-items:center;gap:12px;padding:8px 12px;cursor:pointer;border:2px solid transparent;background:var(--bg-messages);min-height:32px; }
+    .color-swatch:hover { background:var(--bg-window); }
+    .color-swatch.selected { background:var(--bg-titlebar);border-color:var(--text-titlebar);box-shadow:inset 0 0 0 1px var(--text-titlebar); }
+    .color-preview { width:32px;height:32px;border:2px solid;border-color:var(--border-main);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:12px; }
+    .color-name { flex:1;font-family:'VT323',monospace;font-size:16px;color:var(--text-main); }
+    .color-checkmark { color:var(--text-main);font-weight:bold;width:20px;text-align:center;font-size:18px; }
     .settings-save-row { display:flex;gap:8px;margin-top:4px; }
     .settings-btn { flex:1;padding:8px;font-family:'VT323',monospace;font-size:18px;background:var(--bg-titlebar);color:var(--text-titlebar);border:2px solid;border-color:var(--border-main);cursor:pointer;letter-spacing:1px; }
     .settings-status { font-size:14px;color:#007700;min-height:18px;margin-top:6px;text-align:center; }
@@ -596,7 +610,7 @@
             <div class="help-section-title">🎮 Games</div>
             <div class="help-cmd">Slots — match 3 symbols, up to 20x bet</div>
             <div class="help-cmd">Dice — beat the house, win 1.9x</div>
-            <div class="help-cmd">Roulette — pick red/black or even/odd, 1:1 payout</div>
+            <div class="help-cmd">Roulette — pick red/black or even/odd, 1.8x payout</div>
           </div>
         </div>
       </div>
@@ -666,8 +680,11 @@
         <button class="game-btn" onclick="playRoulette('odd')" style="background:#0056b3;">1,3,5... ODD</button>
       </div>
       <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="roulette-bet" value="10" min="1" max="500" /><div class="bet-presets"><button class="bet-preset" onclick="setBet('roulette',10)">10</button><button class="bet-preset" onclick="setBet('roulette',50)">50</button><button class="bet-preset" onclick="setBet('roulette',100)">100</button></div></div>
+      <div id="roulette-selected-info"></div>
+      <div style="font-size:12px;color:var(--text-system);margin:8px 0;">Or pick a specific number (50x payout):</div>
+      <div id="roulette-number-grid"></div>
       <div class="game-result" id="roulette-result"></div>
-      <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Pick your bet type and click a button. Spin 0 is green (house win)</div>
+      <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Red/Black/Even/Odd = 1.8x · Number = 50x. Spin 0 is green (house win)</div>
     </div>
     <div id="game-leaderboard" class="game-panel" style="padding:0 16px 16px;">
       <div class="lb-header"><span>Rank</span><span>Player</span><span>Coins</span></div>
@@ -681,9 +698,9 @@
 <script>
 // ── SHOP CATALOGUE (for color effects) ────────────────────────────────────────
 const SHOP_COLORS={
-  '#ffd700':{name:'Shimmering Gold',effect:'shimmer'},'#e5e4e2':{name:'Platinum Gleam',effect:'gleam'},
+  '#ffd700':{name:'Shimmering Gold / Infinity Gold',effect:'shimmer'},'#e5e4e2':{name:'Platinum Gleam',effect:'gleam'},
   '#b9f2ff':{name:'Diamond Sparkle',effect:'sparkle'},'#ff6bcb':{name:'Aurora Borealis',effect:'rainbow'},
-  '#2a0845':{name:'Cosmic Nebula',effect:'nebula'}
+  '#2a0845':{name:'Cosmic Nebula',effect:'nebula'},'#ff00ff':{name:'Prismatic Legend',effect:'prism'}
 };
 
 // ── SOUNDS ────────────────────────────────────────────────────────────────────
@@ -1234,8 +1251,12 @@ function renderSettingsColors(){
   const ownedColors=shopItems.filter(i=>i.type==='color'&&i.owned);
   const wrap=document.getElementById('settings-color-swatches');wrap.innerHTML='';
   ownedColors.forEach(item=>{
-    const div=document.createElement('div');div.className='color-swatch'+(item.value===selectedSettingsColor?' selected':'');div.style.background=item.value;div.title=item.name;
-    div.onclick=()=>{selectedSettingsColor=item.value;wrap.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));div.classList.add('selected')};
+    const div=document.createElement('div');div.className='color-swatch'+(item.value===selectedSettingsColor?' selected':'');
+    const preview=document.createElement('div');preview.className='color-preview';preview.style.background=item.value;preview.textContent=item.value.substring(1).toUpperCase().substring(0,2);
+    const name=document.createElement('div');name.className='color-name';name.textContent=item.name;
+    const check=document.createElement('div');check.className='color-checkmark';check.textContent=item.value===selectedSettingsColor?'✓':'';
+    div.appendChild(preview);div.appendChild(name);div.appendChild(check);
+    div.onclick=()=>{selectedSettingsColor=item.value;wrap.querySelectorAll('.color-swatch').forEach(s=>{s.classList.remove('selected');s.querySelector('.color-checkmark').textContent=''});div.classList.add('selected');div.querySelector('.color-checkmark').textContent='✓'};
     wrap.appendChild(div);
   });
 }
@@ -1348,7 +1369,7 @@ document.getElementById('shop-overlay').addEventListener('click',e=>{if(e.target
 // ── GAMES ─────────────────────────────────────────────────────────────────────
 function openGames(){updateGameBalances();document.getElementById('games-overlay').classList.add('open');loadLeaderboard()}
 function closeGames(){document.getElementById('games-overlay').classList.remove('open')}
-function switchGame(name){document.querySelectorAll('.game-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.games-tab').forEach(t=>t.classList.remove('active'));document.getElementById('game-'+name).classList.add('active');document.querySelectorAll('.games-tab').forEach(t=>{if(t.textContent.toLowerCase().includes(name==='leaderboard'?'board':name))t.classList.add('active')});if(name==='leaderboard')loadLeaderboard();updateGameBalances()}
+function switchGame(name){document.querySelectorAll('.game-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.games-tab').forEach(t=>t.classList.remove('active'));document.getElementById('game-'+name).classList.add('active');document.querySelectorAll('.games-tab').forEach(t=>{if(t.textContent.toLowerCase().includes(name==='leaderboard'?'board':name))t.classList.add('active')});if(name==='leaderboard')loadLeaderboard();if(name==='roulette')initRouletteNumbers();updateGameBalances()}
 function updateGameBalances(){['slots','dice','roulette'].forEach(g=>{const el=document.getElementById(g+'-balance');if(el)el.textContent=`Balance: 🪙 ${formatNumber(myCoins)}`})}
 function setBet(game,amount){document.getElementById(game+'-bet').value=amount}
 
@@ -1381,21 +1402,33 @@ async function playDice(){
   catch{document.getElementById('dice-result').innerHTML='<span class="result-lose">Error. Try again.</span>'}
   diceRolling=false;btn.disabled=false;
 }
-let rouletteSpinning=false;
+let rouletteSpinning=false;let selectedRouletteNumber=null;
 async function playRoulette(betType){
   if(rouletteSpinning)return;const bet=parseInt(document.getElementById('roulette-bet').value,10);
   if(!bet||bet<1||bet>500){document.getElementById('roulette-result').innerHTML='<span class="result-lose">Bet must be 1-500</span>';return}
+  if(betType==='number'&&selectedRouletteNumber===null){document.getElementById('roulette-result').innerHTML='<span class="result-lose">Select a number first!</span>';return}
+  
   rouletteSpinning=true;const spinEl=document.getElementById('roulette-spin');spinEl.style.animation='none';document.getElementById('roulette-result').textContent='';
   await new Promise(r=>setTimeout(r,50));spinEl.style.animation='spin 2s linear 1';
   await new Promise(r=>setTimeout(r,2000));
-  try{const res=await fetch('/game/roulette',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({bet,betType})});const data=await res.json();
+  try{const res=await fetch('/game/roulette',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({bet,betType:betType==='number'?selectedRouletteNumber:betType})});const data=await res.json();
   if(!res.ok)document.getElementById('roulette-result').innerHTML=`<span class="result-lose">${data.error}</span>`;
   else{spinEl.textContent=data.spinColor+data.spin;myCoins=data.coins;updateCoinDisplay();updateGameBalances();
-  if(data.result==='win'){document.getElementById('roulette-result').innerHTML=`<span class="result-win">🎉 ${betType} hits! +${formatNumber(data.winAmount)} coins!</span>`;soundWin()}
+  if(data.result==='win'){const label=betType==='number'?`#${selectedRouletteNumber}`:betType;document.getElementById('roulette-result').innerHTML=`<span class="result-win">🎉 ${label} hits! +${formatNumber(data.winAmount)} coins!</span>`;soundWin()}
   else{document.getElementById('roulette-result').innerHTML=`<span class="result-lose">House wins. Better luck next time!</span>`;soundLose()}}}
   catch{document.getElementById('roulette-result').innerHTML='<span class="result-lose">Error. Try again.</span>'}
   rouletteSpinning=false;
 }
+function initRouletteNumbers(){
+  const redNumbers=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+  const grid=document.getElementById('roulette-number-grid');grid.innerHTML='';
+  for(let i=1;i<=36;i++){
+    const btn=document.createElement('button');btn.className='roulette-num-btn '+(redNumbers.includes(i)?'red':'black');btn.textContent=i;
+    btn.onclick=()=>{selectedRouletteNumber=i;playRoulette('number')};
+    grid.appendChild(btn);
+  }
+}
+function playNumber(num){selectedRouletteNumber=num;playRoulette('number');}
 async function loadLeaderboard(){
   const container=document.getElementById('leaderboard-rows');container.innerHTML='<div style="text-align:center;color:var(--text-system);padding:20px;">Loading...</div>';
   try{const res=await fetch('/leaderboard',{credentials:'include'});const data=await res.json();

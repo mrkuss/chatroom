@@ -159,10 +159,23 @@ router.post('/game/dice', async (req, res) => {
 router.post('/game/roulette', async (req, res) => {
   if (!req.session.username) return res.status(401).json({ error: 'Not logged in' });
   const betAmount = parseInt(req.body.bet, 10);
-  const betType = String(req.body.betType).toLowerCase(); // 'red', 'black', 'even', 'odd'
+  let betType = req.body.betType;
   
   if (!betAmount || betAmount < 1 || betAmount > 500) return res.status(400).json({ error: 'Bet must be 1-500' });
-  if (!['red', 'black', 'even', 'odd'].includes(betType)) return res.status(400).json({ error: 'Invalid bet type' });
+  
+  // Validate bet type: can be 'red', 'black', 'even', 'odd', or a number 1-36
+  let isNumberBet = false;
+  let betNumber = null;
+  if (!['red', 'black', 'even', 'odd'].includes(String(betType).toLowerCase())) {
+    // Try to parse as number
+    betNumber = parseInt(betType, 10);
+    if (isNaN(betNumber) || betNumber < 1 || betNumber > 36) {
+      return res.status(400).json({ error: 'Invalid bet type' });
+    }
+    isNumberBet = true;
+  } else {
+    betType = String(betType).toLowerCase();
+  }
 
   const newBal = await deductCoins(req.session.username, betAmount);
   if (newBal === false) return res.status(400).json({ error: 'Not enough coins' });
@@ -175,14 +188,19 @@ router.post('/game/roulette', async (req, res) => {
   const blackNumbers = [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35];
   
   let won = false;
-  if (betType === 'red' && redNumbers.includes(spin)) won = true;
-  else if (betType === 'black' && blackNumbers.includes(spin)) won = true;
-  else if (betType === 'even' && spin > 0 && spin % 2 === 0) won = true;
-  else if (betType === 'odd' && spin > 0 && spin % 2 === 1) won = true;
+  if (isNumberBet) {
+    won = (spin === betNumber);
+  } else {
+    if (betType === 'red' && redNumbers.includes(spin)) won = true;
+    else if (betType === 'black' && blackNumbers.includes(spin)) won = true;
+    else if (betType === 'even' && spin > 0 && spin % 2 === 0) won = true;
+    else if (betType === 'odd' && spin > 0 && spin % 2 === 1) won = true;
+  }
 
   let winAmount = 0, finalCoins = newBal, result = 'lose';
   if (won) {
-    winAmount = betAmount; // 1:1 payout
+    const multiplier = isNumberBet ? 50 : 1.8;
+    winAmount = Math.floor(betAmount * multiplier);
     finalCoins = await addCoins(req.session.username, winAmount);
     result = 'win';
   }
@@ -192,7 +210,8 @@ router.post('/game/roulette', async (req, res) => {
 
   const spinColor = spin === 0 ? '🟢' : redNumbers.includes(spin) ? '🔴' : '⚫';
   if (result === 'win') {
-    await broadcastGambling(`🎡 ${req.session.username} won ${formatNumber(winAmount)} coins on roulette! (spin: ${spinColor} ${spin})`);
+    const betLabel = isNumberBet ? `#${betNumber}` : betType;
+    await broadcastGambling(`🎡 ${req.session.username} won ${formatNumber(winAmount)} coins on roulette! (${betLabel} hits: ${spinColor} ${spin})`);
   } else {
     await broadcastGambling(`🎡 ${req.session.username} lost ${formatNumber(betAmount)} coins on roulette (spin: ${spinColor} ${spin})`);
   }
