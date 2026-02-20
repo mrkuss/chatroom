@@ -694,9 +694,34 @@ io.on('connection', (socket) => {
       return;
     }
 
+    // ── /give ──
+    if (raw.startsWith('/give ')) {
+      const parts = raw.slice(6).trim().split(/\s+/);
+      if (parts.length < 2) { socket.emit('system message', 'Usage: /give username amount'); return; }
+      const targetName = parts[0].replace(/^@/, '');
+      const amount = parseInt(parts[1], 10);
+      if (!amount || amount < 1 || amount > 10000) { socket.emit('system message', 'Amount must be between 1 and 10,000 coins.'); return; }
+      if (targetName.toLowerCase() === user.username.toLowerCase()) { socket.emit('system message', 'You cannot give coins to yourself.'); return; }
+      const targetResult = await db.query('SELECT username FROM users WHERE LOWER(username) = LOWER($1)', [targetName]);
+      if (!targetResult.rows.length) { socket.emit('system message', `User "${escapeHtml(targetName)}" does not exist.`); return; }
+      const targetUsername = targetResult.rows[0].username;
+      const newSenderBal = await deductCoins(user.username, amount);
+      if (newSenderBal === false) {
+        const senderCoins = await getCoins(user.username);
+        socket.emit('system message', `You only have ${senderCoins} coins.`);
+        return;
+      }
+      const newTargetBal = await addCoins(targetUsername, amount);
+      broadcastCoins(user.username, newSenderBal);
+      broadcastCoins(targetUsername, newTargetBal);
+      io.to(room).emit('system message', `💸 ${user.username} gave ${amount} coins to ${targetUsername}!`);
+      return;
+    }
+
     const sanitized = escapeHtml(raw);
     await saveMessage({ room, sender: user.username, type: 'chat', text: sanitized });
     io.to(room).emit('chat message', { user: user.username, color: user.color, text: sanitized, type: 'chat', timestamp: Date.now() });
+    addCoins(user.username, 1).then(newBal => broadcastCoins(user.username, newBal)).catch(() => {});
     const url = extractUrl(raw);
     if (url) fetchLinkPreview(url).then((preview) => { if (preview) io.to(room).emit('link preview', { url, ...preview }); });
   });
