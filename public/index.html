@@ -148,11 +148,11 @@
       }
     }
 
-    /* ── LAYOUT: rooms sidebar + main ── */
+    /* ── LAYOUT ── */
     #chat-layout {
       display: flex;
       flex: 1;
-      height: calc(100% - 40px); /* subtract titlebar */
+      height: calc(100% - 40px);
       overflow: hidden;
     }
 
@@ -329,9 +329,7 @@
       position: relative;
       padding: 2px 0;
     }
-    .msg-row:hover .msg-ts {
-      display: inline;
-    }
+    .msg-row:hover .msg-ts { display: inline; }
     .msg-ts {
       display: none;
       font-size: 12px;
@@ -372,7 +370,14 @@
       color: black;
     }
 
+    .poll-card.poll-concluded {
+      opacity: 0.75;
+      border-color: #aaa;
+      background: #f4f4f4;
+    }
+
     .poll-question { font-weight: bold; color: #000080; margin-bottom: 6px; font-size: 17px; }
+    .poll-card.poll-concluded .poll-question { color: #666; }
 
     .poll-option {
       display: flex;
@@ -384,6 +389,7 @@
 
     .poll-option:hover .poll-opt-label { text-decoration: underline; }
     .poll-option.voted .poll-opt-label { color: #000080; font-weight: bold; }
+    .poll-option.concluded { cursor: default; pointer-events: none; }
 
     .poll-bar-wrap {
       flex: 1;
@@ -399,9 +405,15 @@
       transition: width 0.3s;
     }
 
+    .poll-card.poll-concluded .poll-bar { background: #808080; }
+    .poll-option.winner .poll-bar { background: #007700; }
+    .poll-option.winner .poll-opt-label { color: #007700; font-weight: bold; }
+
     .poll-pct { font-size: 13px; color: #555; width: 36px; text-align: right; }
     .poll-opt-label { min-width: 80px; }
     .poll-meta { font-size: 13px; color: #888; margin-top: 4px; }
+    .poll-timer { color: #cc6600; font-size: 13px; }
+    .poll-timer.urgent { color: #cc0000; font-weight: bold; }
 
     /* ── TYPING INDICATOR ── */
     #typing-bar {
@@ -464,10 +476,8 @@
 
     #send-btn:active { border-color: #808080 white white #808080; }
 
-    /* ── DM NOTIFICATION BADGE ── */
-    .dm-flash {
-      animation: flash 0.4s 3;
-    }
+    /* ── DM FLASH ── */
+    .dm-flash { animation: flash 0.4s 3; }
     @keyframes flash {
       0%, 100% { background: #fff0f8; }
       50% { background: #ffccee; }
@@ -525,13 +535,11 @@
     </div>
 
     <div id="chat-layout">
-      <!-- Rooms sidebar -->
       <div id="rooms-sidebar">
         <h3>ROOMS</h3>
         <div id="rooms-list"></div>
       </div>
 
-      <!-- Main chat area -->
       <div id="main-area">
         <div id="users-panel"></div>
         <ul id="messages"></ul>
@@ -573,28 +581,24 @@
       } catch {}
     }
 
-    // Retro "blip" for incoming chat
-    function soundMessage() {
-      playTone(880, 'square', 0.06, 0.1);
-    }
-
-    // Rising chime for join
+    function soundMessage() { playTone(880, 'square', 0.06, 0.1); }
     function soundJoin() {
       playTone(523, 'sine', 0.15, 0.12);
       playTone(659, 'sine', 0.15, 0.12, 0.12);
       playTone(784, 'sine', 0.2, 0.14, 0.24);
     }
-
-    // Descending for leave
     function soundLeave() {
       playTone(784, 'sine', 0.12, 0.1);
       playTone(523, 'sine', 0.2, 0.1, 0.14);
     }
-
-    // Two-tone beep for DM
     function soundDM() {
       playTone(1046, 'square', 0.08, 0.1);
       playTone(1318, 'square', 0.12, 0.12, 0.1);
+    }
+    function soundPollEnd() {
+      playTone(659, 'sine', 0.1, 0.12);
+      playTone(784, 'sine', 0.1, 0.12, 0.1);
+      playTone(1046, 'sine', 0.3, 0.15, 0.2);
     }
 
     function toggleSound() {
@@ -639,8 +643,8 @@
     let usersVisible = false;
     let isTyping = false;
     let typingTimer;
-    const unreadCounts = {}; // room -> count
-    const polls = {};        // pollId -> poll data
+    const unreadCounts = {};
+    const polls = {};
 
     // ── TAB SWITCHING ─────────────────────────────────────────────────────────
     function switchTab(tab) {
@@ -775,8 +779,7 @@
     }
 
     function formatTime(ts) {
-      const d = new Date(ts);
-      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
     function addMessage(html, extraClass = '', timestamp = null) {
@@ -810,53 +813,75 @@
     // ── POLLS ────────────────────────────────────────────────────────────────
     function renderPoll(poll) {
       polls[poll.id] = poll;
-      // Remove existing card if updating
       const existing = document.getElementById(`poll-${poll.id}`);
       if (existing) {
-        updatePollCard(existing, poll);
+        existing.innerHTML = buildPollHtml(poll);
         return;
       }
-      // Create new card
       const messages = document.getElementById('messages');
+      const atBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 40;
       const li = document.createElement('li');
       li.style.listStyle = 'none';
       li.id = `poll-${poll.id}`;
       li.className = 'msg-row';
       li.innerHTML = buildPollHtml(poll);
       messages.appendChild(li);
-      messages.scrollTop = messages.scrollHeight;
+      if (atBottom) messages.scrollTop = messages.scrollHeight;
     }
 
     function buildPollHtml(poll) {
       const totalVotes = Object.keys(poll.votes || {}).length;
       const myVote = (poll.votes || {})[myUsername];
-      let optionsHtml = poll.options.map(opt => {
+      const concluded = poll.concluded;
+
+      // Find winner count for highlighting
+      let topCount = 0;
+      if (concluded && totalVotes > 0) {
+        const tally = {};
+        poll.options.forEach(o => tally[o] = 0);
+        Object.values(poll.votes || {}).forEach(v => { if (tally[v] !== undefined) tally[v]++; });
+        topCount = Math.max(...Object.values(tally));
+      }
+
+      const optionsHtml = poll.options.map(opt => {
         const count = Object.values(poll.votes || {}).filter(v => v === opt).length;
         const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
         const isVoted = myVote === opt;
-        return `<div class="poll-option ${isVoted ? 'voted' : ''}" onclick="castVote(${poll.id}, '${opt.replace(/'/g, "\\'")}')">
-          <span class="poll-opt-label">${opt}</span>
+        const isWinner = concluded && totalVotes > 0 && count === topCount;
+        const classes = [
+          'poll-option',
+          isVoted ? 'voted' : '',
+          concluded ? 'concluded' : '',
+          isWinner ? 'winner' : '',
+        ].filter(Boolean).join(' ');
+
+        return `<div class="${classes}" onclick="${concluded ? '' : `castVote(${poll.id}, '${opt.replace(/'/g, "\\'")}')`}">
+          <span class="poll-opt-label">${isWinner ? '🏆 ' : ''}${opt}</span>
           <div class="poll-bar-wrap"><div class="poll-bar" style="width:${pct}%"></div></div>
           <span class="poll-pct">${pct}%</span>
           <span style="font-size:13px;color:#555">${count}</span>
         </div>`;
       }).join('');
-      return `<div class="poll-card">
+
+      let timerHtml = '';
+      if (!concluded && poll.endsAt) {
+        timerHtml = `<span class="poll-timer" data-ends="${new Date(poll.endsAt).getTime()}">...</span>`;
+      } else if (concluded) {
+        timerHtml = `<span style="color:#888">concluded</span>`;
+      }
+
+      return `<div class="poll-card${concluded ? ' poll-concluded' : ''}">
         <div class="poll-question">📊 ${poll.question}</div>
         ${optionsHtml}
-        <div class="poll-meta">by ${poll.creator} · ${totalVotes} vote${totalVotes !== 1 ? 's' : ''}</div>
+        <div class="poll-meta">by ${poll.creator} · ${totalVotes} vote${totalVotes !== 1 ? 's' : ''} · ${timerHtml}</div>
       </div>`;
-    }
-
-    function updatePollCard(el, poll) {
-      el.innerHTML = buildPollHtml(poll);
     }
 
     function castVote(pollId, option) {
       socket.emit('poll vote', { pollId, option });
     }
 
-      // ── HISTORY ──────────────────────────────────────────────────────────────
+    // ── HISTORY ──────────────────────────────────────────────────────────────
     function renderHistory(history) {
       const messages = document.getElementById('messages');
       messages.innerHTML = '';
@@ -897,9 +922,7 @@
 
     socket.on('room changed', (room) => {
       currentRoom = room;
-      renderRooms(
-        [...document.querySelectorAll('.room-btn')].map(b => b.dataset.room)
-      );
+      renderRooms([...document.querySelectorAll('.room-btn')].map(b => b.dataset.room));
     });
 
     socket.on('history', (history) => {
@@ -936,7 +959,6 @@
 
     socket.on('link preview', ({ url, title, image, description }) => {
       const messages = document.getElementById('messages');
-      // Find the last message that contains this URL and append preview after it
       const rows = messages.querySelectorAll('.msg-row');
       let target = null;
       for (let i = rows.length - 1; i >= 0; i--) {
@@ -963,6 +985,15 @@
 
     socket.on('poll update', (poll) => {
       renderPoll(poll);
+    });
+
+    socket.on('poll concluded', ({ pollId }) => {
+      if (polls[pollId]) {
+        polls[pollId].concluded = true;
+        const el = document.getElementById(`poll-${pollId}`);
+        if (el) el.innerHTML = buildPollHtml(polls[pollId]);
+        soundPollEnd();
+      }
     });
 
     socket.on('user list', (list) => {
@@ -995,7 +1026,9 @@
       socket.disconnect();
     });
 
-    // Tick time-online every second
+    // ── TICKERS ──────────────────────────────────────────────────────────────
+
+    // Time-online ticker
     setInterval(() => {
       document.querySelectorAll('.user-entry').forEach(entry => {
         const joinedAt = parseInt(entry.dataset.joinedAt, 10);
@@ -1004,14 +1037,30 @@
       });
     }, 1000);
 
-    // Emit activity on mouse/keyboard movement
+    // Poll countdown ticker
+    setInterval(() => {
+      document.querySelectorAll('.poll-timer').forEach(el => {
+        const ends = parseInt(el.dataset.ends, 10);
+        const left = Math.max(0, Math.ceil((ends - Date.now()) / 1000));
+        if (left === 0) {
+          el.textContent = 'ending...';
+          el.classList.add('urgent');
+        } else {
+          const m = Math.floor(left / 60), s = left % 60;
+          el.textContent = m > 0 ? `${m}m ${s}s left` : `${s}s left`;
+          el.classList.toggle('urgent', left <= 30);
+        }
+      });
+    }, 1000);
+
+    // Activity emit throttle
     let activityThrottle = 0;
     document.addEventListener('keydown', () => {
       const now = Date.now();
       if (now - activityThrottle > 30000) { activityThrottle = now; socket.emit('activity'); }
     });
 
-    // Enter key bindings
+    // ── KEY BINDINGS ─────────────────────────────────────────────────────────
     document.getElementById('input').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') send();
     });

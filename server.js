@@ -41,7 +41,6 @@ async function initDb() {
   `);
   await db.query(`CREATE INDEX IF NOT EXISTS IDX_session_expire ON session (expire)`);
 
-  // Rooms table
   await db.query(`
     CREATE TABLE IF NOT EXISTS rooms (
       id SERIAL PRIMARY KEY,
@@ -49,13 +48,11 @@ async function initDb() {
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
-  // Seed default rooms
   await db.query(`
     INSERT INTO rooms (name) VALUES ('general'), ('random')
     ON CONFLICT (name) DO NOTHING
   `);
 
-  // Messages table (with room + DM support)
   await db.query(`
     CREATE TABLE IF NOT EXISTS messages (
       id SERIAL PRIMARY KEY,
@@ -70,7 +67,6 @@ async function initDb() {
   await db.query(`CREATE INDEX IF NOT EXISTS IDX_messages_room ON messages (room, created_at DESC)`);
   await db.query(`CREATE INDEX IF NOT EXISTS IDX_messages_dm ON messages (sender, recipient, created_at DESC)`);
 
-  // Polls table
   await db.query(`
     CREATE TABLE IF NOT EXISTS polls (
       id SERIAL PRIMARY KEY,
@@ -79,12 +75,16 @@ async function initDb() {
       options JSONB NOT NULL,
       votes JSONB NOT NULL DEFAULT '{}',
       creator TEXT NOT NULL,
+      ends_at TIMESTAMPTZ,
+      concluded BOOLEAN NOT NULL DEFAULT false,
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
 
-  // Add color column if upgrading from old schema
+  // Safe upgrade columns for existing installs
   await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS color TEXT NOT NULL DEFAULT '#000080'`);
+  await db.query(`ALTER TABLE polls ADD COLUMN IF NOT EXISTS ends_at TIMESTAMPTZ`);
+  await db.query(`ALTER TABLE polls ADD COLUMN IF NOT EXISTS concluded BOOLEAN NOT NULL DEFAULT false`);
 
   console.log('Database initialised');
 }
@@ -151,16 +151,15 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-// Valid username colours (curated, readable on white & dark bg)
 const VALID_COLORS = [
   '#000080','#800000','#008000','#800080','#008080',
   '#0000cc','#cc0000','#007700','#aa00aa','#007777',
   '#cc6600','#006699','#990000','#009900','#660099',
 ];
 
-// ─── Link Preview (server-side OG fetch) ──────────────────────────────────────
+// ─── Link Preview ─────────────────────────────────────────────────────────────
 
-const previewCache = new Map(); // url -> { title, image, description, fetched }
+const previewCache = new Map();
 
 async function fetchLinkPreview(rawUrl) {
   if (previewCache.has(rawUrl)) return previewCache.get(rawUrl);
@@ -201,7 +200,6 @@ async function fetchLinkPreview(rawUrl) {
   });
 }
 
-// Extract first URL from a string
 function extractUrl(text) {
   const m = text.match(/https?:\/\/[^\s<>"']+/i);
   return m ? m[0] : null;
@@ -278,7 +276,6 @@ app.get('/me', async (req, res) => {
   }
 });
 
-// Rooms list
 app.get('/rooms', async (req, res) => {
   const result = await db.query('SELECT name FROM rooms ORDER BY id');
   res.json(result.rows.map(r => r.name));
@@ -286,11 +283,11 @@ app.get('/rooms', async (req, res) => {
 
 // ─── Socket State ─────────────────────────────────────────────────────────────
 
-const connectedUsers  = {};   // socket.id -> { username, color, room, joinedAt, lastActivity }
-const userSocketMap   = {};   // username lowercase -> socket.id
-const rateLimits      = {};   // socket.id -> { count, resetTime }
-const typingTimeouts  = {};   // socket.id -> timeout handle
-const typingByRoom    = {};   // room -> Set of socket.ids
+const connectedUsers  = {};
+const userSocketMap   = {};
+const rateLimits      = {};
+const typingTimeouts  = {};
+const typingByRoom    = {};
 
 // ─── Broadcast Helpers ────────────────────────────────────────────────────────
 
@@ -345,6 +342,18 @@ async function getHistory(room, username, limit = 50) {
   return result.rows.reverse();
 }
 
+async function enrichHistoryWithColors(rows) {
+  const usernames = [...new Set(rows.map(r => r.sender))];
+  if (!usernames.length) return rows;
+  const result = await db.query(
+    `SELECT username, color FROM users WHERE LOWER(username) = ANY($1)`,
+    [usernames.map(u => u.toLowerCase())]
+  );
+  const colorMap = {};
+  result.rows.forEach(r => { colorMap[r.username.toLowerCase()] = r.color; });
+  return rows.map(r => ({ ...r, color: colorMap[r.sender.toLowerCase()] || '#000080' }));
+}
+
 // ─── Poll Helpers ─────────────────────────────────────────────────────────────
 
 function formatPollData(poll) {
@@ -354,15 +363,55 @@ function formatPollData(poll) {
     options: poll.options,
     votes: poll.votes,
     creator: poll.creator,
+    endsAt: poll.ends_at,
+    concluded: poll.concluded,
   };
 }
 
-// ─── Socket.io ────────────────────────────────────────────────────────────────
+// ─── Poll Conclusion Job ──────────────────────────────────────────────────────
 
-// Idle checker - broadcasts updated user lists every 30s to reflect idle changes
+setInterval(async () => {
+  try {
+    const due = await db.query(
+      `SELECT * FROM polls WHERE concluded = false AND ends_at <= NOW()`
+    );
+    for (const poll of due.rows) {
+      const votes = poll.votes || {};
+      const tally = {};
+      poll.options.forEach(o => tally[o] = 0);
+      Object.values(votes).forEach(v => { if (tally[v] !== undefined) tally[v]++; });
+
+      const total = Object.values(tally).reduce((a, b) => a + b, 0);
+      let msg;
+      if (total === 0) {
+        msg = `Poll "${poll.question}" ended with no votes.`;
+      } else {
+        const sorted = Object.entries(tally).sort((a, b) => b[1] - a[1]);
+        const topCount = sorted[0][1];
+        const tied = sorted.filter(([, v]) => v === topCount);
+        if (tied.length > 1) {
+          msg = `Poll "${poll.question}" ended in a tie between: ${tied.map(([k]) => `"${k}"`).join(', ')} (${topCount} vote${topCount !== 1 ? 's' : ''} each)`;
+        } else {
+          msg = `Poll "${poll.question}" — winner: "${sorted[0][0]}" with ${topCount} vote${topCount !== 1 ? 's' : ''} out of ${total}`;
+        }
+      }
+
+      await db.query(`UPDATE polls SET concluded = true WHERE id = $1`, [poll.id]);
+      io.to(poll.room).emit('poll concluded', { pollId: poll.id, message: msg });
+      io.to(poll.room).emit('system message', `🏆 ${msg}`);
+    }
+  } catch (err) {
+    console.error('Poll conclusion error:', err);
+  }
+}, 15000); // check every 15 seconds
+
+// ─── Idle Checker ─────────────────────────────────────────────────────────────
+
 setInterval(() => {
   broadcastAllUserLists();
 }, 30000);
+
+// ─── Socket.io ────────────────────────────────────────────────────────────────
 
 io.on('connection', (socket) => {
 
@@ -377,14 +426,12 @@ io.on('connection', (socket) => {
     const username = escapeHtml(sessionUsername.slice(0, 20));
     const key = username.toLowerCase();
 
-    // Fetch user color
     let color = '#000080';
     try {
       const r = await db.query('SELECT color FROM users WHERE LOWER(username) = LOWER($1)', [username]);
       color = r.rows[0]?.color || '#000080';
     } catch {}
 
-    // Kick existing socket for this user
     const existingId = userSocketMap[key];
     if (existingId && existingId !== socket.id) {
       const existingSocket = io.sockets.sockets.get(existingId);
@@ -393,9 +440,7 @@ io.on('connection', (socket) => {
         existingSocket.disconnect(true);
       }
       const oldUser = connectedUsers[existingId];
-      if (oldUser) {
-        if (typingByRoom[oldUser.room]) typingByRoom[oldUser.room].delete(existingId);
-      }
+      if (oldUser && typingByRoom[oldUser.room]) typingByRoom[oldUser.room].delete(existingId);
       delete connectedUsers[existingId];
       delete rateLimits[existingId];
     }
@@ -406,15 +451,16 @@ io.on('connection', (socket) => {
 
     socket.join(defaultRoom);
 
-    // Send rooms list
     const roomsResult = await db.query('SELECT name FROM rooms ORDER BY id');
     socket.emit('rooms list', roomsResult.rows.map(r => r.name));
 
-    // Send active polls in the room
-    const pollsResult = await db.query('SELECT * FROM polls WHERE room = $1', [defaultRoom]);
-    pollsResult.rows.forEach(poll => socket.emit('poll update', formatPollData(poll)));
+    // Send polls for this room (recent 20, including concluded ones so history is visible)
+    const pollsResult = await db.query(
+      'SELECT * FROM polls WHERE room = $1 ORDER BY created_at DESC LIMIT 20',
+      [defaultRoom]
+    );
+    pollsResult.rows.reverse().forEach(poll => socket.emit('poll update', formatPollData(poll)));
 
-    // Send history
     const history = await getHistory(defaultRoom, username, 50);
     const historyWithColors = await enrichHistoryWithColors(history);
     socket.emit('history', historyWithColors);
@@ -427,7 +473,6 @@ io.on('connection', (socket) => {
     const user = connectedUsers[socket.id];
     if (!user) return;
 
-    // Validate room exists
     const r = await db.query('SELECT name FROM rooms WHERE name = $1', [newRoom]);
     if (!r.rows.length) return;
 
@@ -440,11 +485,12 @@ io.on('connection', (socket) => {
     user.room = newRoom;
     socket.join(newRoom);
 
-    // Send polls for new room
-    const pollsResult = await db.query('SELECT * FROM polls WHERE room = $1', [newRoom]);
-    pollsResult.rows.forEach(poll => socket.emit('poll update', formatPollData(poll)));
+    const pollsResult = await db.query(
+      'SELECT * FROM polls WHERE room = $1 ORDER BY created_at DESC LIMIT 20',
+      [newRoom]
+    );
+    pollsResult.rows.reverse().forEach(poll => socket.emit('poll update', formatPollData(poll)));
 
-    // Send history
     const history = await getHistory(newRoom, user.username, 50);
     const historyWithColors = await enrichHistoryWithColors(history);
     socket.emit('history', historyWithColors);
@@ -458,7 +504,6 @@ io.on('connection', (socket) => {
     const user = connectedUsers[socket.id];
     if (!user) return;
 
-    // Rate limit
     const now = Date.now();
     if (!rateLimits[socket.id] || now > rateLimits[socket.id].resetTime) {
       rateLimits[socket.id] = { count: 0, resetTime: now + 3000 };
@@ -509,7 +554,6 @@ io.on('connection', (socket) => {
         return;
       }
 
-      // Save & send DM
       const dmData = {
         from: user.username,
         fromColor: user.color,
@@ -524,7 +568,6 @@ io.on('connection', (socket) => {
     }
 
     // ── /poll command ──
-    // Usage: /poll "Question?" Option1 Option2 Option3
     if (raw.startsWith('/poll ')) {
       const rest = raw.slice(6).trim();
       const qMatch = rest.match(/^"([^"]+)"\s+(.+)$/);
@@ -540,12 +583,13 @@ io.on('connection', (socket) => {
       }
 
       const result = await db.query(
-        'INSERT INTO polls (room, question, options, votes, creator) VALUES ($1,$2,$3,$4,$5) RETURNING *',
+        `INSERT INTO polls (room, question, options, votes, creator, ends_at)
+         VALUES ($1,$2,$3,$4,$5, NOW() + INTERVAL '5 minutes') RETURNING *`,
         [room, question, JSON.stringify(options), JSON.stringify({}), user.username]
       );
       const poll = result.rows[0];
       io.to(room).emit('poll update', formatPollData(poll));
-      io.to(room).emit('system message', `${user.username} started a poll: "${question}"`);
+      io.to(room).emit('system message', `${user.username} started a poll: "${question}" — voting closes in 5 minutes`);
       return;
     }
 
@@ -562,13 +606,10 @@ io.on('connection', (socket) => {
     };
     io.to(room).emit('chat message', msgData);
 
-    // Link preview (async, don't block)
     const url = extractUrl(raw);
     if (url) {
       fetchLinkPreview(url).then((preview) => {
-        if (preview) {
-          io.to(room).emit('link preview', { url, ...preview });
-        }
+        if (preview) io.to(room).emit('link preview', { url, ...preview });
       });
     }
   });
@@ -580,13 +621,12 @@ io.on('connection', (socket) => {
     try {
       const result = await db.query('SELECT * FROM polls WHERE id = $1 AND room = $2', [pollId, user.room]);
       const poll = result.rows[0];
-      if (!poll) return;
+      if (!poll || poll.concluded) return;
 
-      const options = poll.options;
-      if (!options.includes(option)) return;
+      if (!poll.options.includes(option)) return;
 
       const votes = poll.votes || {};
-      votes[user.username] = option; // one vote per user
+      votes[user.username] = option;
 
       await db.query('UPDATE polls SET votes = $1 WHERE id = $2', [JSON.stringify(votes), pollId]);
       io.to(user.room).emit('poll update', { ...formatPollData(poll), votes });
@@ -615,7 +655,6 @@ io.on('connection', (socket) => {
     stopTypingForSocket(socket, user.room);
   });
 
-  // Touch activity (for away tracking)
   socket.on('activity', () => {
     const user = connectedUsers[socket.id];
     if (user) {
@@ -640,19 +679,6 @@ io.on('connection', (socket) => {
     }
   });
 });
-
-// Helper to enrich history rows with user colors
-async function enrichHistoryWithColors(rows) {
-  const usernames = [...new Set(rows.map(r => r.sender))];
-  if (!usernames.length) return rows;
-  const result = await db.query(
-    `SELECT username, color FROM users WHERE LOWER(username) = ANY($1)`,
-    [usernames.map(u => u.toLowerCase())]
-  );
-  const colorMap = {};
-  result.rows.forEach(r => { colorMap[r.username.toLowerCase()] = r.color; });
-  return rows.map(r => ({ ...r, color: colorMap[r.sender.toLowerCase()] || '#000080' }));
-}
 
 // ─── Start Server ─────────────────────────────────────────────────────────────
 
