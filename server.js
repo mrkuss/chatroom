@@ -478,7 +478,7 @@ async function saveMessage({ room, sender, recipient, type, text }) {
   await db.query('INSERT INTO messages (room, sender, recipient, type, text) VALUES ($1,$2,$3,$4,$5)', [room || null, sender, recipient || null, type, text]);
 }
 
-async function getHistory(room, username, limit = 5) {
+async function getHistory(room, username, limit = 50) {
   const result = await db.query(
     `SELECT sender, recipient, type, text, created_at FROM messages
      WHERE room = $1 OR (type = 'dm' AND (LOWER(sender) = LOWER($2) OR LOWER(recipient) = LOWER($2)))
@@ -573,7 +573,7 @@ io.on('connection', (socket) => {
     const roomsResult = await db.query('SELECT name FROM rooms ORDER BY id');
     socket.emit('rooms list', roomsResult.rows.map(r => r.name));
 
-    const history = await getHistory(defaultRoom, username, 5);
+    const history = await getHistory(defaultRoom, username, 50);
     const historyWithColors = await enrichHistoryWithColors(history);
     socket.emit('history', historyWithColors);
 
@@ -596,7 +596,7 @@ io.on('connection', (socket) => {
     io.to(oldRoom).emit('system message', `${user.username} left #${oldRoom}`);
     user.room = newRoom;
     socket.join(newRoom);
-    const history = await getHistory(newRoom, user.username, 5);
+    const history = await getHistory(newRoom, user.username, 50);
     const historyWithColors = await enrichHistoryWithColors(history);
     socket.emit('history', historyWithColors);
     const pollsResult = await db.query('SELECT * FROM polls WHERE room = $1 ORDER BY created_at DESC LIMIT 20', [newRoom]);
@@ -611,9 +611,22 @@ io.on('connection', (socket) => {
     if (!user) return;
 
     const now = Date.now();
-    if (!rateLimits[socket.id] || now > rateLimits[socket.id].resetTime) rateLimits[socket.id] = { count: 0, resetTime: now + 3000 };
+    const rl = rateLimits[socket.id];
+    // If currently locked out, reject and remind them
+    if (rl && rl.lockedUntil && now < rl.lockedUntil) {
+      const secsLeft = Math.ceil((rl.lockedUntil - now) / 1000);
+      socket.emit('system message', `You are muted for spamming. Try again in ${secsLeft}s.`);
+      return;
+    }
+    // Reset window if expired
+    if (!rl || now > rl.resetTime) rateLimits[socket.id] = { count: 0, resetTime: now + 10000 };
     rateLimits[socket.id].count++;
-    if (rateLimits[socket.id].count > 5) { socket.emit('system message', 'Slow down! You are sending messages too fast.'); return; }
+    // Trigger lockout on 5th message within the 10s window
+    if (rateLimits[socket.id].count >= 5) {
+      rateLimits[socket.id].lockedUntil = now + 25000;
+      socket.emit('system message', '🔇 You have been muted for 25 seconds for sending too many messages.');
+      return;
+    }
 
     if (typeof msg !== 'string') return;
     const raw = msg.trim().slice(0, 500);
