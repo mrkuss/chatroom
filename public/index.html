@@ -241,15 +241,6 @@
     .slot-reel.spinning { animation:spinReel 0.15s infinite; }
     @keyframes spinReel { 0% { transform:translateY(-4px); } 50% { transform:translateY(4px); } 100% { transform:translateY(-4px); } }
 
-    /* CRASH */
-    .crash-display { text-align:center;margin:12px 0; }
-    .crash-multiplier { font-size:48px;color:var(--poll-question);transition:color 0.3s; }
-    .crash-multiplier.danger { color:#cc0000; }
-    .crash-multiplier.crashed { color:#808080; }
-    .crash-status { font-size:14px;color:var(--text-system);margin-top:4px; }
-    #crash-cashout-btn { background:#007700;color:white;border-color:#0a0 #030 #030 #0a0; }
-    #crash-cashout-btn:hover:not(:disabled) { background:#009900; }
-
     /* DICE */
     .dice-display { display:flex;gap:16px;justify-content:center;align-items:center;margin:12px 0;font-size:14px;text-align:center; }
     .dice-side label { display:block;margin-bottom:4px;color:var(--text-system); }
@@ -275,7 +266,7 @@
     <span>chatroom</span>
     <span class="auth-version">v1.0</span>
   </div>
-  <div class="auth-disclaimer">⚠ This chatroom is for invited users only. Be respectful at all times.</div>
+  <div class="auth-disclaimer">a small project by mce. since all social platforms are selling your data, pushing micro-transaction in your face and ASKING for a pic of your face.</div>
   <div class="auth-tabs">
     <button class="auth-tab active" onclick="switchTab('login')">Login</button>
     <button class="auth-tab" onclick="switchTab('register')">Register</button>
@@ -386,7 +377,6 @@
     <div style="padding:0 16px;">
       <div class="games-tabs">
         <button class="games-tab active" onclick="switchGame('slots')">🎰 Slots</button>
-        <button class="games-tab" onclick="switchGame('crash')">📈 Crash</button>
         <button class="games-tab" onclick="switchGame('dice')">🎲 Dice</button>
         <button class="games-tab" onclick="switchGame('leaderboard')">🏆 Board</button>
       </div>
@@ -414,27 +404,6 @@
       <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">
         🍒×3=2x · 🍋×3=3x · 🍊×3=4x · ⭐×3=6x · 💎×3=10x · 7️⃣×3=25x
       </div>
-    </div>
-
-    <!-- CRASH -->
-    <div id="game-crash" class="game-panel" style="padding:0 16px 16px;">
-      <div class="game-balance" id="crash-balance">Balance: 🪙 0</div>
-      <div class="crash-display">
-        <div class="crash-multiplier" id="crash-multiplier">1.00x</div>
-        <div class="crash-status" id="crash-status">Place your bet to start</div>
-      </div>
-      <div class="bet-row">
-        <label>Bet:</label>
-        <input type="number" class="bet-input" id="crash-bet" value="10" min="1" max="500" />
-        <div class="bet-presets">
-          <button class="bet-preset" onclick="setBet('crash',10)">10</button>
-          <button class="bet-preset" onclick="setBet('crash',50)">50</button>
-          <button class="bet-preset" onclick="setBet('crash',100)">100</button>
-        </div>
-      </div>
-      <button class="game-btn" id="crash-start-btn" onclick="startCrash()">START</button>
-      <button class="game-btn" id="crash-cashout-btn" onclick="cashoutCrash()" disabled style="display:none;">CASH OUT</button>
-      <div class="game-result" id="crash-result"></div>
     </div>
 
     <!-- DICE -->
@@ -602,7 +571,7 @@
   }
 
   function updateGameBalances() {
-    ['slots', 'crash', 'dice'].forEach(g => {
+    ['slots', 'dice'].forEach(g => {
       const el = document.getElementById(g + '-balance');
       if (el) el.textContent = `Balance: 🪙 ${myCoins}`;
     });
@@ -623,7 +592,6 @@
     btn.disabled = true;
     document.getElementById('slots-result').textContent = '';
 
-    // Animate spinning
     [0,1,2].forEach(i => document.getElementById('reel-' + i).classList.add('spinning'));
 
     await new Promise(r => setTimeout(r, 600));
@@ -654,95 +622,6 @@
 
     slotsSpinning = false;
     btn.disabled = false;
-  }
-
-  // ── CRASH ────────────────────────────────────────────────────────────────────
-  let crashInterval = null;
-  let crashRunning = false;
-  let crashStartTime = null;
-
-  async function startCrash() {
-    if (crashRunning) return;
-    const bet = parseInt(document.getElementById('crash-bet').value, 10);
-    if (!bet || bet < 1 || bet > 500) { document.getElementById('crash-result').innerHTML = '<span class="result-lose">Bet must be 1-500</span>'; return; }
-
-    try {
-      const res = await fetch('/game/crash/start', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ bet }) });
-      const data = await res.json();
-      if (!res.ok) { document.getElementById('crash-result').innerHTML = `<span class="result-lose">${data.error}</span>`; return; }
-
-      myCoins = data.coins; updateCoinDisplay(); updateGameBalances();
-      crashRunning = true; crashStartTime = Date.now();
-
-      document.getElementById('crash-start-btn').style.display = 'none';
-      document.getElementById('crash-cashout-btn').style.display = 'block';
-      document.getElementById('crash-cashout-btn').disabled = false;
-      document.getElementById('crash-result').textContent = '';
-      document.getElementById('crash-status').textContent = 'Game in progress — cash out before it crashes!';
-
-      const multiplierEl = document.getElementById('crash-multiplier');
-      multiplierEl.className = 'crash-multiplier';
-
-      crashInterval = setInterval(async () => {
-        const elapsed = (Date.now() - crashStartTime) / 1000;
-        const current = Math.pow(1.07, elapsed * 10);
-        const display = current.toFixed(2) + 'x';
-        multiplierEl.textContent = display;
-        if (current > 3) multiplierEl.classList.add('danger');
-
-        // After a while the server will have crashed it - check every second-ish
-        if (elapsed > 0.5 && Math.random() < 0.05) {
-          // Occasionally probe server to see if crashed
-          try {
-            const r = await fetch('/game/crash/result', { method:'POST', credentials:'include' });
-            if (r.ok) {
-              const d = await r.json();
-              if (d.crashed) {
-                clearInterval(crashInterval); crashInterval = null;
-                crashRunning = false;
-                myCoins = d.coins; updateCoinDisplay(); updateGameBalances();
-                multiplierEl.textContent = d.crashPoint.toFixed(2) + 'x';
-                multiplierEl.className = 'crash-multiplier crashed';
-                document.getElementById('crash-status').textContent = `Crashed at ${d.crashPoint.toFixed(2)}x!`;
-                document.getElementById('crash-result').innerHTML = `<span class="result-lose">💥 CRASHED at ${d.crashPoint.toFixed(2)}x! You lost your bet.</span>`;
-                document.getElementById('crash-cashout-btn').style.display = 'none';
-                document.getElementById('crash-start-btn').style.display = 'block';
-                soundLose();
-              }
-            }
-          } catch {}
-        }
-      }, 100);
-
-    } catch { document.getElementById('crash-result').innerHTML = '<span class="result-lose">Error. Try again.</span>'; }
-  }
-
-  async function cashoutCrash() {
-    if (!crashRunning) return;
-    clearInterval(crashInterval); crashInterval = null;
-    document.getElementById('crash-cashout-btn').disabled = true;
-
-    try {
-      const res = await fetch('/game/crash/cashout', { method:'POST', credentials:'include' });
-      const data = await res.json();
-      crashRunning = false;
-      document.getElementById('crash-cashout-btn').style.display = 'none';
-      document.getElementById('crash-start-btn').style.display = 'block';
-
-      if (data.crashed) {
-        myCoins = data.coins; updateCoinDisplay(); updateGameBalances();
-        document.getElementById('crash-multiplier').className = 'crash-multiplier crashed';
-        document.getElementById('crash-status').textContent = `Crashed at ${data.crashPoint.toFixed(2)}x!`;
-        document.getElementById('crash-result').innerHTML = `<span class="result-lose">💥 Just crashed at ${data.crashPoint.toFixed(2)}x!</span>`;
-        soundLose();
-      } else {
-        myCoins = data.coins; updateCoinDisplay(); updateGameBalances();
-        document.getElementById('crash-multiplier').textContent = data.multiplier.toFixed(2) + 'x';
-        document.getElementById('crash-status').textContent = `Cashed out at ${data.multiplier.toFixed(2)}x!`;
-        document.getElementById('crash-result').innerHTML = `<span class="result-win">💰 Cashed out at ${data.multiplier.toFixed(2)}x! +${data.winAmount} coins!</span>`;
-        soundWin();
-      }
-    } catch { crashRunning = false; document.getElementById('crash-start-btn').style.display = 'block'; document.getElementById('crash-cashout-btn').style.display = 'none'; }
   }
 
   // ── DICE ─────────────────────────────────────────────────────────────────────
