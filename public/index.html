@@ -30,17 +30,6 @@
       --link-title-color:#8888cc;--typing-color:#555;--btn-bg:#222;--btn-border:#444 #111 #111 #444;
       --auth-bg:#1a1a1a;--auth-tab-active-bg:#111;--auth-input-bg:#222;
     }
-    body.theme-hacker {
-      --bg-outer:#000000;--bg-window:#0a0a0a;--bg-titlebar:#001400;--bg-sidebar:#001000;
-      --bg-sidebar-hdr:#000800;--bg-messages:#020802;--bg-input:#001400;--bg-bottom:#0a0a0a;
-      --bg-users-panel:#0a0a0a;--border-main:#00aa00 #003300 #003300 #00aa00;--border-inset:#004400;
-      --text-main:#00cc00;--text-titlebar:#00ff00;--text-sidebar:#007700;--text-sidebar-hdr:#00aa00;
-      --text-system:#005500;--text-action:#007700;--room-active-bg:#001f00;--room-hover-bg:#001500;
-      --poll-bg:#001a00;--poll-border:#007700;--poll-bar:#00aa00;--poll-question:#00cc00;
-      --link-preview-bg:#001500;--link-preview-border:#005500;--link-preview-accent:#00aa00;
-      --link-title-color:#00cc00;--typing-color:#005500;--btn-bg:#001400;--btn-border:#00aa00 #003300 #003300 #00aa00;
-      --auth-bg:#0a0a0a;--auth-tab-active-bg:#001400;--auth-input-bg:#001400;
-    }
     body.theme-rose {
       --bg-outer:#3d1a2e;--bg-window:#f5e8ee;--bg-titlebar:#7a2d52;--bg-sidebar:#5c1f3d;
       --bg-sidebar-hdr:#3d1428;--bg-messages:#fff5f8;--bg-input:#fff0f5;--bg-bottom:#f5e8ee;
@@ -51,6 +40,17 @@
       --link-preview-bg:#fff5f9;--link-preview-border:#e8b0c8;--link-preview-accent:#cc5588;
       --link-title-color:#993366;--typing-color:#c090a8;--btn-bg:#f5e8ee;--btn-border:#f0c0d8 #8a3060 #8a3060 #f0c0d8;
       --auth-bg:#f5e8ee;--auth-tab-active-bg:#7a2d52;--auth-input-bg:#fff5f8;
+    }
+    body.theme-amber {
+      --bg-outer:#0d0800;--bg-window:#1a1000;--bg-titlebar:#2a1800;--bg-sidebar:#150d00;
+      --bg-sidebar-hdr:#0d0800;--bg-messages:#120b00;--bg-input:#1a1000;--bg-bottom:#1a1000;
+      --bg-users-panel:#1a1000;--border-main:#cc7700 #442200 #442200 #cc7700;--border-inset:#553300;
+      --text-main:#ff9900;--text-titlebar:#ffbb44;--text-sidebar:#aa6600;--text-sidebar-hdr:#cc8800;
+      --text-system:#664400;--text-action:#886600;--room-active-bg:#2a1800;--room-hover-bg:#221200;
+      --poll-bg:#1a1000;--poll-border:#aa6600;--poll-bar:#cc8800;--poll-question:#ffaa00;
+      --link-preview-bg:#150d00;--link-preview-border:#553300;--link-preview-accent:#cc7700;
+      --link-title-color:#ffaa00;--typing-color:#664400;--btn-bg:#1a1000;--btn-border:#cc7700 #442200 #442200 #cc7700;
+      --auth-bg:#1a1000;--auth-tab-active-bg:#2a1800;--auth-input-bg:#1a1000;
     }
 
     body { background-color:var(--bg-outer);font-family:'VT323',monospace;font-size:18px;color:var(--text-main);height:100vh;height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:background-color 0.2s; }
@@ -71,10 +71,6 @@
     .auth-panel input { width:100%;padding:6px 8px;margin:6px 0;font-family:'VT323',monospace;font-size:20px;border:2px inset var(--border-inset);background:var(--auth-input-bg);color:var(--text-main); }
     .auth-panel button.primary { width:100%;margin-top:10px;padding:8px;font-family:'VT323',monospace;font-size:20px;background:var(--bg-titlebar);color:var(--text-titlebar);border:2px solid;border-color:var(--border-main);cursor:pointer;letter-spacing:1px; }
     .auth-error { margin-top:10px;color:#cc0000;font-size:16px;min-height:20px; }
-    .color-picker-label { display:block;font-size:15px;margin:8px 0 4px; }
-    .color-swatches { display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px; }
-    .color-swatch { width:24px;height:24px;border:2px solid transparent;cursor:pointer;border-radius:2px; }
-    .color-swatch.selected { border-color:black;outline:1px solid white; }
 
     /* ── CHAT SCREEN ── */
     #chat-screen { display:none;width:100%;height:100vh;height:100dvh;background:var(--bg-window);border:none;overflow:hidden;transition:background-color 0.2s; }
@@ -99,8 +95,8 @@
     #logged-in-as { font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:2px; }
     #coin-display { font-size:14px;color:#ffd700;white-space:nowrap;margin-right:4px;text-shadow:0 0 4px rgba(255,215,0,0.5); }
     body.theme-dark #coin-display { color:#ffcc00; }
-    body.theme-hacker #coin-display { color:#00ff00; }
     body.theme-rose #coin-display { color:#ffaa44; }
+    body.theme-amber #coin-display { color:#ffcc00; }
 
     /* ── ICON BUTTONS ── */
     .icon-btn { font-family:'VT323',monospace;font-size:16px;background:var(--btn-bg);color:var(--text-main);border:2px solid;border-color:var(--btn-border);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;padding:0;line-height:1;position:relative; }
@@ -128,10 +124,13 @@
     .msg-text { color:var(--text-main); }
     .msg-own .msg-user { opacity:0.8; }
     .msg-kicked { color:#cc0000;font-style:italic; }
+    /* Claim event highlight */
+    .msg-claim-event { color:#ffaa00;font-weight:bold;font-style:italic;animation:claimPulse 1s ease-in-out 3; }
+    @keyframes claimPulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
     body.theme-dark .msg-dm-row { background:#1a0a14;border-left-color:#aa0066; }
-    body.theme-hacker .msg-dm-row { background:#001200;border-left-color:#00aa44; }
-    body.theme-hacker .msg-dm-label { color:#00aa44; }
     body.theme-rose .msg-dm-row { background:#ffe8f4;border-left-color:#cc5588; }
+    body.theme-amber .msg-dm-row { background:#1a0f00;border-left-color:#cc7700; }
+    body.theme-amber .msg-dm-label { color:#cc7700; }
     .msg-row { position:relative;padding:2px 0; }
     .msg-row:hover .msg-ts { display:inline; }
     .msg-ts { display:none;font-size:12px;color:var(--text-system);margin-left:8px; }
@@ -146,8 +145,8 @@
     .poll-card { background:var(--poll-bg);border:2px solid var(--poll-border);margin:6px 0;padding:8px 12px;font-size:16px;color:var(--text-main); }
     .poll-card.poll-concluded { opacity:0.75;border-color:var(--border-inset);background:var(--bg-messages); }
     .poll-question { font-weight:bold;color:var(--poll-question);margin-bottom:6px;font-size:17px; }
-    .poll-option { display:flex;align-items:center;gap:8px;margin:3px 0;cursor:pointer; }
-    .poll-option:hover .poll-opt-label { text-decoration:underline; }
+    .poll-option { display:flex;align-items:center;gap:8px;margin:3px 0;cursor:pointer;user-select:none; }
+    .poll-option:hover:not(.concluded) .poll-opt-label { text-decoration:underline; }
     .poll-option.voted .poll-opt-label { color:var(--poll-question);font-weight:bold; }
     .poll-option.concluded { cursor:default;pointer-events:none; }
     .poll-bar-wrap { flex:1;height:14px;background:var(--border-inset);border:1px solid var(--border-inset);overflow:hidden; }
@@ -187,19 +186,22 @@
     #settings-modal { max-width:360px; }
     .settings-section { margin-bottom:16px; }
     .settings-label { font-size:16px;margin-bottom:6px;display:block;color:var(--text-main);letter-spacing:1px; }
+    .settings-note { font-size:13px;color:var(--text-system);margin-bottom:8px; }
+    /* Owned theme/color buttons shown in settings */
     .theme-options { display:grid;grid-template-columns:1fr 1fr;gap:6px; }
     .theme-btn { font-family:'VT323',monospace;font-size:16px;padding:8px 6px;border:2px solid;cursor:pointer;letter-spacing:1px;transition:opacity 0.1s;text-align:center; }
     .theme-btn.theme-opt-classic { background:#000080;color:white;border-color:#6060c0 #000040 #000040 #6060c0; }
     .theme-btn.theme-opt-dark { background:#1a1a1a;color:#d0d0d0;border-color:#444 #111 #111 #444; }
-    .theme-btn.theme-opt-hacker { background:#001400;color:#00cc00;border-color:#00aa00 #003300 #003300 #00aa00; }
     .theme-btn.theme-opt-rose { background:#7a2d52;color:#ffe0ee;border-color:#f0a0c0 #3d1428 #3d1428 #f0a0c0; }
+    .theme-btn.theme-opt-amber { background:#2a1800;color:#ff9900;border-color:#cc7700 #442200 #442200 #cc7700; }
     .theme-btn.selected { outline:2px solid white;outline-offset:1px; }
     .theme-btn:active { opacity:0.7; }
     #settings-color-swatches { display:flex;flex-wrap:wrap;gap:5px; }
+    .color-swatch { width:24px;height:24px;border:2px solid transparent;cursor:pointer;border-radius:2px; }
+    .color-swatch.selected { border-color:black;outline:1px solid white; }
     .settings-save-row { display:flex;gap:8px;margin-top:4px; }
     .settings-btn { flex:1;padding:8px;font-family:'VT323',monospace;font-size:18px;background:var(--bg-titlebar);color:var(--text-titlebar);border:2px solid;border-color:var(--border-main);cursor:pointer;letter-spacing:1px; }
     .settings-status { font-size:14px;color:#007700;min-height:18px;margin-top:6px;text-align:center; }
-    body.theme-hacker .settings-status { color:#00cc00; }
 
     /* ── DAILY REWARD ── */
     #daily-modal .modal-box { max-width:320px;text-align:center; }
@@ -210,6 +212,31 @@
     .daily-claim-btn { width:100%;padding:10px;font-family:'VT323',monospace;font-size:22px;background:#007700;color:white;border:2px solid;border-color:#0a0 #030 #030 #0a0;cursor:pointer;margin-top:12px;letter-spacing:1px; }
     .daily-claim-btn:active { border-color:#030 #0a0 #0a0 #030; }
 
+    /* ── SHOP MODAL ── */
+    #shop-modal { max-width:520px; }
+    .shop-tabs { display:flex;border-bottom:2px solid var(--border-inset); }
+    .shop-tab { flex:1;padding:7px 4px;background:#a0a0a0;border:none;font-family:'VT323',monospace;font-size:16px;cursor:pointer;border-right:1px solid var(--border-inset);color:#444;text-align:center; }
+    .shop-tab:last-child { border-right:none; }
+    .shop-tab.active { background:var(--bg-titlebar);color:white; }
+    .shop-panel { display:none; }
+    .shop-panel.active { display:block; }
+    .shop-balance { font-size:16px;color:#ffd700;padding:10px 0 6px;text-align:center; }
+    body.theme-amber .shop-balance { color:#ffcc00; }
+    .shop-grid { display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-bottom:8px; }
+    .shop-item { border:2px solid var(--border-inset);padding:8px;background:var(--bg-messages);position:relative;font-size:14px; }
+    .shop-item.owned { border-color:#007700; }
+    .shop-item-swatch { width:100%;height:28px;margin-bottom:6px;border:1px solid var(--border-inset); }
+    .shop-item-name { font-size:16px;font-weight:bold;color:var(--text-main); }
+    .shop-item-desc { font-size:12px;color:var(--text-system);margin:3px 0 6px; }
+    .shop-item-price { font-size:14px;color:#ffd700; }
+    body.theme-amber .shop-item-price { color:#ffaa00; }
+    .shop-item-price.free { color:#007700; }
+    .shop-item-owned-badge { position:absolute;top:4px;right:4px;font-size:11px;background:#007700;color:white;padding:1px 5px; }
+    .shop-buy-btn { display:block;width:100%;margin-top:6px;padding:5px;font-family:'VT323',monospace;font-size:15px;background:var(--bg-titlebar);color:var(--text-titlebar);border:2px solid;border-color:var(--border-main);cursor:pointer; }
+    .shop-buy-btn:disabled { opacity:0.4;cursor:not-allowed; }
+    .shop-status { font-size:14px;min-height:18px;margin-top:8px;text-align:center;color:#007700; }
+    .shop-status.err { color:#cc0000; }
+
     /* ── GAMES MODAL ── */
     #games-modal { max-width:500px; }
     .games-tabs { display:flex;border-bottom:2px solid var(--border-inset);flex-wrap:wrap; }
@@ -218,10 +245,8 @@
     .games-tab.active { background:var(--bg-titlebar);color:white; }
     .game-panel { display:none;padding:16px 0 0 0; }
     .game-panel.active { display:block; }
-
-    /* shared game UI */
     .game-balance { font-size:16px;color:#ffd700;margin-bottom:12px;text-align:center; }
-    body.theme-hacker .game-balance { color:#00ff00; }
+    body.theme-amber .game-balance { color:#ffcc00; }
     .bet-row { display:flex;align-items:center;gap:8px;margin-bottom:12px; }
     .bet-row label { font-size:16px;flex-shrink:0; }
     .bet-input { flex:1;padding:4px 8px;font-family:'VT323',monospace;font-size:20px;border:2px inset var(--border-inset);background:var(--bg-input);color:var(--text-main);min-width:0; }
@@ -233,7 +258,6 @@
     .result-win { color:#007700;font-size:20px; }
     .result-lose { color:#cc0000;font-size:20px; }
     .result-tie { color:#cc6600;font-size:20px; }
-    body.theme-hacker .result-win { color:#00ff00; }
 
     /* SLOTS */
     .slots-reels { display:flex;gap:8px;justify-content:center;margin:12px 0;font-size:40px; }
@@ -254,7 +278,7 @@
     .lb-rank { color:var(--text-system);width:30px; }
     .lb-name { flex:1;margin:0 8px; }
     .lb-coins { color:#ffd700; }
-    body.theme-hacker .lb-coins { color:#00ff00; }
+    body.theme-amber .lb-coins { color:#ffcc00; }
     .lb-header { display:flex;justify-content:space-between;padding:4px 8px;font-size:14px;color:var(--text-system);border-bottom:2px solid var(--border-inset);margin-bottom:4px; }
   </style>
 </head>
@@ -264,9 +288,9 @@
 <div id="auth-screen">
   <div class="auth-titlebar">
     <span>chatroom</span>
-    <span class="auth-version">v1.0</span>
+    <span class="auth-version">v2.0</span>
   </div>
-  <div class="auth-disclaimer">a small project by mce. since all social platforms are selling your data, pushing micro-transaction in your face and ASKING for a pic of your face</div>
+  <div class="auth-disclaimer">a small project by mce. since all social platforms are selling your data, pushing micro-transactions in your face and asking for a pic of your face</div>
   <div class="auth-tabs">
     <button class="auth-tab active" onclick="switchTab('login')">Login</button>
     <button class="auth-tab" onclick="switchTab('register')">Register</button>
@@ -284,9 +308,6 @@
       <input id="reg-username" type="text" placeholder="Username (3-20 chars)..." maxlength="20" autocomplete="username" />
       <input id="reg-password" type="password" placeholder="Password (min 6 chars)..." autocomplete="new-password" />
       <input id="reg-password2" type="password" placeholder="Confirm password..." autocomplete="new-password" />
-      <span class="color-picker-label">Pick your name colour:</span>
-      <div class="color-swatches" id="color-swatches"></div>
-      <input type="hidden" id="reg-color" value="#000080" />
       <button class="primary" onclick="doRegister()">Create Account</button>
       <div class="auth-error" id="register-error"></div>
     </div>
@@ -302,6 +323,7 @@
       <span id="coin-display">🪙 0</span>
       <button id="user-count-btn" class="icon-btn" onclick="toggleUsers()" title="Online users">👤 0</button>
       <button id="sound-btn" class="icon-btn on" onclick="toggleSound()" title="Toggle SFX">🔊</button>
+      <button class="icon-btn" onclick="openShop()" title="Shop">🛒</button>
       <button class="icon-btn" onclick="openGames()" title="Games">🎮</button>
       <button class="icon-btn" onclick="openSettings()" title="Settings">⚙</button>
       <button class="icon-btn danger" onclick="doLogout()" title="Exit">✕</button>
@@ -317,7 +339,7 @@
       <ul id="messages"></ul>
       <div id="typing-bar"></div>
       <div id="bottom">
-        <input id="input" placeholder="Type a message, /me, /msg, /poll, /duel, /give..." autocomplete="off" />
+        <input id="input" placeholder="Type a message, /me, /msg, /poll, /duel, /give, or 'claim'..." autocomplete="off" />
         <button id="send-btn" onclick="send()">Send</button>
       </div>
     </div>
@@ -338,6 +360,30 @@
   </div>
 </div>
 
+<!-- Shop Modal -->
+<div id="shop-overlay" class="modal-overlay">
+  <div class="modal-box" id="shop-modal">
+    <div class="modal-titlebar">
+      <span>🛒 Shop</span>
+      <button class="modal-close" onclick="closeShop()">✕</button>
+    </div>
+    <div style="padding:0 16px;">
+      <div class="shop-balance" id="shop-balance">Balance: 🪙 0</div>
+      <div class="shop-tabs">
+        <button class="shop-tab active" onclick="switchShopTab('themes')">Themes</button>
+        <button class="shop-tab" onclick="switchShopTab('colors')">Colours</button>
+      </div>
+    </div>
+    <div style="padding:0 16px 16px;max-height:380px;overflow-y:auto;">
+      <div id="shop-themes" class="shop-panel active"></div>
+      <div id="shop-colors" class="shop-panel"></div>
+    </div>
+    <div style="padding:0 16px 12px;">
+      <div class="shop-status" id="shop-status"></div>
+    </div>
+  </div>
+</div>
+
 <!-- Settings Modal -->
 <div id="settings-overlay" class="modal-overlay">
   <div class="modal-box" id="settings-modal">
@@ -348,15 +394,12 @@
     <div class="modal-body">
       <div class="settings-section">
         <span class="settings-label">Theme</span>
-        <div class="theme-options">
-          <button class="theme-btn theme-opt-classic selected" data-theme="classic" onclick="selectTheme('classic')">Classic</button>
-          <button class="theme-btn theme-opt-dark" data-theme="dark" onclick="selectTheme('dark')">Dark</button>
-          <button class="theme-btn theme-opt-hacker" data-theme="hacker" onclick="selectTheme('hacker')">Hacker</button>
-          <button class="theme-btn theme-opt-rose" data-theme="rose" onclick="selectTheme('rose')">Rose</button>
-        </div>
+        <div class="settings-note">Only owned themes shown. Buy more in the 🛒 Shop.</div>
+        <div class="theme-options" id="settings-theme-options"></div>
       </div>
       <div class="settings-section">
         <span class="settings-label">Username Colour</span>
+        <div class="settings-note">Only owned colours shown.</div>
         <div id="settings-color-swatches"></div>
       </div>
       <div class="settings-save-row">
@@ -440,556 +483,617 @@
       <div id="leaderboard-rows"><div style="text-align:center;color:var(--text-system);padding:20px;">Loading...</div></div>
       <button class="game-btn" style="margin-top:12px;" onclick="loadLeaderboard()">↻ Refresh</button>
     </div>
-
   </div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-  // ── SOUNDS ───────────────────────────────────────────────────────────────────
-  let soundEnabled = true;
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  let actx = null;
-  function getActx() { if (!actx) actx = new AudioContext(); return actx; }
-  function playTone(freq, type, duration, vol = 0.15, delay = 0) {
-    if (!soundEnabled) return;
-    try {
-      const ctx = getActx();
-      const osc = ctx.createOscillator(); const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.type = type; osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
-      gain.gain.setValueAtTime(vol, ctx.currentTime + delay);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
-      osc.start(ctx.currentTime + delay); osc.stop(ctx.currentTime + delay + duration + 0.01);
-    } catch {}
-  }
-  function soundMessage() { playTone(880, 'square', 0.06, 0.1); }
-  function soundJoin() { playTone(523,'sine',0.15,0.12); playTone(659,'sine',0.15,0.12,0.12); playTone(784,'sine',0.2,0.14,0.24); }
-  function soundLeave() { playTone(784,'sine',0.12,0.1); playTone(523,'sine',0.2,0.1,0.14); }
-  function soundDM() { playTone(1046,'square',0.08,0.1); playTone(1318,'square',0.12,0.12,0.1); }
-  function soundPollEnd() { playTone(659,'sine',0.1,0.12); playTone(784,'sine',0.1,0.12,0.1); playTone(1046,'sine',0.3,0.15,0.2); }
-  function soundWin() { playTone(523,'sine',0.1,0.15); playTone(659,'sine',0.1,0.15,0.1); playTone(784,'sine',0.1,0.15,0.2); playTone(1046,'sine',0.3,0.18,0.3); }
-  function soundLose() { playTone(400,'sawtooth',0.1,0.12); playTone(300,'sawtooth',0.2,0.12,0.12); }
-  function soundCoin() { playTone(1318,'sine',0.08,0.12); playTone(1568,'sine',0.12,0.14,0.08); }
-  function toggleSound() {
-    soundEnabled = !soundEnabled;
-    const btn = document.getElementById('sound-btn');
-    btn.textContent = soundEnabled ? '🔊' : '🔇';
-    btn.classList.toggle('on', soundEnabled);
-  }
+// ── SOUNDS ────────────────────────────────────────────────────────────────────
+let soundEnabled = true;
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let actx = null;
+function getActx() { if (!actx) actx = new AudioContext(); return actx; }
+function playTone(freq, type, duration, vol = 0.15, delay = 0) {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getActx();
+    const osc = ctx.createOscillator(); const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = type; osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+    gain.gain.setValueAtTime(vol, ctx.currentTime + delay);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+    osc.start(ctx.currentTime + delay); osc.stop(ctx.currentTime + delay + duration + 0.01);
+  } catch {}
+}
+function soundMessage() { playTone(880, 'square', 0.06, 0.1); }
+function soundJoin()    { playTone(523,'sine',0.15,0.12); playTone(659,'sine',0.15,0.12,0.12); playTone(784,'sine',0.2,0.14,0.24); }
+function soundLeave()   { playTone(784,'sine',0.12,0.1); playTone(523,'sine',0.2,0.1,0.14); }
+function soundDM()      { playTone(1046,'square',0.08,0.1); playTone(1318,'square',0.12,0.12,0.1); }
+function soundPollEnd() { playTone(659,'sine',0.1,0.12); playTone(784,'sine',0.1,0.12,0.1); playTone(1046,'sine',0.3,0.15,0.2); }
+function soundWin()     { playTone(523,'sine',0.1,0.15); playTone(659,'sine',0.1,0.15,0.1); playTone(784,'sine',0.1,0.15,0.2); playTone(1046,'sine',0.3,0.18,0.3); }
+function soundLose()    { playTone(400,'sawtooth',0.1,0.12); playTone(300,'sawtooth',0.2,0.12,0.12); }
+function soundCoin()    { playTone(1318,'sine',0.08,0.12); playTone(1568,'sine',0.12,0.14,0.08); }
+function soundClaim()   { playTone(880,'sine',0.08,0.2); playTone(1046,'sine',0.08,0.2,0.1); playTone(1318,'sine',0.15,0.2,0.2); playTone(1568,'sine',0.3,0.25,0.35); }
 
-  // ── COLORS ───────────────────────────────────────────────────────────────────
-  const COLORS = ['#000080','#800000','#008000','#800080','#008080','#0000cc','#cc0000','#007700','#aa00aa','#007777','#cc6600','#006699','#990000','#009900','#660099'];
-  let selectedColor = '#000080', selectedSettingsColor = '#000080', selectedTheme = 'classic';
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  const btn = document.getElementById('sound-btn');
+  btn.textContent = soundEnabled ? '🔊' : '🔇';
+  btn.classList.toggle('on', soundEnabled);
+}
 
-  function buildColorSwatches() {
-    const wrap = document.getElementById('color-swatches');
-    COLORS.forEach(c => {
-      const div = document.createElement('div');
-      div.className = 'color-swatch' + (c === selectedColor ? ' selected' : '');
-      div.style.background = c; div.title = c;
-      div.onclick = () => { selectedColor = c; document.getElementById('reg-color').value = c; wrap.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected')); div.classList.add('selected'); };
-      wrap.appendChild(div);
-    });
-  }
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const socket = io({ autoConnect: false });
+let myUsername = null, myColor = '#000080', myCoins = 0, selectedTheme = 'classic';
+let currentRoom = 'general', usersVisible = false, isTyping = false, typingTimer;
+const unreadCounts = {}, polls = {};
 
-  function buildSettingsColorSwatches(currentColor) {
-    selectedSettingsColor = currentColor;
-    const wrap = document.getElementById('settings-color-swatches'); wrap.innerHTML = '';
-    COLORS.forEach(c => {
-      const div = document.createElement('div');
-      div.className = 'color-swatch' + (c === currentColor ? ' selected' : '');
-      div.style.background = c; div.title = c;
-      div.onclick = () => { selectedSettingsColor = c; wrap.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected')); div.classList.add('selected'); };
-      wrap.appendChild(div);
-    });
-  }
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function updateCoinDisplay() { document.getElementById('coin-display').textContent = `🪙 ${myCoins}`; }
 
-  buildColorSwatches();
+function formatDuration(ms) {
+  const total = Math.floor(ms / 1000);
+  const d = Math.floor(total / 86400), h = Math.floor((total % 86400) / 3600), m = Math.floor((total % 3600) / 60), s = total % 60;
+  if (d > 0) return d + "D " + h + "HR " + m + "M";
+  if (h > 0) return h + "HR " + m + "M";
+  if (m > 0) return m + "M " + s + "S";
+  return s + "S";
+}
+function formatTime(ts) { return new Date(ts).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }); }
 
-  // ── THEME ────────────────────────────────────────────────────────────────────
-  function applyTheme(theme) {
-    document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
-    if (theme !== 'classic') document.body.classList.add('theme-' + theme);
-    selectedTheme = theme;
-    document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('selected', btn.dataset.theme === theme));
-  }
-  function selectTheme(theme) { applyTheme(theme); }
+// ── THEME ─────────────────────────────────────────────────────────────────────
+function applyTheme(theme) {
+  document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
+  if (theme !== 'classic') document.body.classList.add('theme-' + theme);
+  selectedTheme = theme;
+}
 
-  // ── SETTINGS ─────────────────────────────────────────────────────────────────
-  function openSettings() { buildSettingsColorSwatches(myColor); document.getElementById('settings-overlay').classList.add('open'); document.getElementById('settings-status').textContent = ''; }
-  function closeSettings() { document.getElementById('settings-overlay').classList.remove('open'); }
+// ── TAB SWITCHING ──────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t, i) => t.classList.toggle('active', (i === 0) === (tab === 'login')));
+  document.getElementById('login-panel').classList.toggle('active', tab === 'login');
+  document.getElementById('register-panel').classList.toggle('active', tab === 'register');
+}
 
-  async function saveSettings() {
-    const statusEl = document.getElementById('settings-status');
-    statusEl.textContent = 'Saving...'; statusEl.style.color = 'inherit';
-    try {
-      const res = await fetch('/settings', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ color: selectedSettingsColor, theme: selectedTheme }) });
-      const data = await res.json();
-      if (!res.ok) { statusEl.textContent = data.error; statusEl.style.color = '#cc0000'; return; }
-      myColor = selectedSettingsColor;
-      document.getElementById('logged-in-as').innerHTML = `<span style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.5)">${myUsername}</span>`;
-      statusEl.textContent = 'Saved!'; statusEl.style.color = '#007700';
-      setTimeout(() => { statusEl.textContent = ''; }, 2000);
-    } catch { statusEl.textContent = 'Error saving.'; statusEl.style.color = '#cc0000'; }
-  }
+// ── AUTH ───────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  errEl.textContent = '';
+  if (!username || !password) { errEl.textContent = 'Please fill in all fields.'; return; }
+  const res = await fetch('/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ username, password }) });
+  const data = await res.json();
+  if (!res.ok) { errEl.textContent = data.error; return; }
+  enterChat(data.username, data.color || '#000080', data.theme || 'classic', data.coins || 0, data.token, data.dailyAvailable);
+}
 
-  document.getElementById('settings-overlay').addEventListener('click', e => { if (e.target === document.getElementById('settings-overlay')) closeSettings(); });
+async function doRegister() {
+  const username = document.getElementById('reg-username').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const password2 = document.getElementById('reg-password2').value;
+  const errEl = document.getElementById('register-error');
+  errEl.textContent = '';
+  if (!username || !password || !password2) { errEl.textContent = 'Please fill in all fields.'; return; }
+  if (password !== password2) { errEl.textContent = 'Passwords do not match.'; return; }
+  const res = await fetch('/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ username, password }) });
+  const data = await res.json();
+  if (!res.ok) { errEl.textContent = data.error; return; }
+  enterChat(data.username, data.color || '#000080', data.theme || 'classic', data.coins || 100, data.token, false);
+}
 
-  // ── DAILY REWARD ─────────────────────────────────────────────────────────────
-  function showDailyModal() { document.getElementById('daily-modal').classList.add('open'); }
-  function closeDailyModal() { document.getElementById('daily-modal').classList.remove('open'); }
+async function doLogout() {
+  await fetch('/logout', { method:'POST' });
+  socket.disconnect();
+  location.reload();
+}
 
-  async function claimDaily() {
-    try {
-      const res = await fetch('/daily', { method:'POST', credentials:'include' });
-      const data = await res.json();
-      if (!res.ok) { closeDailyModal(); return; }
-      myCoins = data.coins;
-      updateCoinDisplay();
-      soundCoin(); soundWin();
-      closeDailyModal();
-      addMessage(`<span class="msg-system">Daily reward claimed! +${data.reward} coins. Balance: ${data.coins} 🪙</span>`);
-    } catch { closeDailyModal(); }
-  }
+// ── ENTER CHAT ─────────────────────────────────────────────────────────────────
+function enterChat(username, color, theme, coins, token, dailyAvailable) {
+  myUsername = username; myColor = color || '#000080'; myCoins = coins || 0;
+  applyTheme(theme || 'classic');
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('chat-screen').style.display = 'block';
+  document.getElementById('logged-in-as').innerHTML = `<span style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.5)">${username}</span>`;
+  updateCoinDisplay();
+  document.getElementById('input').focus();
+  socket.connect();
+  socket.once('connect', () => { socket.emit('join', token); });
+  if (dailyAvailable) setTimeout(() => showDailyModal(), 1500);
+}
 
-  // ── GAMES ────────────────────────────────────────────────────────────────────
-  function openGames() {
-    updateGameBalances();
-    document.getElementById('games-overlay').classList.add('open');
-    loadLeaderboard();
-  }
-  function closeGames() { document.getElementById('games-overlay').classList.remove('open'); }
-
-  function switchGame(name) {
-    document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.games-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('game-' + name).classList.add('active');
-    document.querySelectorAll('.games-tab').forEach(t => { if (t.textContent.toLowerCase().includes(name === 'leaderboard' ? 'board' : name)) t.classList.add('active'); });
-    if (name === 'leaderboard') loadLeaderboard();
-    updateGameBalances();
-  }
-
-  function updateGameBalances() {
-    ['slots', 'dice'].forEach(g => {
-      const el = document.getElementById(g + '-balance');
-      if (el) el.textContent = `Balance: 🪙 ${myCoins}`;
-    });
-  }
-
-  function setBet(game, amount) { document.getElementById(game + '-bet').value = amount; }
-
-  // ── SLOTS ────────────────────────────────────────────────────────────────────
-  let slotsSpinning = false;
-
-  async function playSlots() {
-    if (slotsSpinning) return;
-    const bet = parseInt(document.getElementById('slots-bet').value, 10);
-    if (!bet || bet < 1 || bet > 500) { document.getElementById('slots-result').innerHTML = '<span class="result-lose">Bet must be 1-500</span>'; return; }
-
-    slotsSpinning = true;
-    const btn = document.getElementById('slots-spin-btn');
-    btn.disabled = true;
-    document.getElementById('slots-result').textContent = '';
-
-    [0,1,2].forEach(i => document.getElementById('reel-' + i).classList.add('spinning'));
-
-    await new Promise(r => setTimeout(r, 600));
-
-    try {
-      const res = await fetch('/game/slots', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ bet }) });
-      const data = await res.json();
-
-      [0,1,2].forEach(i => { const el = document.getElementById('reel-' + i); el.classList.remove('spinning'); el.textContent = data.reels ? data.reels[i] : '?'; });
-
-      if (!res.ok) {
-        document.getElementById('slots-result').innerHTML = `<span class="result-lose">${data.error}</span>`;
-      } else {
-        myCoins = data.coins;
-        updateCoinDisplay(); updateGameBalances();
-        if (data.winAmount > 0) {
-          document.getElementById('slots-result').innerHTML = `<span class="result-win">🎉 WIN! ${data.multiplier}x = +${data.winAmount} coins!</span>`;
-          soundWin();
-        } else {
-          document.getElementById('slots-result').innerHTML = `<span class="result-lose">No match. Better luck next time!</span>`;
-          soundLose();
-        }
-      }
-    } catch {
-      document.getElementById('slots-result').innerHTML = '<span class="result-lose">Error. Try again.</span>';
-      [0,1,2].forEach(i => document.getElementById('reel-' + i).classList.remove('spinning'));
-    }
-
-    slotsSpinning = false;
-    btn.disabled = false;
-  }
-
-  // ── DICE ─────────────────────────────────────────────────────────────────────
-  let diceRolling = false;
-
-  async function playDice() {
-    if (diceRolling) return;
-    const bet = parseInt(document.getElementById('dice-bet').value, 10);
-    if (!bet || bet < 1 || bet > 500) { document.getElementById('dice-result').innerHTML = '<span class="result-lose">Bet must be 1-500</span>'; return; }
-
-    diceRolling = true;
-    const btn = document.getElementById('dice-roll-btn');
-    btn.disabled = true;
-    document.getElementById('dice-player').textContent = '🎲';
-    document.getElementById('dice-house').textContent = '🎲';
-    document.getElementById('dice-result').textContent = '';
-
-    await new Promise(r => setTimeout(r, 500));
-
-    try {
-      const res = await fetch('/game/dice', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ bet }) });
-      const data = await res.json();
-
-      if (!res.ok) {
-        document.getElementById('dice-result').innerHTML = `<span class="result-lose">${data.error}</span>`;
-      } else {
-        document.getElementById('dice-player').textContent = data.playerRoll;
-        document.getElementById('dice-house').textContent = data.houseRoll;
-        myCoins = data.coins; updateCoinDisplay(); updateGameBalances();
-
-        if (data.result === 'win') {
-          document.getElementById('dice-result').innerHTML = `<span class="result-win">🎉 You win! +${data.winAmount} coins!</span>`;
-          soundWin();
-        } else if (data.result === 'tie') {
-          document.getElementById('dice-result').innerHTML = `<span class="result-tie">🤝 Tie! Bet returned.</span>`;
-        } else {
-          document.getElementById('dice-result').innerHTML = `<span class="result-lose">House wins. Better luck next time!</span>`;
-          soundLose();
-        }
-      }
-    } catch { document.getElementById('dice-result').innerHTML = '<span class="result-lose">Error. Try again.</span>'; }
-
-    diceRolling = false; btn.disabled = false;
-  }
-
-  // ── LEADERBOARD ───────────────────────────────────────────────────────────────
-  async function loadLeaderboard() {
-    const container = document.getElementById('leaderboard-rows');
-    container.innerHTML = '<div style="text-align:center;color:var(--text-system);padding:20px;">Loading...</div>';
-    try {
-      const res = await fetch('/leaderboard', { credentials:'include' });
-      const data = await res.json();
-      if (!res.ok) { container.innerHTML = '<div style="color:#cc0000;text-align:center;padding:12px;">Error loading.</div>'; return; }
-      container.innerHTML = data.map((row, i) => `
-        <div class="lb-row">
-          <span class="lb-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`}</span>
-          <span class="lb-name">${escHtml(row.username)}</span>
-          <span class="lb-coins">🪙 ${row.coins}</span>
-        </div>
-      `).join('');
-    } catch { container.innerHTML = '<div style="color:#cc0000;text-align:center;padding:12px;">Error loading.</div>'; }
-  }
-
-  function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-  // ── SOCKET & STATE ────────────────────────────────────────────────────────────
-  const socket = io({ autoConnect: false });
-  let myUsername = null, myColor = '#000080', myCoins = 0;
-  let currentRoom = 'general', usersVisible = false, isTyping = false, typingTimer;
-  const unreadCounts = {}, polls = {};
-
-  function updateCoinDisplay() {
-    document.getElementById('coin-display').textContent = `🪙 ${myCoins}`;
-  }
-
-  // ── TAB SWITCHING ─────────────────────────────────────────────────────────────
-  function switchTab(tab) {
-    document.querySelectorAll('.auth-tab').forEach((t, i) => t.classList.toggle('active', (i === 0) === (tab === 'login')));
-    document.getElementById('login-panel').classList.toggle('active', tab === 'login');
-    document.getElementById('register-panel').classList.toggle('active', tab === 'register');
-  }
-
-  // ── AUTH ──────────────────────────────────────────────────────────────────────
-  async function doLogin() {
-    const username = document.getElementById('login-username').value.trim();
-    const password = document.getElementById('login-password').value;
-    const errEl = document.getElementById('login-error');
-    errEl.textContent = '';
-    if (!username || !password) { errEl.textContent = 'Please fill in all fields.'; return; }
-    const res = await fetch('/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ username, password }) });
-    const data = await res.json();
-    if (!res.ok) { errEl.textContent = data.error; return; }
-    enterChat(data.username, data.color || '#000080', data.theme || 'classic', data.coins || 0, data.token, data.dailyAvailable);
-  }
-
-  async function doRegister() {
-    const username = document.getElementById('reg-username').value.trim();
-    const password = document.getElementById('reg-password').value;
-    const password2 = document.getElementById('reg-password2').value;
-    const color = document.getElementById('reg-color').value;
-    const errEl = document.getElementById('register-error');
-    errEl.textContent = '';
-    if (!username || !password || !password2) { errEl.textContent = 'Please fill in all fields.'; return; }
-    if (password !== password2) { errEl.textContent = 'Passwords do not match.'; return; }
-    const res = await fetch('/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ username, password, color }) });
-    const data = await res.json();
-    if (!res.ok) { errEl.textContent = data.error; return; }
-    enterChat(data.username, data.color || '#000080', data.theme || 'classic', data.coins || 100, data.token, false);
-  }
-
-  async function doLogout() {
-    await fetch('/logout', { method:'POST' });
-    socket.disconnect();
-    location.reload();
-  }
-
-  // ── ENTER CHAT ────────────────────────────────────────────────────────────────
-  function enterChat(username, color, theme, coins, token, dailyAvailable) {
-    myUsername = username; myColor = color || '#000080'; myCoins = coins || 0;
-    applyTheme(theme || 'classic');
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('chat-screen').style.display = 'block';
-    document.getElementById('logged-in-as').innerHTML = `<span style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.5)">${username}</span>`;
-    updateCoinDisplay();
-    document.getElementById('input').focus();
-    socket.connect();
-    socket.once('connect', () => { socket.emit('join', token); });
-    if (dailyAvailable) setTimeout(() => showDailyModal(), 1500);
-  }
-
-  // ── ROOMS ─────────────────────────────────────────────────────────────────────
-  function renderRooms(rooms) {
-    const list = document.getElementById('rooms-list'); list.innerHTML = '';
-    rooms.forEach(room => {
-      const btn = document.createElement('button');
-      btn.className = 'room-btn' + (room === currentRoom ? ' active' : '');
-      btn.dataset.room = room; btn.innerHTML = `#${room}`;
-      if (unreadCounts[room]) btn.innerHTML += `<span class="room-unread">${unreadCounts[room]}</span>`;
-      btn.onclick = () => switchRoom(room);
-      list.appendChild(btn);
-    });
-  }
-
-  function switchRoom(room) {
-    if (room === currentRoom) return;
-    document.getElementById('messages').innerHTML = ''; currentRoom = room;
-    socket.emit('switch room', room); unreadCounts[room] = 0;
-  }
-
-  // ── SEND ──────────────────────────────────────────────────────────────────────
-  function send() {
-    const input = document.getElementById('input');
-    const text = input.value.trim();
-    if (!text) return;
-    socket.emit('chat message', text); input.value = ''; stopTyping();
-  }
-
-  // ── TYPING ────────────────────────────────────────────────────────────────────
-  document.getElementById('input').addEventListener('input', () => {
-    socket.emit('activity');
-    if (!isTyping) { isTyping = true; socket.emit('typing start'); }
-    clearTimeout(typingTimer); typingTimer = setTimeout(stopTyping, 2000);
+// ── ROOMS ──────────────────────────────────────────────────────────────────────
+function renderRooms(rooms) {
+  const list = document.getElementById('rooms-list'); list.innerHTML = '';
+  rooms.forEach(room => {
+    const btn = document.createElement('button');
+    btn.className = 'room-btn' + (room === currentRoom ? ' active' : '');
+    btn.dataset.room = room; btn.innerHTML = `#${room}`;
+    if (unreadCounts[room]) btn.innerHTML += `<span class="room-unread">${unreadCounts[room]}</span>`;
+    btn.onclick = () => switchRoom(room);
+    list.appendChild(btn);
   });
-  function stopTyping() { if (!isTyping) return; isTyping = false; clearTimeout(typingTimer); socket.emit('typing stop'); }
+}
 
-  function toggleUsers() { usersVisible = !usersVisible; document.getElementById('users-panel').classList.toggle('visible', usersVisible); }
+function switchRoom(room) {
+  if (room === currentRoom) return;
+  document.getElementById('messages').innerHTML = ''; currentRoom = room;
+  socket.emit('switch room', room); unreadCounts[room] = 0;
+}
 
-  // ── HELPERS ───────────────────────────────────────────────────────────────────
-  function formatDuration(ms) {
-    const total = Math.floor(ms / 1000);
-    const d = Math.floor(total / 86400), h = Math.floor((total % 86400) / 3600), m = Math.floor((total % 3600) / 60), s = total % 60;
-    if (d > 0) return d + "D " + h + "HR " + m + "M";
-    if (h > 0) return h + "HR " + m + "M";
-    if (m > 0) return m + "M " + s + "S";
-    return s + "S";
+// ── SEND ───────────────────────────────────────────────────────────────────────
+function send() {
+  const input = document.getElementById('input');
+  const text = input.value.trim();
+  if (!text) return;
+  socket.emit('chat message', text); input.value = ''; stopTyping();
+}
+
+// ── TYPING ─────────────────────────────────────────────────────────────────────
+document.getElementById('input').addEventListener('input', () => {
+  socket.emit('activity');
+  if (!isTyping) { isTyping = true; socket.emit('typing start'); }
+  clearTimeout(typingTimer); typingTimer = setTimeout(stopTyping, 2000);
+});
+function stopTyping() { if (!isTyping) return; isTyping = false; clearTimeout(typingTimer); socket.emit('typing stop'); }
+function toggleUsers() { usersVisible = !usersVisible; document.getElementById('users-panel').classList.toggle('visible', usersVisible); }
+
+// ── MESSAGES ───────────────────────────────────────────────────────────────────
+function addMessage(html, extraClass = '', timestamp = null) {
+  const messages = document.getElementById('messages');
+  const atBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 40;
+  const li = document.createElement('li'); li.style.listStyle = 'none';
+  li.className = 'msg-row' + (extraClass ? ' ' + extraClass : '');
+  const ts = timestamp ? `<span class="msg-ts">${formatTime(timestamp)}</span>` : '';
+  li.innerHTML = html + ts; messages.appendChild(li);
+  if (atBottom) messages.scrollTop = messages.scrollHeight;
+  return li;
+}
+
+function addDmMessage(data) {
+  const messages = document.getElementById('messages');
+  const atBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 40;
+  const li = document.createElement('li'); li.style.listStyle = 'none';
+  li.className = 'msg-row msg-dm-row' + (!data.noFlash && !data.self ? ' dm-flash' : '');
+  const label = data.self ? `<span class="msg-dm-label">→ DM to ${data.to}:</span>` : `<span class="msg-dm-label">DM from ${data.from}:</span>`;
+  li.innerHTML = label + `<span class="msg-text">${data.text}</span>`;
+  messages.appendChild(li);
+  if (atBottom) messages.scrollTop = messages.scrollHeight;
+  if (!data.noFlash && !data.self) soundDM();
+}
+
+// ── POLLS ──────────────────────────────────────────────────────────────────────
+function renderPoll(poll) {
+  polls[poll.id] = poll;
+  const existing = document.getElementById(`poll-${poll.id}`);
+  if (existing) { existing.innerHTML = buildPollHtml(poll); return; }
+  const messages = document.getElementById('messages');
+  const atBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 40;
+  const li = document.createElement('li'); li.style.listStyle = 'none';
+  li.id = `poll-${poll.id}`; li.className = 'msg-row'; li.innerHTML = buildPollHtml(poll);
+  messages.appendChild(li);
+  if (atBottom) messages.scrollTop = messages.scrollHeight;
+}
+
+function buildPollHtml(poll) {
+  const totalVotes = Object.keys(poll.votes || {}).length;
+  const myVote = (poll.votes || {})[myUsername];
+  const concluded = poll.concluded;
+  let topCount = 0;
+  if (concluded && totalVotes > 0) {
+    const tally = {}; poll.options.forEach(o => tally[o] = 0);
+    Object.values(poll.votes || {}).forEach(v => { if (tally[v] !== undefined) tally[v]++; });
+    topCount = Math.max(...Object.values(tally));
   }
-  function formatTime(ts) { return new Date(ts).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }); }
-
-  function addMessage(html, extraClass = '', timestamp = null) {
-    const messages = document.getElementById('messages');
-    const atBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 40;
-    const li = document.createElement('li'); li.style.listStyle = 'none';
-    li.className = 'msg-row' + (extraClass ? ' ' + extraClass : '');
-    const ts = timestamp ? `<span class="msg-ts">${formatTime(timestamp)}</span>` : '';
-    li.innerHTML = html + ts; messages.appendChild(li);
-    if (atBottom) messages.scrollTop = messages.scrollHeight;
-    return li;
-  }
-
-  function addDmMessage(data) {
-    const messages = document.getElementById('messages');
-    const atBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 40;
-    const li = document.createElement('li'); li.style.listStyle = 'none';
-    li.className = 'msg-row msg-dm-row' + (!data.noFlash && !data.self ? ' dm-flash' : '');
-    const label = data.self ? `<span class="msg-dm-label">→ DM to ${data.to}:</span>` : `<span class="msg-dm-label">DM from ${data.from}:</span>`;
-    li.innerHTML = label + `<span class="msg-text">${data.text}</span>`;
-    messages.appendChild(li);
-    if (atBottom) messages.scrollTop = messages.scrollHeight;
-    if (!data.noFlash && !data.self) soundDM();
-  }
-
-  // ── POLLS ────────────────────────────────────────────────────────────────────
-  function renderPoll(poll) {
-    polls[poll.id] = poll;
-    const existing = document.getElementById(`poll-${poll.id}`);
-    if (existing) { existing.innerHTML = buildPollHtml(poll); return; }
-    const messages = document.getElementById('messages');
-    const atBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 40;
-    const li = document.createElement('li'); li.style.listStyle = 'none';
-    li.id = `poll-${poll.id}`; li.className = 'msg-row'; li.innerHTML = buildPollHtml(poll);
-    messages.appendChild(li);
-    if (atBottom) messages.scrollTop = messages.scrollHeight;
-  }
-
-  function buildPollHtml(poll) {
-    const totalVotes = Object.keys(poll.votes || {}).length;
-    const myVote = (poll.votes || {})[myUsername];
-    const concluded = poll.concluded;
-    let topCount = 0;
-    if (concluded && totalVotes > 0) {
-      const tally = {}; poll.options.forEach(o => tally[o] = 0);
-      Object.values(poll.votes || {}).forEach(v => { if (tally[v] !== undefined) tally[v]++; });
-      topCount = Math.max(...Object.values(tally));
-    }
-    const optionsHtml = poll.options.map(opt => {
-      const count = Object.values(poll.votes || {}).filter(v => v === opt).length;
-      const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
-      const isVoted = myVote === opt, isWinner = concluded && totalVotes > 0 && count === topCount;
-      const classes = ['poll-option', isVoted ? 'voted' : '', concluded ? 'concluded' : '', isWinner ? 'winner' : ''].filter(Boolean).join(' ');
-      return `<div class="${classes}" onclick="${concluded ? '' : `castVote(${poll.id}, '${opt.replace(/'/g, "\\'")}')`}">
-        <span class="poll-opt-label">${isWinner ? '🏆 ' : ''}${opt}</span>
-        <div class="poll-bar-wrap"><div class="poll-bar" style="width:${pct}%"></div></div>
-        <span class="poll-pct">${pct}%</span>
-        <span style="font-size:13px;color:var(--text-system)">${count}</span>
-      </div>`;
-    }).join('');
-    let timerHtml = '';
-    if (!concluded && poll.endsAt) timerHtml = `<span class="poll-timer" data-ends="${new Date(poll.endsAt).getTime()}">...</span>`;
-    else if (concluded) timerHtml = `<span style="color:var(--text-system)">concluded</span>`;
-    return `<div class="poll-card${concluded ? ' poll-concluded' : ''}">
-      <div class="poll-question">📊 ${poll.question}</div>${optionsHtml}
-      <div class="poll-meta">by ${poll.creator} · ${totalVotes} vote${totalVotes !== 1 ? 's' : ''} · ${timerHtml}</div>
+  const optionsHtml = poll.options.map(opt => {
+    const count = Object.values(poll.votes || {}).filter(v => v === opt).length;
+    const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+    const isVoted = myVote === opt;
+    const isWinner = concluded && totalVotes > 0 && count === topCount;
+    const classes = ['poll-option', isVoted ? 'voted' : '', concluded ? 'concluded' : '', isWinner ? 'winner' : ''].filter(Boolean).join(' ');
+    // Use data-poll and data-opt attributes so onclick isn't broken by string escaping
+    return `<div class="${classes}" data-poll="${poll.id}" data-opt="${escHtml(opt)}">
+      <span class="poll-opt-label">${isWinner ? '🏆 ' : ''}${escHtml(opt)}</span>
+      <div class="poll-bar-wrap"><div class="poll-bar" style="width:${pct}%"></div></div>
+      <span class="poll-pct">${pct}%</span>
+      <span style="font-size:13px;color:var(--text-system)">${count}</span>
     </div>`;
-  }
+  }).join('');
+  let timerHtml = '';
+  if (!concluded && poll.endsAt) timerHtml = `<span class="poll-timer" data-ends="${new Date(poll.endsAt).getTime()}">...</span>`;
+  else if (concluded) timerHtml = `<span style="color:var(--text-system)">concluded</span>`;
+  return `<div class="poll-card${concluded ? ' poll-concluded' : ''}">
+    <div class="poll-question">📊 ${escHtml(poll.question)}</div>${optionsHtml}
+    <div class="poll-meta">by ${escHtml(poll.creator)} · ${totalVotes} vote${totalVotes !== 1 ? 's' : ''} · ${timerHtml}</div>
+  </div>`;
+}
 
-  function castVote(pollId, option) { socket.emit('poll vote', { pollId, option }); }
+// Delegate poll clicks from the messages container (fixes double-fire from innerHTML re-use)
+document.getElementById('messages').addEventListener('click', (e) => {
+  const opt = e.target.closest('.poll-option');
+  if (!opt || opt.classList.contains('concluded')) return;
+  const pollId = parseInt(opt.dataset.poll, 10);
+  const option = opt.dataset.opt;
+  if (pollId && option) socket.emit('poll vote', { pollId, option });
+});
 
-  // ── HISTORY ──────────────────────────────────────────────────────────────────
-  function renderHistory(history) {
-    const messages = document.getElementById('messages'); messages.innerHTML = '';
-    if (history.length === 0) return;
-    addMessage(`<span class="msg-system">── message history ──</span>`);
-    history.forEach(row => {
-      const ts = new Date(row.created_at).getTime();
-      if (row.type === 'system') {
-        addMessage(`<span class="msg-system">*** ${row.text} ***</span>`, '', ts);
-      } else if (row.type === 'action') {
-        addMessage(`<span class="msg-action">*** <span class="msg-user" style="color:${row.color}">${row.sender}</span> ${row.text} ***</span>`, '', ts);
-      } else if (row.type === 'dm') {
-        addDmMessage({ from: row.sender, to: row.recipient, text: row.text, self: row.sender === myUsername, noFlash: true });
-      } else {
-        addMessage(`<span class="msg-user" style="color:${row.color}">${row.sender}:</span> <span class="msg-text">${row.text}</span>`, row.sender === myUsername ? 'msg-own' : '', ts);
-      }
-    });
-    addMessage(`<span class="msg-system">── live ──</span>`);
-    messages.scrollTop = messages.scrollHeight;
-  }
-
-  // ── SOCKET EVENTS ────────────────────────────────────────────────────────────
-  socket.on('rooms list', rooms => renderRooms(rooms));
-  socket.on('room changed', room => { currentRoom = room; renderRooms([...document.querySelectorAll('.room-btn')].map(b => b.dataset.room)); });
-  socket.on('history', history => renderHistory(history));
-
-  socket.on('chat message', ({ user, color, text, type, timestamp }) => {
-    const isOwn = user === myUsername;
-    if (type === 'action') addMessage(`<span class="msg-action">*** <span class="msg-user" style="color:${color}">${user}</span> ${text} ***</span>`, '', timestamp);
-    else addMessage(`<span class="msg-user" style="color:${color}">${user}:</span> <span class="msg-text">${text}</span>`, isOwn ? 'msg-own' : '', timestamp || Date.now());
-    if (!isOwn) soundMessage();
+// ── HISTORY ────────────────────────────────────────────────────────────────────
+function renderHistory(history) {
+  const messages = document.getElementById('messages'); messages.innerHTML = '';
+  if (history.length === 0) return;
+  addMessage(`<span class="msg-system">── message history ──</span>`);
+  history.forEach(row => {
+    const ts = new Date(row.created_at).getTime();
+    if (row.type === 'system') {
+      addMessage(`<span class="msg-system">*** ${row.text} ***</span>`, '', ts);
+    } else if (row.type === 'action') {
+      addMessage(`<span class="msg-action">*** <span class="msg-user" style="color:${row.color}">${row.sender}</span> ${row.text} ***</span>`, '', ts);
+    } else if (row.type === 'dm') {
+      addDmMessage({ from: row.sender, to: row.recipient, text: row.text, self: row.sender === myUsername, noFlash: true });
+    } else {
+      addMessage(`<span class="msg-user" style="color:${row.color}">${row.sender}:</span> <span class="msg-text">${row.text}</span>`, row.sender === myUsername ? 'msg-own' : '', ts);
+    }
   });
+  addMessage(`<span class="msg-system">── live ──</span>`);
+  document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+}
 
-  socket.on('system message', msg => {
+// ── SOCKET EVENTS ──────────────────────────────────────────────────────────────
+socket.on('rooms list', rooms => renderRooms(rooms));
+socket.on('room changed', room => { currentRoom = room; renderRooms([...document.querySelectorAll('.room-btn')].map(b => b.dataset.room)); });
+socket.on('history', history => renderHistory(history));
+
+socket.on('chat message', ({ user, color, text, type, timestamp }) => {
+  const isOwn = user === myUsername;
+  if (type === 'action') addMessage(`<span class="msg-action">*** <span class="msg-user" style="color:${color}">${user}</span> ${text} ***</span>`, '', timestamp);
+  else addMessage(`<span class="msg-user" style="color:${color}">${user}:</span> <span class="msg-text">${text}</span>`, isOwn ? 'msg-own' : '', timestamp || Date.now());
+  if (!isOwn) soundMessage();
+});
+
+socket.on('system message', msg => {
+  // Detect claim event announcement for special styling
+  const isClaim = msg.includes('TYPE "claim"') || msg.includes('claimed the reward');
+  if (isClaim) {
+    addMessage(`<span class="msg-claim-event">*** ${msg} ***</span>`);
+    if (msg.includes('TYPE "claim"')) soundClaim();
+    else if (msg.includes('claimed the reward') && msg.includes(myUsername)) soundWin();
+  } else {
     addMessage(`<span class="msg-system">*** ${msg} ***</span>`);
     if (/has joined/.test(msg)) soundJoin();
     else if (/has left/.test(msg)) soundLeave();
+  }
+});
+
+socket.on('dm', data => addDmMessage(data));
+socket.on('coins update', ({ coins }) => { myCoins = coins; updateCoinDisplay(); updateGameBalances(); });
+
+socket.on('link preview', ({ url, title, image, description }) => {
+  const messages = document.getElementById('messages');
+  const rows = messages.querySelectorAll('.msg-row');
+  let target = null;
+  for (let i = rows.length - 1; i >= 0; i--) { if (rows[i].textContent.includes(url.slice(8, 40))) { target = rows[i]; break; } }
+  const previewEl = document.createElement('div'); previewEl.className = 'link-preview';
+  let html = '';
+  if (image) html += `<img src="${image}" alt="" onerror="this.style.display='none'">`;
+  if (title) html += `<div class="lp-title">${title}</div>`;
+  if (description) html += `<div class="lp-desc">${description}</div>`;
+  previewEl.innerHTML = html;
+  const atBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 40;
+  if (target) target.appendChild(previewEl);
+  else { const li = document.createElement('li'); li.style.listStyle = 'none'; li.appendChild(previewEl); messages.appendChild(li); }
+  if (atBottom) messages.scrollTop = messages.scrollHeight;
+});
+
+socket.on('poll update', poll => renderPoll(poll));
+socket.on('poll concluded', ({ pollId }) => {
+  if (polls[pollId]) { polls[pollId].concluded = true; const el = document.getElementById(`poll-${pollId}`); if (el) el.innerHTML = buildPollHtml(polls[pollId]); soundPollEnd(); }
+});
+
+socket.on('user list', list => {
+  document.getElementById('user-count-btn').textContent = `👤 ${list.length}`;
+  const panel = document.getElementById('users-panel'); panel.innerHTML = '';
+  list.forEach(({ username, color, joinedAt, idle }) => {
+    const entry = document.createElement('span'); entry.className = 'user-entry'; entry.dataset.joinedAt = joinedAt;
+    entry.innerHTML = `<span class="uname" style="color:${color}">${username}</span>${idle ? '<span class="uidle">⏸</span>' : ''}<span class="utime">${formatDuration(Date.now() - joinedAt)}</span>`;
+    panel.appendChild(entry);
   });
+});
 
-  socket.on('dm', data => addDmMessage(data));
+socket.on('typing', ({ text }) => {
+  const bar = document.getElementById('typing-bar');
+  bar.innerHTML = text ? text + ' <span class="dots"><span></span><span></span><span></span></span>' : '';
+});
 
-  socket.on('coins update', ({ coins }) => { myCoins = coins; updateCoinDisplay(); updateGameBalances(); });
+socket.on('kicked', reason => {
+  addMessage(`<span class="msg-kicked">⚠ ${reason || 'You were signed in from another device.'}</span>`);
+  document.getElementById('input').disabled = true;
+  document.getElementById('send-btn').disabled = true;
+  socket.disconnect();
+});
 
-  socket.on('link preview', ({ url, title, image, description }) => {
-    const messages = document.getElementById('messages');
-    const rows = messages.querySelectorAll('.msg-row');
-    let target = null;
-    for (let i = rows.length - 1; i >= 0; i--) { if (rows[i].textContent.includes(url.slice(8, 40))) { target = rows[i]; break; } }
-    const previewEl = document.createElement('div'); previewEl.className = 'link-preview';
-    let html = '';
-    if (image) html += `<img src="${image}" alt="" onerror="this.style.display='none'">`;
-    if (title) html += `<div class="lp-title">${title}</div>`;
-    if (description) html += `<div class="lp-desc">${description}</div>`;
-    previewEl.innerHTML = html;
-    const atBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 40;
-    if (target) target.appendChild(previewEl);
-    else { const li = document.createElement('li'); li.style.listStyle = 'none'; li.appendChild(previewEl); messages.appendChild(li); }
-    if (atBottom) messages.scrollTop = messages.scrollHeight;
+// ── DAILY REWARD ───────────────────────────────────────────────────────────────
+function showDailyModal() { document.getElementById('daily-modal').classList.add('open'); }
+function closeDailyModal() { document.getElementById('daily-modal').classList.remove('open'); }
+
+async function claimDaily() {
+  try {
+    const res = await fetch('/daily', { method:'POST', credentials:'include' });
+    const data = await res.json();
+    if (!res.ok) { closeDailyModal(); return; }
+    myCoins = data.coins; updateCoinDisplay();
+    soundCoin(); soundWin();
+    closeDailyModal();
+    addMessage(`<span class="msg-system">Daily reward claimed! +${data.reward} coins. Balance: ${data.coins} 🪙</span>`);
+  } catch { closeDailyModal(); }
+}
+
+// ── SHOP ───────────────────────────────────────────────────────────────────────
+let shopItems = [];
+let selectedSettingsColor = '#000080', selectedSettingsTheme = 'classic';
+
+async function openShop() {
+  document.getElementById('shop-overlay').classList.add('open');
+  document.getElementById('shop-balance').textContent = `Balance: 🪙 ${myCoins}`;
+  document.getElementById('shop-status').textContent = '';
+  await loadShopItems();
+}
+function closeShop() { document.getElementById('shop-overlay').classList.remove('open'); }
+
+function switchShopTab(tab) {
+  document.querySelectorAll('.shop-tab').forEach(t => t.classList.toggle('active', t.textContent.toLowerCase().includes(tab === 'themes' ? 'theme' : 'colour')));
+  document.getElementById('shop-themes').classList.toggle('active', tab === 'themes');
+  document.getElementById('shop-colors').classList.toggle('active', tab === 'colors');
+}
+
+async function loadShopItems() {
+  try {
+    const res = await fetch('/shop', { credentials:'include' });
+    shopItems = await res.json();
+    renderShopThemes();
+    renderShopColors();
+  } catch { document.getElementById('shop-status').textContent = 'Error loading shop.'; document.getElementById('shop-status').className = 'shop-status err'; }
+}
+
+function renderShopThemes() {
+  const themes = shopItems.filter(i => i.type === 'theme');
+  document.getElementById('shop-themes').innerHTML = `<div class="shop-grid">${themes.map(item => shopItemHtml(item)).join('')}</div>`;
+}
+
+function renderShopColors() {
+  const colors = shopItems.filter(i => i.type === 'color');
+  document.getElementById('shop-colors').innerHTML = `<div class="shop-grid">${colors.map(item => shopItemHtml(item)).join('')}</div>`;
+}
+
+function shopItemHtml(item) {
+  const priceLabel = item.price === 0
+    ? `<span class="shop-item-price free">FREE</span>`
+    : `<span class="shop-item-price">🪙 ${item.price}</span>`;
+  const badge = item.owned ? `<span class="shop-item-owned-badge">✓ OWNED</span>` : '';
+  const btn = item.owned
+    ? `<button class="shop-buy-btn" disabled>Owned</button>`
+    : `<button class="shop-buy-btn" onclick="buyItem('${item.id}')">Buy ${item.price === 0 ? '(Free)' : `🪙 ${item.price}`}</button>`;
+  return `<div class="shop-item${item.owned ? ' owned' : ''}" id="shop-item-${item.id}">
+    ${badge}
+    <div class="shop-item-swatch" style="background:${item.preview}"></div>
+    <div class="shop-item-name">${escHtml(item.name)}</div>
+    <div class="shop-item-desc">${escHtml(item.description || '')}</div>
+    ${priceLabel}
+    ${btn}
+  </div>`;
+}
+
+async function buyItem(itemId) {
+  const statusEl = document.getElementById('shop-status');
+  statusEl.textContent = 'Purchasing...'; statusEl.className = 'shop-status';
+  try {
+    const res = await fetch('/shop/buy', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ itemId }) });
+    const data = await res.json();
+    if (!res.ok) { statusEl.textContent = data.error; statusEl.className = 'shop-status err'; return; }
+    myCoins = data.coins; updateCoinDisplay();
+    document.getElementById('shop-balance').textContent = `Balance: 🪙 ${myCoins}`;
+    // Update local item list
+    const idx = shopItems.findIndex(i => i.id === itemId);
+    if (idx >= 0) shopItems[idx].owned = true;
+    renderShopThemes(); renderShopColors();
+    statusEl.textContent = `✓ Purchased ${data.item.name}!`; statusEl.className = 'shop-status';
+    soundCoin();
+  } catch { statusEl.textContent = 'Purchase failed.'; statusEl.className = 'shop-status err'; }
+}
+
+document.getElementById('shop-overlay').addEventListener('click', e => { if (e.target === document.getElementById('shop-overlay')) closeShop(); });
+
+// ── SETTINGS ───────────────────────────────────────────────────────────────────
+async function openSettings() {
+  document.getElementById('settings-overlay').classList.add('open');
+  document.getElementById('settings-status').textContent = '';
+  selectedSettingsColor = myColor;
+  selectedSettingsTheme = selectedTheme;
+  // Load owned items to populate settings
+  if (shopItems.length === 0) await loadShopItems();
+  renderSettingsThemes();
+  renderSettingsColors();
+}
+function closeSettings() { document.getElementById('settings-overlay').classList.remove('open'); }
+
+function renderSettingsThemes() {
+  const ownedThemes = shopItems.filter(i => i.type === 'theme' && i.owned);
+  const wrap = document.getElementById('settings-theme-options'); wrap.innerHTML = '';
+  ownedThemes.forEach(item => {
+    const btn = document.createElement('button');
+    btn.className = `theme-btn theme-opt-${item.value}${item.value === selectedSettingsTheme ? ' selected' : ''}`;
+    btn.textContent = item.name;
+    btn.onclick = () => {
+      selectedSettingsTheme = item.value;
+      wrap.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      applyTheme(item.value); // live preview
+    };
+    wrap.appendChild(btn);
   });
+  if (ownedThemes.length === 0) wrap.innerHTML = '<span style="font-size:14px;color:var(--text-system)">No themes owned yet. Visit the 🛒 Shop!</span>';
+}
 
-  socket.on('poll update', poll => renderPoll(poll));
-  socket.on('poll concluded', ({ pollId }) => {
-    if (polls[pollId]) { polls[pollId].concluded = true; const el = document.getElementById(`poll-${pollId}`); if (el) el.innerHTML = buildPollHtml(polls[pollId]); soundPollEnd(); }
+function renderSettingsColors() {
+  const ownedColors = shopItems.filter(i => i.type === 'color' && i.owned);
+  const wrap = document.getElementById('settings-color-swatches'); wrap.innerHTML = '';
+  ownedColors.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'color-swatch' + (item.value === selectedSettingsColor ? ' selected' : '');
+    div.style.background = item.value; div.title = item.name;
+    div.onclick = () => {
+      selectedSettingsColor = item.value;
+      wrap.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+      div.classList.add('selected');
+    };
+    wrap.appendChild(div);
   });
+  if (ownedColors.length === 0) wrap.innerHTML = '<span style="font-size:14px;color:var(--text-system)">No colours owned yet. Visit the 🛒 Shop!</span>';
+}
 
-  socket.on('user list', list => {
-    document.getElementById('user-count-btn').textContent = `👤 ${list.length}`;
-    const panel = document.getElementById('users-panel'); panel.innerHTML = '';
-    list.forEach(({ username, color, joinedAt, idle }) => {
-      const entry = document.createElement('span'); entry.className = 'user-entry'; entry.dataset.joinedAt = joinedAt;
-      entry.innerHTML = `<span class="uname" style="color:${color}">${username}</span>${idle ? '<span class="uidle">⏸</span>' : ''}<span class="utime">${formatDuration(Date.now() - joinedAt)}</span>`;
-      panel.appendChild(entry);
-    });
-  });
+async function saveSettings() {
+  const statusEl = document.getElementById('settings-status');
+  statusEl.textContent = 'Saving...'; statusEl.style.color = 'inherit';
+  try {
+    const res = await fetch('/settings', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ color: selectedSettingsColor, theme: selectedSettingsTheme }) });
+    const data = await res.json();
+    if (!res.ok) { statusEl.textContent = data.error; statusEl.style.color = '#cc0000'; return; }
+    myColor = selectedSettingsColor;
+    document.getElementById('logged-in-as').innerHTML = `<span style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.5)">${myUsername}</span>`;
+    statusEl.textContent = 'Saved!'; statusEl.style.color = '#007700';
+    setTimeout(() => { statusEl.textContent = ''; }, 2000);
+  } catch { statusEl.textContent = 'Error saving.'; statusEl.style.color = '#cc0000'; }
+}
 
-  socket.on('typing', ({ text }) => {
-    const bar = document.getElementById('typing-bar');
-    bar.innerHTML = text ? text + ' <span class="dots"><span></span><span></span><span></span></span>' : '';
-  });
+document.getElementById('settings-overlay').addEventListener('click', e => { if (e.target === document.getElementById('settings-overlay')) closeSettings(); });
 
-  socket.on('kicked', reason => {
-    addMessage(`<span class="msg-kicked">⚠ ${reason || 'You were signed in from another device.'}</span>`);
-    document.getElementById('input').disabled = true; document.getElementById('send-btn').disabled = true;
-    socket.disconnect();
-  });
+// ── GAMES ──────────────────────────────────────────────────────────────────────
+function openGames() { updateGameBalances(); document.getElementById('games-overlay').classList.add('open'); loadLeaderboard(); }
+function closeGames() { document.getElementById('games-overlay').classList.remove('open'); }
 
-  // ── TICKERS ──────────────────────────────────────────────────────────────────
-  setInterval(() => {
-    document.querySelectorAll('.user-entry').forEach(entry => {
-      const span = entry.querySelector('.utime');
-      if (span) span.textContent = formatDuration(Date.now() - parseInt(entry.dataset.joinedAt, 10));
-    });
-  }, 1000);
+function switchGame(name) {
+  document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.games-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('game-' + name).classList.add('active');
+  document.querySelectorAll('.games-tab').forEach(t => { if (t.textContent.toLowerCase().includes(name === 'leaderboard' ? 'board' : name)) t.classList.add('active'); });
+  if (name === 'leaderboard') loadLeaderboard();
+  updateGameBalances();
+}
 
-  setInterval(() => {
-    document.querySelectorAll('.poll-timer').forEach(el => {
-      const left = Math.max(0, Math.ceil((parseInt(el.dataset.ends, 10) - Date.now()) / 1000));
-      if (left === 0) { el.textContent = 'ending...'; el.classList.add('urgent'); }
-      else { const m = Math.floor(left / 60), s = left % 60; el.textContent = m > 0 ? `${m}m ${s}s left` : `${s}s left`; el.classList.toggle('urgent', left <= 30); }
-    });
-  }, 1000);
+function updateGameBalances() {
+  ['slots','dice'].forEach(g => { const el = document.getElementById(g + '-balance'); if (el) el.textContent = `Balance: 🪙 ${myCoins}`; });
+}
 
-  let activityThrottle = 0;
-  document.addEventListener('keydown', () => {
-    const now = Date.now();
-    if (now - activityThrottle > 30000) { activityThrottle = now; socket.emit('activity'); }
-  });
+function setBet(game, amount) { document.getElementById(game + '-bet').value = amount; }
 
-  // ── KEY BINDINGS ──────────────────────────────────────────────────────────────
-  document.getElementById('input').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
-  ['login-username','login-password'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); }));
-  ['reg-username','reg-password','reg-password2'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') doRegister(); }));
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSettings(); closeGames(); } });
-
-  // ── AUTO-LOGIN ────────────────────────────────────────────────────────────────
-  fetch('/me').then(async res => {
-    if (res.ok) {
-      const data = await res.json();
-      enterChat(data.username, data.color, data.theme || 'classic', data.coins || 0, data.token, data.dailyAvailable);
+// SLOTS
+let slotsSpinning = false;
+async function playSlots() {
+  if (slotsSpinning) return;
+  const bet = parseInt(document.getElementById('slots-bet').value, 10);
+  if (!bet || bet < 1 || bet > 500) { document.getElementById('slots-result').innerHTML = '<span class="result-lose">Bet must be 1-500</span>'; return; }
+  slotsSpinning = true;
+  const btn = document.getElementById('slots-spin-btn'); btn.disabled = true;
+  document.getElementById('slots-result').textContent = '';
+  [0,1,2].forEach(i => document.getElementById('reel-' + i).classList.add('spinning'));
+  await new Promise(r => setTimeout(r, 600));
+  try {
+    const res = await fetch('/game/slots', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ bet }) });
+    const data = await res.json();
+    [0,1,2].forEach(i => { const el = document.getElementById('reel-' + i); el.classList.remove('spinning'); el.textContent = data.reels ? data.reels[i] : '?'; });
+    if (!res.ok) {
+      document.getElementById('slots-result').innerHTML = `<span class="result-lose">${data.error}</span>`;
+    } else {
+      myCoins = data.coins; updateCoinDisplay(); updateGameBalances();
+      if (data.winAmount > 0) { document.getElementById('slots-result').innerHTML = `<span class="result-win">🎉 WIN! ${data.multiplier}x = +${data.winAmount} coins!</span>`; soundWin(); }
+      else { document.getElementById('slots-result').innerHTML = `<span class="result-lose">No match. Better luck next time!</span>`; soundLose(); }
     }
+  } catch { document.getElementById('slots-result').innerHTML = '<span class="result-lose">Error. Try again.</span>'; [0,1,2].forEach(i => document.getElementById('reel-' + i).classList.remove('spinning')); }
+  slotsSpinning = false; btn.disabled = false;
+}
+
+// DICE
+let diceRolling = false;
+async function playDice() {
+  if (diceRolling) return;
+  const bet = parseInt(document.getElementById('dice-bet').value, 10);
+  if (!bet || bet < 1 || bet > 500) { document.getElementById('dice-result').innerHTML = '<span class="result-lose">Bet must be 1-500</span>'; return; }
+  diceRolling = true;
+  const btn = document.getElementById('dice-roll-btn'); btn.disabled = true;
+  document.getElementById('dice-player').textContent = '🎲';
+  document.getElementById('dice-house').textContent = '🎲';
+  document.getElementById('dice-result').textContent = '';
+  await new Promise(r => setTimeout(r, 500));
+  try {
+    const res = await fetch('/game/dice', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ bet }) });
+    const data = await res.json();
+    if (!res.ok) {
+      document.getElementById('dice-result').innerHTML = `<span class="result-lose">${data.error}</span>`;
+    } else {
+      document.getElementById('dice-player').textContent = data.playerRoll;
+      document.getElementById('dice-house').textContent = data.houseRoll;
+      myCoins = data.coins; updateCoinDisplay(); updateGameBalances();
+      if (data.result === 'win') { document.getElementById('dice-result').innerHTML = `<span class="result-win">🎉 You win! +${data.winAmount} coins!</span>`; soundWin(); }
+      else if (data.result === 'tie') { document.getElementById('dice-result').innerHTML = `<span class="result-tie">🤝 Tie! Bet returned.</span>`; }
+      else { document.getElementById('dice-result').innerHTML = `<span class="result-lose">House wins. Better luck next time!</span>`; soundLose(); }
+    }
+  } catch { document.getElementById('dice-result').innerHTML = '<span class="result-lose">Error. Try again.</span>'; }
+  diceRolling = false; btn.disabled = false;
+}
+
+// LEADERBOARD
+async function loadLeaderboard() {
+  const container = document.getElementById('leaderboard-rows');
+  container.innerHTML = '<div style="text-align:center;color:var(--text-system);padding:20px;">Loading...</div>';
+  try {
+    const res = await fetch('/leaderboard', { credentials:'include' });
+    const data = await res.json();
+    if (!res.ok) { container.innerHTML = '<div style="color:#cc0000;text-align:center;padding:12px;">Error loading.</div>'; return; }
+    container.innerHTML = data.map((row, i) => `
+      <div class="lb-row">
+        <span class="lb-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`}</span>
+        <span class="lb-name">${escHtml(row.username)}</span>
+        <span class="lb-coins">🪙 ${row.coins}</span>
+      </div>
+    `).join('');
+  } catch { container.innerHTML = '<div style="color:#cc0000;text-align:center;padding:12px;">Error loading.</div>'; }
+}
+
+// ── TICKERS ────────────────────────────────────────────────────────────────────
+setInterval(() => {
+  document.querySelectorAll('.user-entry').forEach(entry => {
+    const span = entry.querySelector('.utime');
+    if (span) span.textContent = formatDuration(Date.now() - parseInt(entry.dataset.joinedAt, 10));
   });
+}, 1000);
+
+setInterval(() => {
+  document.querySelectorAll('.poll-timer').forEach(el => {
+    const left = Math.max(0, Math.ceil((parseInt(el.dataset.ends, 10) - Date.now()) / 1000));
+    if (left === 0) { el.textContent = 'ending...'; el.classList.add('urgent'); }
+    else { const m = Math.floor(left / 60), s = left % 60; el.textContent = m > 0 ? `${m}m ${s}s left` : `${s}s left`; el.classList.toggle('urgent', left <= 30); }
+  });
+}, 1000);
+
+let activityThrottle = 0;
+document.addEventListener('keydown', () => {
+  const now = Date.now();
+  if (now - activityThrottle > 30000) { activityThrottle = now; socket.emit('activity'); }
+});
+
+// ── KEY BINDINGS ───────────────────────────────────────────────────────────────
+document.getElementById('input').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+['login-username','login-password'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); }));
+['reg-username','reg-password','reg-password2'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') doRegister(); }));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSettings(); closeGames(); closeShop(); } });
+
+// ── AUTO-LOGIN ─────────────────────────────────────────────────────────────────
+fetch('/me').then(async res => {
+  if (res.ok) {
+    const data = await res.json();
+    enterChat(data.username, data.color, data.theme || 'classic', data.coins || 0, data.token, data.dailyAvailable);
+  }
+});
 </script>
 </body>
 </html>
