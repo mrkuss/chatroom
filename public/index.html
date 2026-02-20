@@ -336,7 +336,7 @@
 <!-- Daily Reward Modal -->
 <div id="daily-modal" class="modal-overlay">
   <div class="modal-box" style="max-width:320px;text-align:center;">
-    <div class="modal-titlebar"><span>🎁 Daily Reward</span></div>
+    <div class="modal-titlebar"><span>Daily Reward</span></div>
     <div class="modal-body">
       <span class="daily-icon">🪙</span>
       <div class="daily-title">Daily Bonus Available!</div>
@@ -580,7 +580,7 @@
       updateCoinDisplay();
       soundCoin(); soundWin();
       closeDailyModal();
-      addMessage(`<span class="msg-system">🎁 Daily reward claimed! +${data.reward} coins. Balance: ${data.coins} 🪙</span>`);
+      addMessage(`<span class="msg-system">Daily reward claimed! +${data.reward} coins. Balance: ${data.coins} 🪙</span>`);
     } catch { closeDailyModal(); }
   }
 
