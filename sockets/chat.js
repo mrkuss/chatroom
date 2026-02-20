@@ -386,6 +386,7 @@ function initChat(io) {
           '/poll "Question?" Option1 Option2 — create a 5-min poll',
           '/give username amount — give coins',
           '/duel username amount — challenge to coinflip',
+          '/rob username percentage — attempt to steal coins (risky!)',
           '/accept — accept a duel',
           '/decline — decline a duel',
           '/create roomname code — create private room (digits only)',
@@ -746,6 +747,54 @@ function initChat(io) {
         broadcastCoins(user.username, newSenderBal);
         broadcastCoins(targetUsername, newTargetBal);
         io.to(room).emit('system message', `💸 ${user.username} gave ${formatNumber(amount)} coins to ${targetUsername}!`);
+        return;
+      }
+
+      // ── /rob (username) (percentage) ───────────────────────────────────────
+      if (raw.startsWith('/rob ')) {
+        const parts = raw.slice(5).trim().split(/\s+/);
+        if (parts.length < 2) { socket.emit('system message', 'Usage: /rob username percentage'); return; }
+        const targetName = parts[0].replace(/^@/, '');
+        const percentage = parseInt(parts[1], 10);
+        if (isNaN(percentage) || percentage < 1 || percentage > 100) { socket.emit('system message', 'Percentage must be 1-100.'); return; }
+        if (targetName.toLowerCase() === user.username.toLowerCase()) { socket.emit('system message', 'You cannot rob yourself.'); return; }
+        
+        try {
+          const targetRes = await db.query('SELECT username, coins FROM users WHERE LOWER(username) = LOWER($1)', [targetName]);
+          if (!targetRes.rows.length) { socket.emit('system message', `User "${escapeHtml(targetName)}" not found.`); return; }
+          const targetUser = targetRes.rows[0];
+          const targetCoins = targetUser.coins;
+          const robAmount = Math.max(1, Math.floor(targetCoins * percentage / 100));
+          
+          // Calculate success chance: 0.6 / (1 + (percentage / 10)^2)
+          const successChance = 0.6 / (1 + Math.pow(percentage / 10, 2));
+          const roll = Math.random();
+          const success = roll < successChance;
+          
+          if (success) {
+            // Rob succeeds: robber gains robAmount, victim loses robAmount
+            const robberNewBal = await addCoins(user.username, robAmount);
+            const victimNewBal = await deductCoins(targetUser.username, robAmount);
+            broadcastCoins(user.username, robberNewBal);
+            broadcastCoins(targetUser.username, victimNewBal);
+            io.to(room).emit('system message', `🏴 ${user.username} robbed ${formatNumber(robAmount)} coins from ${targetUser.username}! 💰`);
+          } else {
+            // Rob fails: robber loses 2x the amount they tried to rob (doubled), victim gains it
+            const penalty = robAmount * 2;
+            const robberNewBal = await deductCoins(user.username, penalty);
+            if (robberNewBal === false) {
+              socket.emit('system message', `You don't have enough coins to cover the penalty!`);
+              return;
+            }
+            const victimNewBal = await addCoins(targetUser.username, penalty);
+            broadcastCoins(user.username, robberNewBal);
+            broadcastCoins(targetUser.username, victimNewBal);
+            io.to(room).emit('system message', `🚔 ${user.username} failed to rob ${targetUser.username}! Penalty: ${formatNumber(penalty)} coins to victim! 👮`);
+          }
+        } catch (err) {
+          console.error('Rob error:', err);
+          socket.emit('system message', 'Error executing /rob command.');
+        }
         return;
       }
 

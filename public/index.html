@@ -189,6 +189,20 @@
     .dm-flash { animation:flash 0.4s 3; }
     @keyframes flash{0%,100%{background:#fff0f8}50%{background:#ffccee}}
 
+    /* ── Premium Color Effects ── */
+    @keyframes shimmer { 0%,100%{opacity:1}50%{opacity:0.7;text-shadow:0 0 8px #ffd700} }
+    @keyframes gleam { 0%,100%{text-shadow:0 0 0 rgba(255,255,255,0)}50%{text-shadow:0 0 12px rgba(255,255,255,0.8)} }
+    @keyframes sparkle { 0%,100%{text-shadow:0 0 0 rgba(100,200,255,0)}25%{text-shadow:0 0 8px rgba(100,200,255,0.6)}50%{text-shadow:0 0 16px rgba(200,255,255,0.8)}75%{text-shadow:0 0 8px rgba(100,200,255,0.6)} }
+    @keyframes rainbow { 0%{color:#ff0000}16%{color:#ff7f00}33%{color:#ffff00}50%{color:#00ff00}66%{color:#0000ff}83%{color:#4b0082}100%{color:#ff0000} }
+    @keyframes nebula { 0%,100%{text-shadow:0 0 20px rgba(138,43,226,0.5),0 0 40px rgba(75,0,130,0.3)}50%{text-shadow:0 0 30px rgba(138,43,226,0.8),0 0 60px rgba(75,0,130,0.6)} }
+    @keyframes infinity { 0%,100%{text-shadow:0 0 10px #ffd700,0 0 20px rgba(255,215,0,0.8)}25%{text-shadow:0 0 20px #ffd700,0 0 40px rgba(255,215,0,0.6)}50%{text-shadow:0 0 30px #ffed4e,0 0 60px rgba(255,237,74,0.8)}75%{text-shadow:0 0 20px #ffd700,0 0 40px rgba(255,215,0,0.6)} }
+    .user-shimmer { animation:shimmer 1.5s ease-in-out infinite; }
+    .user-gleam { animation:gleam 2s ease-in-out infinite; }
+    .user-sparkle { animation:sparkle 2s ease-in-out infinite; }
+    .user-rainbow { animation:rainbow 3s linear infinite; }
+    .user-nebula { animation:nebula 3s ease-in-out infinite; }
+    .user-infinity { animation:infinity 2s ease-in-out infinite; }
+
     /* ── MODALS ── */
     .modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center; }
     .modal-overlay.open { display:flex; }
@@ -330,6 +344,7 @@
     .slot-reel { width:60px;height:60px;background:var(--bg-messages);border:3px inset var(--border-inset);display:flex;align-items:center;justify-content:center; }
     .slot-reel.spinning { animation:spinReel 0.15s infinite; }
     @keyframes spinReel{0%{transform:translateY(-4px)}50%{transform:translateY(4px)}100%{transform:translateY(-4px)}}
+    @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
     .dice-display { display:flex;gap:16px;justify-content:center;align-items:center;margin:12px 0;font-size:14px;text-align:center; }
     .dice-side label { display:block;margin-bottom:4px;color:var(--text-system); }
     .dice-value { font-size:48px;min-width:60px;height:60px;background:var(--bg-messages);border:3px inset var(--border-inset);display:flex;align-items:center;justify-content:center; }
@@ -579,8 +594,9 @@
           </div>
           <div class="help-section">
             <div class="help-section-title">🎮 Games</div>
-            <div class="help-cmd">Slots — match 3 symbols, up to 25x bet</div>
+            <div class="help-cmd">Slots — match 3 symbols, up to 20x bet</div>
             <div class="help-cmd">Dice — beat the house, win 1.9x</div>
+            <div class="help-cmd">Roulette — pick red/black or even/odd, 1:1 payout</div>
           </div>
         </div>
       </div>
@@ -615,6 +631,7 @@
       <div class="games-tabs">
         <button class="games-tab active" onclick="switchGame('slots')">🎰 Slots</button>
         <button class="games-tab" onclick="switchGame('dice')">🎲 Dice</button>
+        <button class="games-tab" onclick="switchGame('roulette')">🎡 Roulette</button>
         <button class="games-tab" onclick="switchGame('leaderboard')">🏆 Board</button>
       </div>
     </div>
@@ -624,7 +641,7 @@
       <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="slots-bet" value="10" min="1" max="500" /><div class="bet-presets"><button class="bet-preset" onclick="setBet('slots',10)">10</button><button class="bet-preset" onclick="setBet('slots',50)">50</button><button class="bet-preset" onclick="setBet('slots',100)">100</button></div></div>
       <button class="game-btn" id="slots-spin-btn" onclick="playSlots()">SPIN</button>
       <div class="game-result" id="slots-result"></div>
-      <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">🍒×3=2x · 🍋×3=3x · 🍊×3=4x · ⭐×3=6x · 💎×3=10x · 7️⃣×3=25x</div>
+      <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">More forgiving odds · 🍒=2x · 🍋=3x · 🍊=4x · ⭐=6x · 💎=8x · 7️⃣=20x</div>
     </div>
     <div id="game-dice" class="game-panel" style="padding:0 16px 16px;">
       <div class="game-balance" id="dice-balance">Balance: 🪙 0</div>
@@ -633,6 +650,24 @@
       <button class="game-btn" id="dice-roll-btn" onclick="playDice()">ROLL DICE</button>
       <div class="game-result" id="dice-result"></div>
       <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Roll 2 dice vs the house. Higher total wins 1.9x · Tie returns bet</div>
+    </div>
+    <div id="game-roulette" class="game-panel" style="padding:0 16px 16px;">
+      <div class="game-balance" id="roulette-balance">Balance: 🪙 0</div>
+      <div style="display:flex;justify-content:center;align-items:center;gap:16px;margin:16px 0;">
+        <div style="text-align:center;">
+          <label style="font-size:12px;color:var(--text-system);">Spin</label>
+          <div style="font-size:32px;margin-top:4px;" id="roulette-spin">🎡</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;">
+        <button class="game-btn" onclick="playRoulette('red')" style="background:#cc0000;">🔴 RED</button>
+        <button class="game-btn" onclick="playRoulette('black')" style="background:#222222;color:#fff;">⚫ BLACK</button>
+        <button class="game-btn" onclick="playRoulette('even')" style="background:#0056b3;">2,4,6... EVEN</button>
+        <button class="game-btn" onclick="playRoulette('odd')" style="background:#0056b3;">1,3,5... ODD</button>
+      </div>
+      <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="roulette-bet" value="10" min="1" max="500" /><div class="bet-presets"><button class="bet-preset" onclick="setBet('roulette',10)">10</button><button class="bet-preset" onclick="setBet('roulette',50)">50</button><button class="bet-preset" onclick="setBet('roulette',100)">100</button></div></div>
+      <div class="game-result" id="roulette-result"></div>
+      <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Pick your bet type and click a button. Spin 0 is green (house win)</div>
     </div>
     <div id="game-leaderboard" class="game-panel" style="padding:0 16px 16px;">
       <div class="lb-header"><span>Rank</span><span>Player</span><span>Coins</span></div>
@@ -644,6 +679,13 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
+// ── SHOP CATALOGUE (for color effects) ────────────────────────────────────────
+const SHOP_COLORS={
+  '#ffd700':{name:'Shimmering Gold',effect:'shimmer'},'#e5e4e2':{name:'Platinum Gleam',effect:'gleam'},
+  '#b9f2ff':{name:'Diamond Sparkle',effect:'sparkle'},'#ff6bcb':{name:'Aurora Borealis',effect:'rainbow'},
+  '#2a0845':{name:'Cosmic Nebula',effect:'nebula'}
+};
+
 // ── SOUNDS ────────────────────────────────────────────────────────────────────
 let soundEnabled = true;
 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -1059,10 +1101,10 @@ socket.on('room created',({room,code})=>{
 });
 
 socket.on('chat message',({id,user,color,text,type,timestamp})=>{
-  const isOwn=user===myUsername;
-  if(type==='action')addMessage(`<span class="msg-action">*** <span class="msg-user" data-username="${escHtml(user)}" style="color:${color}">${user}</span> ${text} ***</span>`,'',timestamp);
+  const isOwn=user===myUsername;const colorInfo=SHOP_COLORS[color];const effectClass=colorInfo?` user-${colorInfo.effect}`:'';
+  if(type==='action')addMessage(`<span class="msg-action">*** <span class="msg-user${effectClass}" data-username="${escHtml(user)}" style="color:${color}">${user}</span> ${text} ***</span>`,'',timestamp);
   else {
-    addMessage(`<span class="msg-user" data-username="${escHtml(user)}" style="color:${color}">${user}:</span> <span class="msg-text">${text}</span>`,isOwn?'msg-own':'',timestamp||Date.now(),id);
+    addMessage(`<span class="msg-user${effectClass}" data-username="${escHtml(user)}" style="color:${color}">${user}:</span> <span class="msg-text">${text}</span>`,isOwn?'msg-own':'',timestamp||Date.now(),id);
     // If message from someone else in another room will be notified by 'room message'.
   }
   if(!isOwn)soundMessage();
@@ -1112,7 +1154,8 @@ socket.on('user list',list=>{
   const panel=document.getElementById('users-panel');panel.innerHTML='';
   list.forEach(({username,color,joinedAt,idle})=>{
     const entry=document.createElement('span');entry.className='user-entry';entry.dataset.joinedAt=joinedAt;
-    entry.innerHTML=`<span class="uname" style="color:${color}" data-username="${escHtml(username)}" onclick="openProfile('${escHtml(username)}')">${username}</span>${idle?'<span class="uidle">⏸</span>':''}<span class="utime">${formatDuration(Date.now()-joinedAt)}</span>`;
+    const colorInfo=SHOP_COLORS[color];const effectClass=colorInfo?` user-${colorInfo.effect}`:'';
+    entry.innerHTML=`<span class="uname${effectClass}" style="color:${color}" data-username="${escHtml(username)}" onclick="openProfile('${escHtml(username)}')">${username}</span>${idle?'<span class="uidle">⏸</span>':''}<span class="utime">${formatDuration(Date.now()-joinedAt)}</span>`;
     panel.appendChild(entry);
   });
 });
@@ -1144,8 +1187,9 @@ async function openProfile(username){
     const d=await res.json();if(!res.ok){document.getElementById('profile-modal-body').textContent=d.error;return}
     const badge=d.activeBadge?`<span title="${d.activeBadge.name}">${d.activeBadge.emoji} ${d.activeBadge.name}</span>`:'<span style="color:var(--text-system)">No badge</span>';
     const badgesHtml=d.earnedBadges.length?d.earnedBadges.map(b=>`<span title="${b.description}" style="font-size:20px;cursor:help">${b.emoji}</span>`).join(' '):'<span style="color:var(--text-system);font-size:14px">No badges yet</span>';
+    const colorInfo=SHOP_COLORS[d.color];const effectClass=colorInfo?` user-${colorInfo.effect}`:'';
     document.getElementById('profile-modal-body').innerHTML=`
-      <div class="profile-header"><div class="profile-avatar">👤</div><div><div class="profile-name" style="color:${d.color||'var(--text-main)'}">${escHtml(d.username)}</div><div class="profile-badge-display">${badge}</div></div></div>
+      <div class="profile-header"><div class="profile-avatar">👤</div><div><div class="profile-name${effectClass}" style="color:${d.color||'var(--text-main)'}">${escHtml(d.username)}</div><div class="profile-badge-display">${badge}</div></div></div>
       <div class="profile-stats">
           <div class="stat-row"><span class="stat-label">Joined</span><span class="stat-value">${formatDate(d.createdAt)}</span></div>
           <div class="stat-row"><span class="stat-label">Coins</span><span class="stat-value">🪙 ${formatNumber(d.coins)}</span></div>
@@ -1305,7 +1349,7 @@ document.getElementById('shop-overlay').addEventListener('click',e=>{if(e.target
 function openGames(){updateGameBalances();document.getElementById('games-overlay').classList.add('open');loadLeaderboard()}
 function closeGames(){document.getElementById('games-overlay').classList.remove('open')}
 function switchGame(name){document.querySelectorAll('.game-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.games-tab').forEach(t=>t.classList.remove('active'));document.getElementById('game-'+name).classList.add('active');document.querySelectorAll('.games-tab').forEach(t=>{if(t.textContent.toLowerCase().includes(name==='leaderboard'?'board':name))t.classList.add('active')});if(name==='leaderboard')loadLeaderboard();updateGameBalances()}
-function updateGameBalances(){['slots','dice'].forEach(g=>{const el=document.getElementById(g+'-balance');if(el)el.textContent=`Balance: 🪙 ${formatNumber(myCoins)}`})}
+function updateGameBalances(){['slots','dice','roulette'].forEach(g=>{const el=document.getElementById(g+'-balance');if(el)el.textContent=`Balance: 🪙 ${formatNumber(myCoins)}`})}
 function setBet(game,amount){document.getElementById(game+'-bet').value=amount}
 
 let slotsSpinning=false;
@@ -1336,6 +1380,21 @@ async function playDice(){
   else{document.getElementById('dice-result').innerHTML=`<span class="result-lose">House wins. Better luck next time!</span>`;soundLose()}}}
   catch{document.getElementById('dice-result').innerHTML='<span class="result-lose">Error. Try again.</span>'}
   diceRolling=false;btn.disabled=false;
+}
+let rouletteSpinning=false;
+async function playRoulette(betType){
+  if(rouletteSpinning)return;const bet=parseInt(document.getElementById('roulette-bet').value,10);
+  if(!bet||bet<1||bet>500){document.getElementById('roulette-result').innerHTML='<span class="result-lose">Bet must be 1-500</span>';return}
+  rouletteSpinning=true;const spinEl=document.getElementById('roulette-spin');spinEl.style.animation='none';document.getElementById('roulette-result').textContent='';
+  await new Promise(r=>setTimeout(r,50));spinEl.style.animation='spin 2s linear 1';
+  await new Promise(r=>setTimeout(r,2000));
+  try{const res=await fetch('/game/roulette',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({bet,betType})});const data=await res.json();
+  if(!res.ok)document.getElementById('roulette-result').innerHTML=`<span class="result-lose">${data.error}</span>`;
+  else{spinEl.textContent=data.spinColor+data.spin;myCoins=data.coins;updateCoinDisplay();updateGameBalances();
+  if(data.result==='win'){document.getElementById('roulette-result').innerHTML=`<span class="result-win">🎉 ${betType} hits! +${formatNumber(data.winAmount)} coins!</span>`;soundWin()}
+  else{document.getElementById('roulette-result').innerHTML=`<span class="result-lose">House wins. Better luck next time!</span>`;soundLose()}}}
+  catch{document.getElementById('roulette-result').innerHTML='<span class="result-lose">Error. Try again.</span>'}
+  rouletteSpinning=false;
 }
 async function loadLeaderboard(){
   const container=document.getElementById('leaderboard-rows');container.innerHTML='<div style="text-align:center;color:var(--text-system);padding:20px;">Loading...</div>';
