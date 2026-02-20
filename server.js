@@ -15,7 +15,7 @@ const io = new Server(server);
 
 const db = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }, // Required for Railway
+  ssl: { rejectUnauthorized: false },
 });
 
 async function initDb() {
@@ -27,8 +27,6 @@ async function initDb() {
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
-
-  // Table required by connect-pg-simple for persistent sessions
   await db.query(`
     CREATE TABLE IF NOT EXISTS session (
       sid TEXT NOT NULL COLLATE "default",
@@ -37,11 +35,7 @@ async function initDb() {
       CONSTRAINT session_pkey PRIMARY KEY (sid)
     )
   `);
-
-  await db.query(`
-    CREATE INDEX IF NOT EXISTS IDX_session_expire ON session (expire)
-  `);
-
+  await db.query(`CREATE INDEX IF NOT EXISTS IDX_session_expire ON session (expire)`);
   console.log('Database initialised');
 }
 
@@ -55,23 +49,24 @@ initDb().catch((err) => {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(
-  session({
-    store: new pgSession({
-      pool: db,
-      tableName: 'session',
-      pruneSessionInterval: 60 * 15, // Clean up expired sessions every 15 min
-    }),
-    secret: process.env.SESSION_SECRET || 'change-this-in-production',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    },
-  })
-);
+const sessionMiddleware = session({
+  store: new pgSession({
+    pool: db,
+    tableName: 'session',
+    pruneSessionInterval: 60 * 15,
+  }),
+  secret: process.env.SESSION_SECRET || 'change-this-in-production',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  },
+});
+
+app.use(sessionMiddleware);
+io.engine.use(sessionMiddleware);
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -84,45 +79,28 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-function requireAuth(req, res, next) {
-  if (!req.session.username) {
-    return res.status(401).json({ error: 'Not logged in' });
-  }
-  next();
-}
-
 // ─── Auth Routes ──────────────────────────────────────────────────────────────
 
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
 
-  if (!username || !password) {
+  if (!username || !password)
     return res.status(400).json({ error: 'Username and password are required' });
-  }
-  if (username.length < 3 || username.length > 20) {
-    return res.status(400).json({ error: 'Username must be 3–20 characters' });
-  }
-  if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-    return res
-      .status(400)
-      .json({ error: 'Username can only contain letters, numbers, and underscores' });
-  }
-  if (password.length < 6) {
+  if (username.length < 3 || username.length > 20)
+    return res.status(400).json({ error: 'Username must be 3-20 characters' });
+  if (!/^[a-zA-Z0-9_]+$/.test(username))
+    return res.status(400).json({ error: 'Username can only contain letters, numbers, and underscores' });
+  if (password.length < 6)
     return res.status(400).json({ error: 'Password must be at least 6 characters' });
-  }
 
   try {
     const hash = await bcrypt.hash(password, 12);
-    await db.query(
-      'INSERT INTO users (username, password_hash) VALUES ($1, $2)',
-      [username, hash]
-    );
+    await db.query('INSERT INTO users (username, password_hash) VALUES ($1, $2)', [username, hash]);
     req.session.username = username;
     res.json({ ok: true, username });
   } catch (err) {
-    if (err.code === '23505') {
+    if (err.code === '23505')
       return res.status(409).json({ error: 'Username already taken' });
-    }
     console.error('Register error:', err);
     res.status(500).json({ error: 'Server error' });
   }
@@ -131,9 +109,8 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
-  if (!username || !password) {
+  if (!username || !password)
     return res.status(400).json({ error: 'Username and password are required' });
-  }
 
   try {
     const result = await db.query(
@@ -142,14 +119,12 @@ app.post('/login', async (req, res) => {
     );
     const user = result.rows[0];
 
-    if (!user) {
+    if (!user)
       return res.status(401).json({ error: 'Invalid username or password' });
-    }
 
     const match = await bcrypt.compare(password, user.password_hash);
-    if (!match) {
+    if (!match)
       return res.status(401).json({ error: 'Invalid username or password' });
-    }
 
     req.session.username = user.username;
     res.json({ ok: true, username: user.username });
@@ -174,26 +149,93 @@ app.get('/me', (req, res) => {
   }
 });
 
-// ─── Socket.io ────────────────────────────────────────────────────────────────
+// ─── Socket State ─────────────────────────────────────────────────────────────
 
-const connectedUsers = {}; // socket.id -> username
-const rateLimits = {};     // socket.id -> { count, resetTime }
+// socket.id -> { username, joinedAt }
+const connectedUsers = {};
+
+// username lowercase -> socket.id
+const userSocketMap = {};
+
+// socket.id -> { count, resetTime }
+const rateLimits = {};
+
+// socket.id -> timeout handle
+const typingTimeouts = {};
+
+// Set of socket.ids currently typing
+const typingUsers = new Set();
+
+// ─── Broadcast Helpers ────────────────────────────────────────────────────────
+
+function broadcastUserList() {
+  const list = Object.values(connectedUsers).map(({ username, joinedAt }) => ({
+    username,
+    joinedAt,
+  }));
+  io.emit('user list', list);
+}
+
+function broadcastTyping() {
+  const names = [...typingUsers]
+    .map((id) => connectedUsers[id]?.username)
+    .filter(Boolean);
+
+  if (names.length === 0) {
+    io.emit('typing', { text: '' });
+  } else if (names.length === 1) {
+    io.emit('typing', { text: `${names[0]} is typing` });
+  } else {
+    io.emit('typing', { text: 'Multiple users are typing' });
+  }
+}
+
+// ─── Socket.io ────────────────────────────────────────────────────────────────
 
 io.on('connection', (socket) => {
 
-  socket.on('join', (username) => {
-    if (!username || typeof username !== 'string') return;
+  // ── Join ──────────────────────────────────────────────────────────────────
 
-    const sanitized = escapeHtml(username.slice(0, 20));
-    connectedUsers[socket.id] = sanitized;
+  socket.on('join', (clientUsername) => {
+    // Verify the username against the server session — client can't spoof it
+    const sessionUsername = socket.request.session?.username;
 
-    io.emit('user count', Object.keys(connectedUsers).length);
-    io.emit('system message', `${sanitized} has joined the chat`);
+    if (!sessionUsername) {
+      socket.emit('kicked', 'Not authenticated. Please log in again.');
+      socket.disconnect(true);
+      return;
+    }
+
+    // Use the session username (authoritative), ignore what client sent
+    const username = escapeHtml(sessionUsername.slice(0, 20));
+    const key = username.toLowerCase();
+
+    // Kick any existing session for this user
+    const existingId = userSocketMap[key];
+    if (existingId && existingId !== socket.id) {
+      const existingSocket = io.sockets.sockets.get(existingId);
+      if (existingSocket) {
+        existingSocket.emit('kicked', 'You were signed in from another device.');
+        existingSocket.disconnect(true);
+      }
+      delete connectedUsers[existingId];
+      delete rateLimits[existingId];
+      typingUsers.delete(existingId);
+      clearTimeout(typingTimeouts[existingId]);
+    }
+
+    connectedUsers[socket.id] = { username, joinedAt: Date.now() };
+    userSocketMap[key] = socket.id;
+
+    broadcastUserList();
+    io.emit('system message', `${username} has joined the chat`);
   });
 
+  // ── Chat message ──────────────────────────────────────────────────────────
+
   socket.on('chat message', (msg) => {
-    const username = connectedUsers[socket.id];
-    if (!username) return;
+    const user = connectedUsers[socket.id];
+    if (!user) return;
 
     // Rate limiting: max 5 messages per 3 seconds
     const now = Date.now();
@@ -203,7 +245,7 @@ io.on('connection', (socket) => {
     rateLimits[socket.id].count++;
 
     if (rateLimits[socket.id].count > 5) {
-      socket.emit('system message', 'You are sending messages too fast. Please slow down.');
+      socket.emit('system message', 'Slow down! You are sending messages too fast.');
       return;
     }
 
@@ -211,16 +253,49 @@ io.on('connection', (socket) => {
     const sanitized = escapeHtml(msg.trim().slice(0, 500));
     if (!sanitized) return;
 
-    io.emit('chat message', { user: username, text: sanitized });
+    // Clear typing state when they send
+    typingUsers.delete(socket.id);
+    clearTimeout(typingTimeouts[socket.id]);
+    broadcastTyping();
+
+    io.emit('chat message', { user: user.username, text: sanitized });
   });
 
+  // ── Typing ────────────────────────────────────────────────────────────────
+
+  socket.on('typing start', () => {
+    if (!connectedUsers[socket.id]) return;
+    typingUsers.add(socket.id);
+    broadcastTyping();
+    clearTimeout(typingTimeouts[socket.id]);
+    typingTimeouts[socket.id] = setTimeout(() => {
+      typingUsers.delete(socket.id);
+      broadcastTyping();
+    }, 3000);
+  });
+
+  socket.on('typing stop', () => {
+    typingUsers.delete(socket.id);
+    clearTimeout(typingTimeouts[socket.id]);
+    broadcastTyping();
+  });
+
+  // ── Disconnect ────────────────────────────────────────────────────────────
+
   socket.on('disconnect', () => {
-    const username = connectedUsers[socket.id];
-    if (username) {
+    const user = connectedUsers[socket.id];
+    if (user) {
+      const key = user.username.toLowerCase();
+      if (userSocketMap[key] === socket.id) {
+        delete userSocketMap[key];
+      }
       delete connectedUsers[socket.id];
       delete rateLimits[socket.id];
-      io.emit('user count', Object.keys(connectedUsers).length);
-      io.emit('system message', `${username} has left the chat`);
+      typingUsers.delete(socket.id);
+      clearTimeout(typingTimeouts[socket.id]);
+      broadcastUserList();
+      broadcastTyping();
+      io.emit('system message', `${user.username} has left the chat`);
     }
   });
 });
