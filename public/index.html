@@ -414,8 +414,9 @@
       document.getElementById('input').focus();
 
       socket.connect();
-      // Pass username so server can verify it against the session
-      socket.emit('join', username);
+      socket.once('connect', () => {
+        socket.emit('join', username);
+      });
     }
 
     // ── SEND ──
