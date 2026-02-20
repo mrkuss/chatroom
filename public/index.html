@@ -1,417 +1,346 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <title>chatroom</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Chatroom</title>
+  <script src="/socket.io/socket.io.js"></script>
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
-      background-color: #000080;
-      font-family: 'VT323', monospace;
-      font-size: 18px;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
       color: white;
+      display: flex;
       height: 100vh;
-      height: 100dvh;
+    }
+
+    #login {
+      margin: auto;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* ── AUTH SCREEN ── */
-    #auth-screen {
-      background: #c0c0c0;
-      color: black;
-      border: 3px solid;
-      border-color: white #808080 #808080 white;
-      width: 90%;
-      max-width: 360px;
-    }
-
-    .auth-tabs {
-      display: flex;
-      border-bottom: 2px solid #808080;
-    }
-
-    .auth-tab {
-      flex: 1;
-      padding: 8px;
-      background: #a0a0a0;
-      border: none;
-      font-family: 'VT323', monospace;
-      font-size: 18px;
-      cursor: pointer;
-      border-right: 1px solid #808080;
-      color: #444;
-    }
-
-    .auth-tab:last-child { border-right: none; }
-
-    .auth-tab.active {
-      background: #000080;
-      color: white;
-    }
-
-    .auth-titlebar {
-      background: #000080;
-      color: white;
-      padding: 6px 10px;
-      font-size: 18px;
-      letter-spacing: 1px;
-    }
-
-    .auth-body {
-      padding: 20px;
-    }
-
-    .auth-panel { display: none; }
-    .auth-panel.active { display: block; }
-
-    .auth-panel p {
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
-
-    .auth-panel input {
-      width: 100%;
-      padding: 6px 8px;
-      margin: 6px 0;
-      font-family: 'VT323', monospace;
-      font-size: 20px;
-      border: 2px inset #808080;
-      background: white;
-    }
-
-    .auth-panel button.primary {
-      width: 100%;
-      margin-top: 10px;
-      padding: 8px;
-      font-family: 'VT323', monospace;
-      font-size: 20px;
-      background: #000080;
-      color: white;
-      border: 2px solid;
-      border-color: #6060c0 #000040 #000040 #6060c0;
-      cursor: pointer;
-      letter-spacing: 1px;
-    }
-
-    .auth-panel button.primary:active {
-      border-color: #000040 #6060c0 #6060c0 #000040;
-    }
-
-    .auth-error {
-      margin-top: 10px;
-      color: #cc0000;
-      font-size: 16px;
-      min-height: 20px;
-    }
-
-    /* ── CHAT SCREEN ── */
-    #chat-screen {
-      display: none;
-      flex-direction: column;
-      width: 100%;
-      height: 100vh;
-      height: 100dvh;
-      background: #c0c0c0;
-      border: none;
-    }
-
-    @media (min-width: 600px) {
-      #chat-screen {
-        width: 700px;
-        height: 90vh;
-        border: 3px solid;
-        border-color: white #808080 #808080 white;
-      }
-    }
-
-    #titlebar {
-      background: #000080;
-      color: white;
-      padding: 6px 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 18px;
-      letter-spacing: 1px;
-      flex-shrink: 0;
-      gap: 8px;
-    }
-
-    #titlebar-left {
-      display: flex;
-      align-items: center;
       gap: 10px;
-      min-width: 0;
+      width: 250px;
     }
 
-    #logged-in-as {
-      font-size: 14px;
-      color: #aad4ff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    input, button {
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
     }
 
-    #user-count {
-      font-size: 15px;
-      background: #008080;
-      padding: 2px 8px;
-      border: 1px solid;
-      border-color: #808080 white white #808080;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    #logout-btn {
-      font-family: 'VT323', monospace;
-      font-size: 14px;
-      background: #800000;
+    button {
+      background: #2563eb;
       color: white;
-      border: 1px solid;
-      border-color: #ff8080 #400000 #400000 #ff8080;
-      padding: 2px 8px;
       cursor: pointer;
-      flex-shrink: 0;
+    }
+
+    #app {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    #sidebar {
+      width: 220px;
+      background: #020617;
+      padding: 15px;
+      overflow-y: auto;
+      border-right: 1px solid #1e293b;
+    }
+
+    #sidebarHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    #sidebarHeader h3 {
+      margin: 0;
+    }
+
+    #toggleUsersBtn {
+      padding: 4px 8px;
+      font-size: 12px;
+      background: #1e293b;
+      color: #94a3b8;
+      cursor: pointer;
+    }
+
+    #usersPanel.collapsed {
+      display: none;
+    }
+
+    #chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     #messages {
       flex: 1;
       overflow-y: auto;
-      padding: 8px;
-      background: white;
-      border: 2px inset #808080;
-      margin: 8px 8px 4px 8px;
-      font-size: 18px;
-      line-height: 1.6;
-      -webkit-overflow-scrolling: touch;
-      color: black;
+      padding: 15px;
     }
 
-    .msg-user { color: #000080; font-weight: bold; }
-    .msg-system { color: #808080; font-style: italic; }
-    .msg-text { color: black; }
-    .msg-own .msg-user { color: #800000; }
-
-    #bottom {
+    #typingBar {
+      min-height: 20px;
+      padding: 0 15px 4px;
+      font-size: 12px;
+      color: #64748b;
+      font-style: italic;
       display: flex;
-      gap: 6px;
-      padding: 8px;
-      flex-shrink: 0;
+      align-items: center;
+      gap: 5px;
     }
 
-    #input {
+    .dots span {
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      background: #64748b;
+      border-radius: 50%;
+      animation: bounce 1.2s infinite;
+    }
+    .dots span:nth-child(2) { animation-delay: .2s; }
+    .dots span:nth-child(3) { animation-delay: .4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: .4; }
+      40%            { transform: translateY(-4px); opacity: 1; }
+    }
+
+    #inputRow {
+      display: flex;
+      padding: 10px;
+      background: #020617;
+    }
+
+    #msg {
       flex: 1;
-      padding: 8px;
-      font-family: 'VT323', monospace;
-      font-size: 20px;
-      border: 2px inset #808080;
-      min-width: 0;
-      color: black;
+      margin-right: 10px;
     }
 
-    #send-btn {
-      padding: 8px 16px;
-      font-family: 'VT323', monospace;
-      font-size: 20px;
-      background: #c0c0c0;
-      border: 2px solid;
-      border-color: white #808080 #808080 white;
-      cursor: pointer;
-      white-space: nowrap;
-      flex-shrink: 0;
+    .userRow {
+      font-size: 14px;
+      margin-bottom: 6px;
+      opacity: 0.9;
     }
 
-    #send-btn:active {
-      border-color: #808080 white white #808080;
+    .userTime {
+      font-size: 11px;
+      color: #64748b;
+      margin-left: 4px;
+    }
+
+    .msg {
+      margin-bottom: 8px;
+    }
+
+    .system {
+      opacity: 0.6;
+      font-style: italic;
+    }
+
+    .kicked {
+      color: #ef4444;
+      font-style: italic;
     }
   </style>
 </head>
+
 <body>
 
-  <!-- Auth Screen -->
-  <div id="auth-screen">
-    <div class="auth-titlebar">chatroom</div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" onclick="switchTab('login')">Login</button>
-      <button class="auth-tab" onclick="switchTab('register')">Register</button>
+  <div id="login">
+    <h2>Chatroom</h2>
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <button onclick="register()">Register</button>
+    <div id="error"></div>
+  </div>
+
+  <div id="app">
+    <div id="sidebar">
+      <div id="sidebarHeader">
+        <h3>Online</h3>
+        <button id="toggleUsersBtn" onclick="toggleUsers()">hide</button>
+      </div>
+      <div id="users" id="usersPanel"></div>
     </div>
-    <div class="auth-body">
 
-      <!-- Login -->
-      <div id="login-panel" class="auth-panel active">
-        <p>Sign in to your account:</p>
-        <input id="login-username" type="text" placeholder="Username..." maxlength="20" autocomplete="username" />
-        <input id="login-password" type="password" placeholder="Password..." autocomplete="current-password" />
-        <button class="primary" onclick="doLogin()">Login</button>
-        <div class="auth-error" id="login-error"></div>
+    <div id="chat">
+      <div id="messages"></div>
+      <div id="typingBar"></div>
+      <div id="inputRow">
+        <input id="msg" placeholder="Message">
+        <button onclick="send()">Send</button>
       </div>
-
-      <!-- Register -->
-      <div id="register-panel" class="auth-panel">
-        <p>Create a new account:</p>
-        <input id="reg-username" type="text" placeholder="Username (3-20 chars)..." maxlength="20" autocomplete="username" />
-        <input id="reg-password" type="password" placeholder="Password (min 6 chars)..." autocomplete="new-password" />
-        <input id="reg-password2" type="password" placeholder="Confirm password..." autocomplete="new-password" />
-        <button class="primary" onclick="doRegister()">Create Account</button>
-        <div class="auth-error" id="register-error"></div>
-      </div>
-
     </div>
   </div>
 
-  <!-- Chat Screen -->
-  <div id="chat-screen">
-    <div id="titlebar">
-      <div id="titlebar-left">
-        <span>chatroom</span>
-        <span id="logged-in-as"></span>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <span id="user-count">👤 0 online</span>
-        <button id="logout-btn" onclick="doLogout()">exit</button>
-      </div>
-    </div>
-    <ul id="messages"></ul>
-    <div id="bottom">
-      <input id="input" placeholder="Type a message..." autocomplete="off" />
-      <button id="send-btn" onclick="send()">Send</button>
-    </div>
-  </div>
+<script>
+let socket;
+let myUser;
+let usersVisible = true;
+let typingTimer;
+let isTyping = false;
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io({ autoConnect: false });
-    let myUsername = null;
+const usernameEl = document.getElementById("username");
+const passwordEl = document.getElementById("password");
+const msgEl      = document.getElementById("msg");
+const usersDiv   = document.getElementById("users");
+const loginDiv   = document.getElementById("login");
+const appDiv     = document.getElementById("app");
+const errorEl    = document.getElementById("error");
+const messages   = document.getElementById("messages");
+const typingBar  = document.getElementById("typingBar");
 
-    // ── TAB SWITCHING ──
-    function switchTab(tab) {
-      document.querySelectorAll('.auth-tab').forEach((t, i) => {
-        t.classList.toggle('active', (i === 0) === (tab === 'login'));
-      });
-      document.getElementById('login-panel').classList.toggle('active', tab === 'login');
-      document.getElementById('register-panel').classList.toggle('active', tab === 'register');
-    }
+async function login() {
+  const username = usernameEl.value;
+  const password = passwordEl.value;
+  const res = await fetch('/login', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ username, password })
+  });
+  const data = await res.json();
+  if (!data.ok) return errorEl.innerText = data.error;
+  startChat(data.username);
+}
 
-    // ── AUTH ──
-    async function doLogin() {
-      const username = document.getElementById('login-username').value.trim();
-      const password = document.getElementById('login-password').value;
-      const errEl = document.getElementById('login-error');
-      errEl.textContent = '';
+async function register() {
+  const username = usernameEl.value;
+  const password = passwordEl.value;
+  const res = await fetch('/register', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ username, password })
+  });
+  const data = await res.json();
+  if (!data.ok) return errorEl.innerText = data.error;
+  startChat(data.username);
+}
 
-      if (!username || !password) { errEl.textContent = 'Please fill in all fields.'; return; }
+async function autoLogin() {
+  const res = await fetch('/me');
+  if (!res.ok) return;
+  const data = await res.json();
+  startChat(data.username);
+}
 
-      const res = await fetch('/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
+function startChat(username) {
+  myUser = username;
+  loginDiv.style.display = "none";
+  appDiv.style.display = "flex";
 
-      if (!res.ok) { errEl.textContent = data.error; return; }
-      enterChat(data.username);
-    }
+  socket = io();
 
-    async function doRegister() {
-      const username = document.getElementById('reg-username').value.trim();
-      const password = document.getElementById('reg-password').value;
-      const password2 = document.getElementById('reg-password2').value;
-      const errEl = document.getElementById('register-error');
-      errEl.textContent = '';
+  // Server reads username from session — don't pass it
+  socket.emit("join");
 
-      if (!username || !password || !password2) { errEl.textContent = 'Please fill in all fields.'; return; }
-      if (password !== password2) { errEl.textContent = 'Passwords do not match.'; return; }
+  socket.on("chat message", msg => {
+    addMsg(msg.user + ": " + msg.text);
+  });
 
-      const res = await fetch('/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
+  socket.on("system message", msg => {
+    addMsg(msg, true);
+  });
 
-      if (!res.ok) { errEl.textContent = data.error; return; }
-      enterChat(data.username);
-    }
-
-    async function doLogout() {
-      await fetch('/logout', { method: 'POST' });
-      socket.disconnect();
-      location.reload();
-    }
-
-    // ── CHAT ──
-    function enterChat(username) {
-      myUsername = username;
-      document.getElementById('auth-screen').style.display = 'none';
-      document.getElementById('chat-screen').style.display = 'flex';
-      document.getElementById('logged-in-as').textContent = `[${username}]`;
-      document.getElementById('input').focus();
-
-      socket.connect();
-      socket.emit('join', username);
-    }
-
-    function send() {
-      const input = document.getElementById('input');
-      const text = input.value.trim();
-      if (!text) return;
-      socket.emit('chat message', text);
-      input.value = '';
-    }
-
-    document.getElementById('input').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') send();
+  socket.on("user list", list => {
+    usersDiv.innerHTML = "";
+    list.forEach(({ username, joinedAt }) => {
+      const d = document.createElement("div");
+      d.className = "userRow";
+      d.dataset.joinedAt = joinedAt;
+      d.innerHTML = username + '<span class="userTime">' + formatDuration(Date.now() - joinedAt) + '</span>';
+      usersDiv.appendChild(d);
     });
+  });
 
-    // Enter key on auth inputs
-    ['login-username','login-password'].forEach(id => {
-      document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-    });
-    ['reg-username','reg-password','reg-password2'].forEach(id => {
-      document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') doRegister(); });
-    });
-
-    // ── SOCKET EVENTS ──
-    socket.on('chat message', ({ user, text }) => {
-      const isOwn = user === myUsername;
-      addMessage(
-        `<span class="msg-user">${user}:</span> <span class="msg-text">${text}</span>`,
-        isOwn ? 'msg-own' : ''
-      );
-    });
-
-    socket.on('system message', (msg) => {
-      addMessage(`<span class="msg-system">*** ${msg} ***</span>`);
-    });
-
-    socket.on('user count', (count) => {
-      document.getElementById('user-count').textContent = `👤 ${count} online`;
-    });
-
-    function addMessage(html, extraClass = '') {
-      const messages = document.getElementById('messages');
-      const li = document.createElement('li');
-      li.style.listStyle = 'none';
-      li.style.padding = '2px 0';
-      if (extraClass) li.classList.add(extraClass);
-      li.innerHTML = html; // safe — server-side escaped before broadcast
-      messages.appendChild(li);
-      messages.scrollTop = messages.scrollHeight;
+  socket.on("typing", ({ text }) => {
+    if (!text) {
+      typingBar.innerHTML = "";
+    } else {
+      typingBar.innerHTML = text + ' <span class="dots"><span></span><span></span><span></span></span>';
     }
+  });
 
-    // ── CHECK IF ALREADY LOGGED IN (session persists on refresh) ──
-    fetch('/me').then(async res => {
-      if (res.ok) {
-        const data = await res.json();
-        enterChat(data.username);
-      }
-    });
-  </script>
+  socket.on("kicked", reason => {
+    addMsg("⚠ " + (reason || "You were signed in from another device."), false, true);
+    msgEl.disabled = true;
+    socket.disconnect();
+  });
+}
+
+function send() {
+  if (!msgEl.value) return;
+  socket.emit("chat message", msgEl.value);
+  msgEl.value = "";
+  stopTyping();
+}
+
+function addMsg(text, system = false, kicked = false) {
+  const d = document.createElement("div");
+  d.className = "msg" + (system ? " system" : "") + (kicked ? " kicked" : "");
+  d.innerText = text;
+  messages.appendChild(d);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+// Toggle online users list
+function toggleUsers() {
+  usersVisible = !usersVisible;
+  usersDiv.classList.toggle("collapsed", !usersVisible);
+  document.getElementById("toggleUsersBtn").innerText = usersVisible ? "hide" : "show";
+}
+
+// Typing events
+msgEl.addEventListener("input", () => {
+  if (!socket) return;
+  if (!isTyping) {
+    isTyping = true;
+    socket.emit("typing start");
+  }
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(stopTyping, 2000);
+});
+
+function stopTyping() {
+  if (!isTyping || !socket) return;
+  isTyping = false;
+  clearTimeout(typingTimer);
+  socket.emit("typing stop");
+}
+
+msgEl.addEventListener("keypress", e => {
+  if (e.key === "Enter") send();
+});
+
+// Tick time-online every second
+setInterval(() => {
+  document.querySelectorAll(".userRow").forEach(row => {
+    const joinedAt = parseInt(row.dataset.joinedAt, 10);
+    const span = row.querySelector(".userTime");
+    if (span) span.innerText = formatDuration(Date.now() - joinedAt);
+  });
+}, 1000);
+
+function formatDuration(ms) {
+  const total = Math.floor(ms / 1000);
+  const d = Math.floor(total / 86400);
+  const h = Math.floor((total % 86400) / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  if (d > 0) return d + "D " + h + "HR " + m + "M " + s + "S";
+  if (h > 0) return h + "HR " + m + "M " + s + "S";
+  if (m > 0) return m + "M " + s + "S";
+  return s + "S";
+}
+
+autoLogin();
+</script>
+
 </body>
 </html>
