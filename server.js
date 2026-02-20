@@ -83,6 +83,7 @@ async function initDb() {
 
   // Safe upgrade columns for existing installs
   await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS color TEXT NOT NULL DEFAULT '#000080'`);
+  await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS theme TEXT NOT NULL DEFAULT 'classic'`);
   await db.query(`ALTER TABLE polls ADD COLUMN IF NOT EXISTS ends_at TIMESTAMPTZ`);
   await db.query(`ALTER TABLE polls ADD COLUMN IF NOT EXISTS concluded BOOLEAN NOT NULL DEFAULT false`);
 
@@ -157,6 +158,8 @@ const VALID_COLORS = [
   '#cc6600','#006699','#990000','#009900','#660099',
 ];
 
+const VALID_THEMES = ['classic', 'dark', 'hacker', 'rose'];
+
 // ─── Link Preview ─────────────────────────────────────────────────────────────
 
 const previewCache = new Map();
@@ -223,10 +226,10 @@ app.post('/register', async (req, res) => {
 
   try {
     const hash = await bcrypt.hash(password, 12);
-    await db.query('INSERT INTO users (username, password_hash, color) VALUES ($1, $2, $3)', [username, hash, safeColor]);
+    await db.query('INSERT INTO users (username, password_hash, color, theme) VALUES ($1, $2, $3, $4)', [username, hash, safeColor, 'classic']);
     req.session.username = username;
     const token = createSocketToken(username);
-    res.json({ ok: true, username, color: safeColor, token });
+    res.json({ ok: true, username, color: safeColor, theme: 'classic', token });
   } catch (err) {
     if (err.code === '23505')
       return res.status(409).json({ error: 'Username already taken' });
@@ -251,7 +254,7 @@ app.post('/login', async (req, res) => {
 
     req.session.username = user.username;
     const token = createSocketToken(user.username);
-    res.json({ ok: true, username: user.username, color: user.color || '#000080', token });
+    res.json({ ok: true, username: user.username, color: user.color || '#000080', theme: user.theme || 'classic', token });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -267,10 +270,11 @@ app.post('/logout', (req, res) => {
 
 app.get('/me', async (req, res) => {
   if (req.session.username) {
-    const result = await db.query('SELECT color FROM users WHERE LOWER(username) = LOWER($1)', [req.session.username]);
+    const result = await db.query('SELECT color, theme FROM users WHERE LOWER(username) = LOWER($1)', [req.session.username]);
     const color = result.rows[0]?.color || '#000080';
+    const theme = result.rows[0]?.theme || 'classic';
     const token = createSocketToken(req.session.username);
-    res.json({ username: req.session.username, color, token });
+    res.json({ username: req.session.username, color, theme, token });
   } else {
     res.status(401).json({ error: 'Not logged in' });
   }
@@ -279,6 +283,50 @@ app.get('/me', async (req, res) => {
 app.get('/rooms', async (req, res) => {
   const result = await db.query('SELECT name FROM rooms ORDER BY id');
   res.json(result.rows.map(r => r.name));
+});
+
+// ─── Settings Route ───────────────────────────────────────────────────────────
+
+app.post('/settings', async (req, res) => {
+  if (!req.session.username) return res.status(401).json({ error: 'Not logged in' });
+
+  const { color, theme } = req.body;
+  const updates = [];
+  const values = [];
+  let idx = 1;
+
+  if (color !== undefined) {
+    if (!VALID_COLORS.includes(color)) return res.status(400).json({ error: 'Invalid color' });
+    updates.push(`color = $${idx++}`);
+    values.push(color);
+  }
+
+  if (theme !== undefined) {
+    if (!VALID_THEMES.includes(theme)) return res.status(400).json({ error: 'Invalid theme' });
+    updates.push(`theme = $${idx++}`);
+    values.push(theme);
+  }
+
+  if (!updates.length) return res.status(400).json({ error: 'Nothing to update' });
+
+  values.push(req.session.username);
+  try {
+    await db.query(`UPDATE users SET ${updates.join(', ')} WHERE LOWER(username) = LOWER($${idx})`, values);
+
+    // If color changed, update the live socket user so messages broadcast the new color
+    if (color) {
+      const key = req.session.username.toLowerCase();
+      const socketId = userSocketMap[key];
+      if (socketId && connectedUsers[socketId]) {
+        connectedUsers[socketId].color = color;
+      }
+    }
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Settings error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 // ─── Socket State ─────────────────────────────────────────────────────────────
@@ -403,7 +451,7 @@ setInterval(async () => {
   } catch (err) {
     console.error('Poll conclusion error:', err);
   }
-}, 15000); // check every 15 seconds
+}, 15000);
 
 // ─── Idle Checker ─────────────────────────────────────────────────────────────
 
@@ -454,17 +502,16 @@ io.on('connection', (socket) => {
     const roomsResult = await db.query('SELECT name FROM rooms ORDER BY id');
     socket.emit('rooms list', roomsResult.rows.map(r => r.name));
 
+    // Send history first, then polls (so polls aren't wiped by renderHistory)
     const history = await getHistory(defaultRoom, username, 50);
     const historyWithColors = await enrichHistoryWithColors(history);
     socket.emit('history', historyWithColors);
 
-    // Send polls AFTER history so renderHistory() doesn't wipe them
     const pollsResult = await db.query(
       'SELECT * FROM polls WHERE room = $1 ORDER BY created_at DESC LIMIT 20',
       [defaultRoom]
     );
     pollsResult.rows.reverse().forEach(poll => socket.emit('poll update', formatPollData(poll)));
-
 
     broadcastUserList(defaultRoom);
     io.to(defaultRoom).emit('system message', `${username} has joined #${defaultRoom}`);
@@ -486,12 +533,11 @@ io.on('connection', (socket) => {
     user.room = newRoom;
     socket.join(newRoom);
 
-  
+    // Send history first, then polls
     const history = await getHistory(newRoom, user.username, 50);
     const historyWithColors = await enrichHistoryWithColors(history);
     socket.emit('history', historyWithColors);
 
-    // Send polls AFTER history
     const pollsResult = await db.query(
       'SELECT * FROM polls WHERE room = $1 ORDER BY created_at DESC LIMIT 20',
       [newRoom]

@@ -8,32 +8,178 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* ── THEMES ── */
+    :root {
+      --bg-outer:       #000080;
+      --bg-window:      #c0c0c0;
+      --bg-titlebar:    #000080;
+      --bg-sidebar:     #000060;
+      --bg-sidebar-hdr: #000040;
+      --bg-messages:    #ffffff;
+      --bg-input:       #ffffff;
+      --bg-bottom:      #c0c0c0;
+      --bg-users-panel: #c0c0c0;
+      --border-main:    white #808080 #808080 white;
+      --border-inset:   #808080;
+      --text-main:      #000000;
+      --text-titlebar:  #ffffff;
+      --text-sidebar:   #c0c0ff;
+      --text-sidebar-hdr: #aad4ff;
+      --text-system:    #808080;
+      --text-action:    #555555;
+      --room-active-bg: #0000c0;
+      --room-hover-bg:  #0000a0;
+      --poll-bg:        #f0f0ff;
+      --poll-border:    #000080;
+      --poll-bar:       #000080;
+      --poll-question:  #000080;
+      --link-preview-bg: #f0f4ff;
+      --link-preview-border: #c0c8e0;
+      --link-preview-accent: #000080;
+      --link-title-color: #000080;
+      --typing-color:   #808080;
+      --btn-bg:         #c0c0c0;
+      --btn-border:     white #808080 #808080 white;
+      --auth-bg:        #c0c0c0;
+      --auth-tab-active-bg: #000080;
+      --auth-input-bg:  #ffffff;
+    }
+
+    body.theme-dark {
+      --bg-outer:       #0a0a0a;
+      --bg-window:      #1a1a1a;
+      --bg-titlebar:    #111111;
+      --bg-sidebar:     #0d0d0d;
+      --bg-sidebar-hdr: #080808;
+      --bg-messages:    #141414;
+      --bg-input:       #1e1e1e;
+      --bg-bottom:      #1a1a1a;
+      --bg-users-panel: #1a1a1a;
+      --border-main:    #444 #111 #111 #444;
+      --border-inset:   #333;
+      --text-main:      #d0d0d0;
+      --text-titlebar:  #e0e0e0;
+      --text-sidebar:   #9090c0;
+      --text-sidebar-hdr: #7090b0;
+      --text-system:    #555;
+      --text-action:    #777;
+      --room-active-bg: #252535;
+      --room-hover-bg:  #1e1e2e;
+      --poll-bg:        #1e1e2e;
+      --poll-border:    #4444aa;
+      --poll-bar:       #4444aa;
+      --poll-question:  #8888cc;
+      --link-preview-bg: #1e1e28;
+      --link-preview-border: #333355;
+      --link-preview-accent: #4444aa;
+      --link-title-color: #8888cc;
+      --typing-color:   #555;
+      --btn-bg:         #222;
+      --btn-border:     #444 #111 #111 #444;
+      --auth-bg:        #1a1a1a;
+      --auth-tab-active-bg: #111;
+      --auth-input-bg:  #222;
+    }
+
+    body.theme-hacker {
+      --bg-outer:       #000000;
+      --bg-window:      #0a0a0a;
+      --bg-titlebar:    #001400;
+      --bg-sidebar:     #001000;
+      --bg-sidebar-hdr: #000800;
+      --bg-messages:    #020802;
+      --bg-input:       #001400;
+      --bg-bottom:      #0a0a0a;
+      --bg-users-panel: #0a0a0a;
+      --border-main:    #00aa00 #003300 #003300 #00aa00;
+      --border-inset:   #004400;
+      --text-main:      #00cc00;
+      --text-titlebar:  #00ff00;
+      --text-sidebar:   #007700;
+      --text-sidebar-hdr: #00aa00;
+      --text-system:    #005500;
+      --text-action:    #007700;
+      --room-active-bg: #001f00;
+      --room-hover-bg:  #001500;
+      --poll-bg:        #001a00;
+      --poll-border:    #007700;
+      --poll-bar:       #00aa00;
+      --poll-question:  #00cc00;
+      --link-preview-bg: #001500;
+      --link-preview-border: #005500;
+      --link-preview-accent: #00aa00;
+      --link-title-color: #00cc00;
+      --typing-color:   #005500;
+      --btn-bg:         #001400;
+      --btn-border:     #00aa00 #003300 #003300 #00aa00;
+      --auth-bg:        #0a0a0a;
+      --auth-tab-active-bg: #001400;
+      --auth-input-bg:  #001400;
+    }
+
+    body.theme-rose {
+      --bg-outer:       #3d1a2e;
+      --bg-window:      #f5e8ee;
+      --bg-titlebar:    #7a2d52;
+      --bg-sidebar:     #5c1f3d;
+      --bg-sidebar-hdr: #3d1428;
+      --bg-messages:    #fff5f8;
+      --bg-input:       #fff0f5;
+      --bg-bottom:      #f5e8ee;
+      --bg-users-panel: #f5e8ee;
+      --border-main:    #f0c0d8 #8a3060 #8a3060 #f0c0d8;
+      --border-inset:   #c090a8;
+      --text-main:      #3a1428;
+      --text-titlebar:  #ffe0ee;
+      --text-sidebar:   #f0b0cc;
+      --text-sidebar-hdr: #f8d0e4;
+      --text-system:    #b08090;
+      --text-action:    #805060;
+      --room-active-bg: #7a2d52;
+      --room-hover-bg:  #5c1f3d;
+      --poll-bg:        #fff0f8;
+      --poll-border:    #cc5588;
+      --poll-bar:       #cc5588;
+      --poll-question:  #993366;
+      --link-preview-bg: #fff5f9;
+      --link-preview-border: #e8b0c8;
+      --link-preview-accent: #cc5588;
+      --link-title-color: #993366;
+      --typing-color:   #c090a8;
+      --btn-bg:         #f5e8ee;
+      --btn-border:     #f0c0d8 #8a3060 #8a3060 #f0c0d8;
+      --auth-bg:        #f5e8ee;
+      --auth-tab-active-bg: #7a2d52;
+      --auth-input-bg:  #fff5f8;
+    }
+
     body {
-      background-color: #000080;
+      background-color: var(--bg-outer);
       font-family: 'VT323', monospace;
       font-size: 18px;
-      color: white;
+      color: var(--text-main);
       height: 100vh;
       height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      transition: background-color 0.2s;
     }
 
     /* ── AUTH SCREEN ── */
     #auth-screen {
-      background: #c0c0c0;
-      color: black;
+      background: var(--auth-bg);
+      color: var(--text-main);
       border: 3px solid;
-      border-color: white #808080 #808080 white;
+      border-color: var(--border-main);
       width: 90%;
       max-width: 380px;
     }
 
     .auth-tabs {
       display: flex;
-      border-bottom: 2px solid #808080;
+      border-bottom: 2px solid var(--border-inset);
     }
 
     .auth-tab {
@@ -44,16 +190,16 @@
       font-family: 'VT323', monospace;
       font-size: 18px;
       cursor: pointer;
-      border-right: 1px solid #808080;
+      border-right: 1px solid var(--border-inset);
       color: #444;
     }
 
     .auth-tab:last-child { border-right: none; }
-    .auth-tab.active { background: #000080; color: white; }
+    .auth-tab.active { background: var(--auth-tab-active-bg); color: white; }
 
     .auth-titlebar {
-      background: #000080;
-      color: white;
+      background: var(--bg-titlebar);
+      color: var(--text-titlebar);
       padding: 6px 10px;
       font-size: 18px;
       letter-spacing: 1px;
@@ -72,8 +218,9 @@
       margin: 6px 0;
       font-family: 'VT323', monospace;
       font-size: 20px;
-      border: 2px inset #808080;
-      background: white;
+      border: 2px inset var(--border-inset);
+      background: var(--auth-input-bg);
+      color: var(--text-main);
     }
 
     .auth-panel button.primary {
@@ -82,16 +229,12 @@
       padding: 8px;
       font-family: 'VT323', monospace;
       font-size: 20px;
-      background: #000080;
-      color: white;
+      background: var(--bg-titlebar);
+      color: var(--text-titlebar);
       border: 2px solid;
-      border-color: #6060c0 #000040 #000040 #6060c0;
+      border-color: var(--border-main);
       cursor: pointer;
       letter-spacing: 1px;
-    }
-
-    .auth-panel button.primary:active {
-      border-color: #000040 #6060c0 #6060c0 #000040;
     }
 
     .auth-error {
@@ -134,9 +277,10 @@
       width: 100%;
       height: 100vh;
       height: 100dvh;
-      background: #c0c0c0;
+      background: var(--bg-window);
       border: none;
       overflow: hidden;
+      transition: background-color 0.2s;
     }
 
     @media (min-width: 700px) {
@@ -144,7 +288,7 @@
         width: 760px;
         height: 90vh;
         border: 3px solid;
-        border-color: white #808080 #808080 white;
+        border-color: var(--border-main);
       }
     }
 
@@ -159,21 +303,21 @@
     /* ── ROOMS SIDEBAR ── */
     #rooms-sidebar {
       width: 110px;
-      background: #000060;
-      color: white;
+      background: var(--bg-sidebar);
+      color: var(--text-sidebar);
       display: flex;
       flex-direction: column;
-      border-right: 2px solid #808080;
+      border-right: 2px solid var(--border-inset);
       flex-shrink: 0;
     }
 
     #rooms-sidebar h3 {
       font-size: 14px;
       padding: 6px 8px;
-      background: #000040;
-      border-bottom: 1px solid #4040a0;
+      background: var(--bg-sidebar-hdr);
+      border-bottom: 1px solid var(--border-inset);
       letter-spacing: 1px;
-      color: #aad4ff;
+      color: var(--text-sidebar-hdr);
     }
 
     .room-btn {
@@ -185,13 +329,13 @@
       font-size: 16px;
       background: none;
       border: none;
-      color: #c0c0ff;
+      color: var(--text-sidebar);
       cursor: pointer;
-      border-bottom: 1px solid #000040;
+      border-bottom: 1px solid var(--bg-sidebar-hdr);
     }
 
-    .room-btn:hover { background: #0000a0; }
-    .room-btn.active { background: #0000c0; color: white; font-weight: bold; }
+    .room-btn:hover { background: var(--room-hover-bg); }
+    .room-btn.active { background: var(--room-active-bg); color: white; font-weight: bold; }
     .room-btn .room-unread {
       float: right;
       background: #cc0000;
@@ -213,73 +357,88 @@
 
     /* ── TITLEBAR ── */
     #titlebar {
-      background: #000080;
-      color: white;
-      padding: 6px 10px;
+      background: var(--bg-titlebar);
+      color: var(--text-titlebar);
+      padding: 0 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 18px;
       letter-spacing: 1px;
       flex-shrink: 0;
-      gap: 8px;
       height: 40px;
+      gap: 8px;
     }
 
-    #titlebar-left {
+    #titlebar-title {
+      font-size: 18px;
+      letter-spacing: 2px;
+      flex-shrink: 0;
+    }
+
+    #titlebar-right {
       display: flex;
       align-items: center;
-      gap: 10px;
-      min-width: 0;
+      gap: 5px;
+      margin-left: auto;
     }
 
     #logged-in-as {
-      font-size: 14px;
-      color: #aad4ff;
+      font-size: 15px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      margin-right: 4px;
     }
 
-    #user-count-btn {
+    /* ── ICON BUTTONS ── */
+    .icon-btn {
       font-family: 'VT323', monospace;
-      font-size: 15px;
-      background: #008080;
-      color: white;
-      padding: 2px 8px;
-      border: 1px solid;
-      border-color: #80c0c0 #004040 #004040 #80c0c0;
+      font-size: 16px;
+      background: var(--btn-bg);
+      color: var(--text-main);
+      border: 2px solid;
+      border-color: var(--btn-border);
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0;
+      line-height: 1;
+      position: relative;
+    }
+
+    .icon-btn:active { border-color: var(--border-inset) white white var(--border-inset); }
+
+    .icon-btn.on { background: #006600; color: white; border-color: #0a0 #030 #030 #0a0; }
+    .icon-btn.danger { background: #800000; color: white; border-color: #ff8080 #400000 #400000 #ff8080; }
+    .icon-btn.danger:active { border-color: #400000 #ff8080 #ff8080 #400000; }
+
+    /* Tooltip */
+    .icon-btn[title]:hover::after {
+      content: attr(title);
+      position: absolute;
+      bottom: -26px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #000;
+      color: #fff;
+      font-size: 12px;
+      padding: 2px 6px;
       white-space: nowrap;
-      flex-shrink: 0;
-      cursor: pointer;
+      z-index: 100;
+      pointer-events: none;
+      border: 1px solid #555;
     }
 
-    #user-count-btn:active { border-color: #004040 #80c0c0 #80c0c0 #004040; }
-
-    #sound-btn {
-      font-family: 'VT323', monospace;
+    /* user count stays wider */
+    #user-count-btn {
+      width: auto;
+      padding: 0 8px;
       font-size: 14px;
-      background: #404040;
-      color: white;
-      border: 1px solid;
-      border-color: #888 #333 #333 #888;
-      padding: 2px 8px;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-
-    #sound-btn.on { background: #006600; border-color: #0a0 #030 #030 #0a0; }
-
-    #logout-btn {
-      font-family: 'VT323', monospace;
-      font-size: 14px;
-      background: #800000;
-      color: white;
-      border: 1px solid;
-      border-color: #ff8080 #400000 #400000 #ff8080;
-      padding: 2px 8px;
-      cursor: pointer;
-      flex-shrink: 0;
     }
 
     /* ── ONLINE USERS PANEL ── */
@@ -288,17 +447,17 @@
       flex-wrap: wrap;
       gap: 4px 16px;
       padding: 6px 8px;
-      background: #c0c0c0;
-      border-bottom: 2px inset #808080;
+      background: var(--bg-users-panel);
+      border-bottom: 2px inset var(--border-inset);
       font-size: 15px;
-      color: black;
+      color: var(--text-main);
       flex-shrink: 0;
     }
 
     #users-panel.visible { display: flex; }
 
     .user-entry .uname { font-weight: bold; }
-    .user-entry .utime { color: #808080; font-size: 13px; margin-left: 4px; }
+    .user-entry .utime { color: var(--text-system); font-size: 13px; margin-left: 4px; }
     .user-entry .uidle { color: #aa6600; font-size: 13px; margin-left: 2px; }
 
     /* ── MESSAGES ── */
@@ -306,23 +465,29 @@
       flex: 1;
       overflow-y: auto;
       padding: 8px;
-      background: white;
-      border: 2px inset #808080;
+      background: var(--bg-messages);
+      border: 2px inset var(--border-inset);
       margin: 8px 8px 0 8px;
       font-size: 18px;
       line-height: 1.6;
       -webkit-overflow-scrolling: touch;
-      color: black;
+      color: var(--text-main);
+      transition: background-color 0.2s, color 0.2s;
     }
 
-    .msg-action { color: #555; font-style: italic; }
-    .msg-action .msg-user { color: #555; }
-    .msg-system { color: #808080; font-style: italic; }
+    .msg-action { color: var(--text-action); font-style: italic; }
+    .msg-action .msg-user { color: var(--text-action); }
+    .msg-system { color: var(--text-system); font-style: italic; }
     .msg-dm-row { background: #fff0f8; padding: 0 4px; border-left: 3px solid #cc0088; }
     .msg-dm-label { color: #cc0088; font-size: 15px; margin-right: 4px; }
-    .msg-text { color: black; }
+    .msg-text { color: var(--text-main); }
     .msg-own .msg-user { opacity: 0.8; }
     .msg-kicked { color: #cc0000; font-style: italic; }
+
+    body.theme-dark .msg-dm-row { background: #1a0a14; border-left-color: #aa0066; }
+    body.theme-hacker .msg-dm-row { background: #001200; border-left-color: #00aa44; }
+    body.theme-hacker .msg-dm-label { color: #00aa44; }
+    body.theme-rose .msg-dm-row { background: #ffe8f4; border-left-color: #cc5588; }
 
     /* ── TIMESTAMP (hover) ── */
     .msg-row {
@@ -333,7 +498,7 @@
     .msg-ts {
       display: none;
       font-size: 12px;
-      color: #aaa;
+      color: var(--text-system);
       margin-left: 8px;
     }
 
@@ -342,12 +507,12 @@
       display: inline-block;
       margin: 4px 0 2px 12px;
       padding: 6px 10px;
-      background: #f0f4ff;
-      border: 1px solid #c0c8e0;
-      border-left: 3px solid #000080;
+      background: var(--link-preview-bg);
+      border: 1px solid var(--link-preview-border);
+      border-left: 3px solid var(--link-preview-accent);
       font-size: 15px;
       max-width: 420px;
-      color: #222;
+      color: var(--text-main);
     }
 
     .link-preview img {
@@ -357,27 +522,26 @@
       margin-bottom: 4px;
     }
 
-    .link-preview .lp-title { font-weight: bold; color: #000080; }
-    .link-preview .lp-desc { color: #555; font-size: 13px; }
+    .link-preview .lp-title { font-weight: bold; color: var(--link-title-color); }
+    .link-preview .lp-desc { color: var(--text-system); font-size: 13px; }
 
     /* ── POLL ── */
     .poll-card {
-      background: #f0f0ff;
-      border: 2px solid #000080;
+      background: var(--poll-bg);
+      border: 2px solid var(--poll-border);
       margin: 6px 0;
       padding: 8px 12px;
       font-size: 16px;
-      color: black;
+      color: var(--text-main);
     }
 
     .poll-card.poll-concluded {
       opacity: 0.75;
-      border-color: #aaa;
-      background: #f4f4f4;
+      border-color: var(--border-inset);
+      background: var(--bg-messages);
     }
 
-    .poll-question { font-weight: bold; color: #000080; margin-bottom: 6px; font-size: 17px; }
-    .poll-card.poll-concluded .poll-question { color: #666; }
+    .poll-question { font-weight: bold; color: var(--poll-question); margin-bottom: 6px; font-size: 17px; }
 
     .poll-option {
       display: flex;
@@ -388,30 +552,30 @@
     }
 
     .poll-option:hover .poll-opt-label { text-decoration: underline; }
-    .poll-option.voted .poll-opt-label { color: #000080; font-weight: bold; }
+    .poll-option.voted .poll-opt-label { color: var(--poll-question); font-weight: bold; }
     .poll-option.concluded { cursor: default; pointer-events: none; }
 
     .poll-bar-wrap {
       flex: 1;
       height: 14px;
-      background: #d0d0d0;
-      border: 1px solid #aaa;
+      background: var(--border-inset);
+      border: 1px solid var(--border-inset);
       overflow: hidden;
     }
 
     .poll-bar {
       height: 100%;
-      background: #000080;
+      background: var(--poll-bar);
       transition: width 0.3s;
     }
 
-    .poll-card.poll-concluded .poll-bar { background: #808080; }
+    .poll-card.poll-concluded .poll-bar { background: var(--border-inset); }
     .poll-option.winner .poll-bar { background: #007700; }
     .poll-option.winner .poll-opt-label { color: #007700; font-weight: bold; }
 
-    .poll-pct { font-size: 13px; color: #555; width: 36px; text-align: right; }
+    .poll-pct { font-size: 13px; color: var(--text-system); width: 36px; text-align: right; }
     .poll-opt-label { min-width: 80px; }
-    .poll-meta { font-size: 13px; color: #888; margin-top: 4px; }
+    .poll-meta { font-size: 13px; color: var(--text-system); margin-top: 4px; }
     .poll-timer { color: #cc6600; font-size: 13px; }
     .poll-timer.urgent { color: #cc0000; font-weight: bold; }
 
@@ -421,7 +585,7 @@
       padding: 2px 10px;
       margin: 0 8px;
       font-size: 14px;
-      color: #808080;
+      color: var(--typing-color);
       font-style: italic;
       display: flex;
       align-items: center;
@@ -433,7 +597,7 @@
       display: inline-block;
       width: 4px;
       height: 4px;
-      background: #808080;
+      background: var(--typing-color);
       border-radius: 50%;
       animation: bounce 1.2s infinite;
     }
@@ -450,6 +614,7 @@
       gap: 6px;
       padding: 8px;
       flex-shrink: 0;
+      background: var(--bg-bottom);
     }
 
     #input {
@@ -457,24 +622,26 @@
       padding: 8px;
       font-family: 'VT323', monospace;
       font-size: 20px;
-      border: 2px inset #808080;
+      border: 2px inset var(--border-inset);
       min-width: 0;
-      color: black;
+      color: var(--text-main);
+      background: var(--bg-input);
     }
 
     #send-btn {
       padding: 8px 16px;
       font-family: 'VT323', monospace;
       font-size: 20px;
-      background: #c0c0c0;
+      background: var(--btn-bg);
+      color: var(--text-main);
       border: 2px solid;
-      border-color: white #808080 #808080 white;
+      border-color: var(--btn-border);
       cursor: pointer;
       white-space: nowrap;
       flex-shrink: 0;
     }
 
-    #send-btn:active { border-color: #808080 white white #808080; }
+    #send-btn:active { border-color: var(--border-inset) white white var(--border-inset); }
 
     /* ── DM FLASH ── */
     .dm-flash { animation: flash 0.4s 3; }
@@ -482,6 +649,151 @@
       0%, 100% { background: #fff0f8; }
       50% { background: #ffccee; }
     }
+
+    /* ── SETTINGS MODAL ── */
+    #settings-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #settings-overlay.open { display: flex; }
+
+    #settings-modal {
+      background: var(--bg-window);
+      border: 3px solid;
+      border-color: var(--border-main);
+      width: 90%;
+      max-width: 360px;
+      font-family: 'VT323', monospace;
+      color: var(--text-main);
+    }
+
+    #settings-titlebar {
+      background: var(--bg-titlebar);
+      color: var(--text-titlebar);
+      padding: 6px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 18px;
+      letter-spacing: 1px;
+    }
+
+    #settings-close-btn {
+      font-family: 'VT323', monospace;
+      font-size: 16px;
+      background: #800000;
+      color: white;
+      border: 2px solid;
+      border-color: #ff8080 #400000 #400000 #ff8080;
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      line-height: 1;
+    }
+
+    #settings-body {
+      padding: 16px;
+    }
+
+    .settings-section {
+      margin-bottom: 16px;
+    }
+
+    .settings-label {
+      font-size: 16px;
+      margin-bottom: 6px;
+      display: block;
+      color: var(--text-main);
+      letter-spacing: 1px;
+    }
+
+    /* ── THEME PICKER ── */
+    .theme-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .theme-btn {
+      font-family: 'VT323', monospace;
+      font-size: 16px;
+      padding: 8px 6px;
+      border: 2px solid;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: opacity 0.1s;
+      text-align: center;
+    }
+
+    .theme-btn.theme-opt-classic {
+      background: #000080; color: white;
+      border-color: #6060c0 #000040 #000040 #6060c0;
+    }
+    .theme-btn.theme-opt-dark {
+      background: #1a1a1a; color: #d0d0d0;
+      border-color: #444 #111 #111 #444;
+    }
+    .theme-btn.theme-opt-hacker {
+      background: #001400; color: #00cc00;
+      border-color: #00aa00 #003300 #003300 #00aa00;
+    }
+    .theme-btn.theme-opt-rose {
+      background: #7a2d52; color: #ffe0ee;
+      border-color: #f0a0c0 #3d1428 #3d1428 #f0a0c0;
+    }
+
+    .theme-btn.selected {
+      outline: 2px solid white;
+      outline-offset: 1px;
+    }
+
+    .theme-btn:active { opacity: 0.7; }
+
+    /* ── SETTINGS COLOR PICKER ── */
+    #settings-color-swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .settings-save-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .settings-btn {
+      flex: 1;
+      padding: 8px;
+      font-family: 'VT323', monospace;
+      font-size: 18px;
+      background: var(--bg-titlebar);
+      color: var(--text-titlebar);
+      border: 2px solid;
+      border-color: var(--border-main);
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+
+    .settings-status {
+      font-size: 14px;
+      color: #007700;
+      min-height: 18px;
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    body.theme-hacker .settings-status { color: #00cc00; }
   </style>
 </head>
 <body>
@@ -523,14 +835,13 @@
   <!-- Chat Screen -->
   <div id="chat-screen">
     <div id="titlebar">
-      <div id="titlebar-left">
-        <span>chatroom</span>
+      <span id="titlebar-title">chatroom</span>
+      <div id="titlebar-right">
         <span id="logged-in-as"></span>
-      </div>
-      <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
-        <button id="user-count-btn" onclick="toggleUsers()">👤 0 online</button>
-        <button id="sound-btn" class="on" onclick="toggleSound()" title="Toggle sounds">🔊 SFX</button>
-        <button id="logout-btn" onclick="doLogout()">exit</button>
+        <button id="user-count-btn" class="icon-btn" onclick="toggleUsers()" title="Online users">👤 0</button>
+        <button id="sound-btn" class="icon-btn on" onclick="toggleSound()" title="Toggle SFX">🔊</button>
+        <button id="settings-btn" class="icon-btn" onclick="openSettings()" title="Settings">⚙</button>
+        <button id="logout-btn" class="icon-btn danger" onclick="doLogout()" title="Exit">✕</button>
       </div>
     </div>
 
@@ -548,6 +859,39 @@
           <input id="input" placeholder="Type a message, /me, /msg, /poll..." autocomplete="off" />
           <button id="send-btn" onclick="send()">Send</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-overlay">
+    <div id="settings-modal">
+      <div id="settings-titlebar">
+        <span>⚙ Settings</span>
+        <button id="settings-close-btn" onclick="closeSettings()">✕</button>
+      </div>
+      <div id="settings-body">
+
+        <div class="settings-section">
+          <span class="settings-label">Theme</span>
+          <div class="theme-options">
+            <button class="theme-btn theme-opt-classic selected" data-theme="classic" onclick="selectTheme('classic')">Classic</button>
+            <button class="theme-btn theme-opt-dark" data-theme="dark" onclick="selectTheme('dark')">Dark</button>
+            <button class="theme-btn theme-opt-hacker" data-theme="hacker" onclick="selectTheme('hacker')">Hacker</button>
+            <button class="theme-btn theme-opt-rose" data-theme="rose" onclick="selectTheme('rose')">Rose</button>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <span class="settings-label">Username Colour</span>
+          <div id="settings-color-swatches"></div>
+        </div>
+
+        <div class="settings-save-row">
+          <button class="settings-btn" onclick="saveSettings()">Save</button>
+        </div>
+        <div class="settings-status" id="settings-status"></div>
+
       </div>
     </div>
   </div>
@@ -604,8 +948,9 @@
     function toggleSound() {
       soundEnabled = !soundEnabled;
       const btn = document.getElementById('sound-btn');
-      btn.textContent = soundEnabled ? '🔊 SFX' : '🔇 SFX';
+      btn.textContent = soundEnabled ? '🔊' : '🔇';
       btn.classList.toggle('on', soundEnabled);
+      btn.title = soundEnabled ? 'Toggle SFX' : 'Toggle SFX (off)';
     }
 
     // ── COLORS ────────────────────────────────────────────────────────────────
@@ -616,6 +961,8 @@
     ];
 
     let selectedColor = '#000080';
+    let selectedSettingsColor = '#000080';
+    let selectedTheme = 'classic';
 
     function buildColorSwatches() {
       const wrap = document.getElementById('color-swatches');
@@ -633,7 +980,101 @@
         wrap.appendChild(div);
       });
     }
+
+    function buildSettingsColorSwatches(currentColor) {
+      selectedSettingsColor = currentColor;
+      const wrap = document.getElementById('settings-color-swatches');
+      wrap.innerHTML = '';
+      COLORS.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'color-swatch' + (c === currentColor ? ' selected' : '');
+        div.style.background = c;
+        div.title = c;
+        div.onclick = () => {
+          selectedSettingsColor = c;
+          wrap.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+          div.classList.add('selected');
+        };
+        wrap.appendChild(div);
+      });
+    }
+
     buildColorSwatches();
+
+    // ── THEME ─────────────────────────────────────────────────────────────────
+    function applyTheme(theme) {
+      document.body.className = document.body.className
+        .replace(/theme-\w+/g, '')
+        .trim();
+      if (theme !== 'classic') {
+        document.body.classList.add('theme-' + theme);
+      }
+      selectedTheme = theme;
+      // Update selected state on theme buttons
+      document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.classList.toggle('selected', btn.dataset.theme === theme);
+      });
+    }
+
+    function selectTheme(theme) {
+      applyTheme(theme);
+    }
+
+    // ── SETTINGS ─────────────────────────────────────────────────────────────
+    function openSettings() {
+      buildSettingsColorSwatches(myColor);
+      applyThemeButtonState(selectedTheme);
+      document.getElementById('settings-status').textContent = '';
+      document.getElementById('settings-overlay').classList.add('open');
+    }
+
+    function closeSettings() {
+      document.getElementById('settings-overlay').classList.remove('open');
+    }
+
+    function applyThemeButtonState(theme) {
+      document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.classList.toggle('selected', btn.dataset.theme === theme);
+      });
+    }
+
+    async function saveSettings() {
+      const statusEl = document.getElementById('settings-status');
+      statusEl.textContent = 'Saving...';
+      statusEl.style.color = 'inherit';
+
+      try {
+        const res = await fetch('/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ color: selectedSettingsColor, theme: selectedTheme }),
+        });
+        const data = await res.json();
+        if (!res.ok) { statusEl.textContent = data.error; statusEl.style.color = '#cc0000'; return; }
+
+        // Apply color change locally
+        myColor = selectedSettingsColor;
+        document.getElementById('logged-in-as').innerHTML =
+          `<span style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.5)">${myUsername}</span>`;
+
+        statusEl.textContent = 'Saved!';
+        statusEl.style.color = '#007700';
+        setTimeout(() => { statusEl.textContent = ''; }, 2000);
+      } catch {
+        statusEl.textContent = 'Error saving.';
+        statusEl.style.color = '#cc0000';
+      }
+    }
+
+    // Close modal on overlay click
+    document.getElementById('settings-overlay').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('settings-overlay')) closeSettings();
+    });
+
+    // Escape key closes modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeSettings();
+    });
 
     // ── SOCKET & STATE ────────────────────────────────────────────────────────
     const socket = io({ autoConnect: false });
@@ -669,7 +1110,7 @@
       });
       const data = await res.json();
       if (!res.ok) { errEl.textContent = data.error; return; }
-      enterChat(data.username, data.color || '#000080', data.token);
+      enterChat(data.username, data.color || '#000080', data.theme || 'classic', data.token);
     }
 
     async function doRegister() {
@@ -688,7 +1129,7 @@
       });
       const data = await res.json();
       if (!res.ok) { errEl.textContent = data.error; return; }
-      enterChat(data.username, data.color || '#000080', data.token);
+      enterChat(data.username, data.color || '#000080', data.theme || 'classic', data.token);
     }
 
     async function doLogout() {
@@ -698,13 +1139,17 @@
     }
 
     // ── ENTER CHAT ────────────────────────────────────────────────────────────
-    function enterChat(username, color, token) {
+    function enterChat(username, color, theme, token) {
       myUsername = username;
       myColor = color || '#000080';
+
+      // Apply saved theme
+      applyTheme(theme || 'classic');
+
       document.getElementById('auth-screen').style.display = 'none';
       document.getElementById('chat-screen').style.display = 'block';
       document.getElementById('logged-in-as').innerHTML =
-        `[<span style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.7)">${username}</span>]`;
+        `<span style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.5)">${username}</span>`;
       document.getElementById('input').focus();
 
       socket.connect();
@@ -802,7 +1247,7 @@
       li.style.listStyle = 'none';
       li.className = 'msg-row msg-dm-row' + (!data.noFlash && !data.self ? ' dm-flash' : '');
       const label = data.self
-        ? `<span class="msg-dm-label">DM to ${data.to}:</span>`
+        ? `<span class="msg-dm-label">→ DM to ${data.to}:</span>`
         : `<span class="msg-dm-label">DM from ${data.from}:</span>`;
       li.innerHTML = label + `<span class="msg-text">${data.text}</span>`;
       messages.appendChild(li);
@@ -834,7 +1279,6 @@
       const myVote = (poll.votes || {})[myUsername];
       const concluded = poll.concluded;
 
-      // Find winner count for highlighting
       let topCount = 0;
       if (concluded && totalVotes > 0) {
         const tally = {};
@@ -859,7 +1303,7 @@
           <span class="poll-opt-label">${isWinner ? '🏆 ' : ''}${opt}</span>
           <div class="poll-bar-wrap"><div class="poll-bar" style="width:${pct}%"></div></div>
           <span class="poll-pct">${pct}%</span>
-          <span style="font-size:13px;color:#555">${count}</span>
+          <span style="font-size:13px;color:var(--text-system)">${count}</span>
         </div>`;
       }).join('');
 
@@ -867,7 +1311,7 @@
       if (!concluded && poll.endsAt) {
         timerHtml = `<span class="poll-timer" data-ends="${new Date(poll.endsAt).getTime()}">...</span>`;
       } else if (concluded) {
-        timerHtml = `<span style="color:#888">concluded</span>`;
+        timerHtml = `<span style="color:var(--text-system)">concluded</span>`;
       }
 
       return `<div class="poll-card${concluded ? ' poll-concluded' : ''}">
@@ -916,18 +1360,14 @@
     }
 
     // ── SOCKET EVENTS ─────────────────────────────────────────────────────────
-    socket.on('rooms list', (rooms) => {
-      renderRooms(rooms);
-    });
+    socket.on('rooms list', (rooms) => { renderRooms(rooms); });
 
     socket.on('room changed', (room) => {
       currentRoom = room;
       renderRooms([...document.querySelectorAll('.room-btn')].map(b => b.dataset.room));
     });
 
-    socket.on('history', (history) => {
-      renderHistory(history);
-    });
+    socket.on('history', (history) => { renderHistory(history); });
 
     socket.on('chat message', ({ user, color, text, type, timestamp }) => {
       const isOwn = user === myUsername;
@@ -953,9 +1393,7 @@
       else if (isLeave) soundLeave();
     });
 
-    socket.on('dm', (data) => {
-      addDmMessage(data);
-    });
+    socket.on('dm', (data) => { addDmMessage(data); });
 
     socket.on('link preview', ({ url, title, image, description }) => {
       const messages = document.getElementById('messages');
@@ -983,9 +1421,7 @@
       if (atBottom) messages.scrollTop = messages.scrollHeight;
     });
 
-    socket.on('poll update', (poll) => {
-      renderPoll(poll);
-    });
+    socket.on('poll update', (poll) => { renderPoll(poll); });
 
     socket.on('poll concluded', ({ pollId }) => {
       if (polls[pollId]) {
@@ -997,7 +1433,7 @@
     });
 
     socket.on('user list', (list) => {
-      document.getElementById('user-count-btn').textContent = `👤 ${list.length} online`;
+      document.getElementById('user-count-btn').textContent = `👤 ${list.length}`;
       const panel = document.getElementById('users-panel');
       panel.innerHTML = '';
       list.forEach(({ username, color, joinedAt, idle }) => {
@@ -1027,8 +1463,6 @@
     });
 
     // ── TICKERS ──────────────────────────────────────────────────────────────
-
-    // Time-online ticker
     setInterval(() => {
       document.querySelectorAll('.user-entry').forEach(entry => {
         const joinedAt = parseInt(entry.dataset.joinedAt, 10);
@@ -1037,7 +1471,6 @@
       });
     }, 1000);
 
-    // Poll countdown ticker
     setInterval(() => {
       document.querySelectorAll('.poll-timer').forEach(el => {
         const ends = parseInt(el.dataset.ends, 10);
@@ -1053,7 +1486,6 @@
       });
     }, 1000);
 
-    // Activity emit throttle
     let activityThrottle = 0;
     document.addEventListener('keydown', () => {
       const now = Date.now();
@@ -1071,11 +1503,11 @@
       document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') doRegister(); });
     });
 
-    // Auto-login if session exists
+    // ── AUTO-LOGIN ────────────────────────────────────────────────────────────
     fetch('/me').then(async res => {
       if (res.ok) {
         const data = await res.json();
-        enterChat(data.username, data.color, data.token);
+        enterChat(data.username, data.color, data.theme || 'classic', data.token);
       }
     });
   </script>
