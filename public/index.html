@@ -85,6 +85,11 @@
     .room-btn.active { background:var(--room-active-bg);color:white;font-weight:bold; }
     .room-btn .room-unread { float:right;background:#cc0000;color:white;font-size:12px;padding:0 4px;border-radius:2px; }
     .room-private-icon { font-size:11px;margin-right:2px; }
+    /* Room code badge shown under the room name for owners */
+    .room-code-badge { display:block;font-size:11px;color:#ffd700;letter-spacing:1px;padding:0 8px 4px;line-height:1.2;opacity:0.85; }
+    body.theme-rose .room-code-badge { color:#cc5588; }
+    body.theme-dark .room-code-badge { color:#8888cc; }
+    body.theme-amber .room-code-badge { color:#cc8800; }
 
     /* ── MAIN ── */
     #main-area { flex:1;display:flex;flex-direction:column;overflow:hidden; }
@@ -130,8 +135,6 @@
     .msg-row:hover .msg-ts { display:inline; }
     .msg-row:hover .msg-react-btn { display:inline-flex; }
     .msg-ts { display:none;font-size:12px;color:var(--text-system);margin-left:8px; }
-
-    /* ── USERNAME CLICKABLE ── */
     .msg-user { cursor:pointer; }
     .msg-user:hover { text-decoration:underline; }
 
@@ -190,6 +193,37 @@
     .modal-close { font-family:'VT323',monospace;font-size:16px;background:#800000;color:white;border:2px solid;border-color:#ff8080 #400000 #400000 #ff8080;width:22px;height:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1; }
     .modal-body { padding:16px; }
 
+    /* ── KEYPAD MODAL ── */
+    #keypad-modal .modal-box { max-width:280px; }
+    .keypad-room-name { text-align:center;font-size:17px;color:var(--text-system);margin-bottom:10px; }
+    /* Dot display — shows entered digits as filled/empty circles */
+    .keypad-dots { display:flex;justify-content:center;gap:8px;margin-bottom:12px;min-height:24px; }
+    .keypad-dot { width:14px;height:14px;border-radius:50%;border:2px solid var(--border-inset);background:transparent;transition:background 0.1s; }
+    .keypad-dot.filled { background:var(--poll-bar); }
+    /* 3×3 grid + bottom row */
+    .keypad-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px; }
+    .keypad-btn { font-family:'VT323',monospace;font-size:28px;padding:10px 0;background:var(--btn-bg);color:var(--text-main);border:2px solid;border-color:var(--btn-border);cursor:pointer;text-align:center;user-select:none;transition:opacity 0.07s; }
+    .keypad-btn:active { border-color:var(--border-inset) white white var(--border-inset);opacity:0.7; }
+    .keypad-bottom-row { display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px; }
+    .keypad-enter { background:var(--bg-titlebar);color:var(--text-titlebar);border-color:var(--border-main); }
+    .keypad-clear { background:#800000;color:white;border-color:#ff8080 #400000 #400000 #ff8080; }
+    .keypad-error { text-align:center;color:#cc0000;font-size:15px;min-height:20px;margin-top:6px; }
+
+    /* ── ROOM CREATED / CODE DISPLAY MODAL ── */
+    #room-created-modal .modal-box { max-width:300px;text-align:center; }
+    .room-created-icon { font-size:40px;display:block;margin-bottom:6px; }
+    .room-code-display { font-size:48px;letter-spacing:12px;color:var(--poll-question);margin:10px 0;font-weight:bold; }
+    .room-code-label { font-size:14px;color:var(--text-system);margin-bottom:12px; }
+    .room-code-note { font-size:13px;color:var(--text-system);margin-top:8px; }
+
+    /* ── CHANGEPASS CONFIRM MODAL ── */
+    #changepass-modal .modal-box { max-width:320px; }
+    .changepass-warning { font-size:15px;color:#cc6600;margin-bottom:10px;line-height:1.4; }
+    .changepass-new-code { font-size:32px;letter-spacing:8px;text-align:center;color:var(--poll-question);margin:8px 0; }
+    .changepass-row { display:flex;gap:8px;margin-top:12px; }
+    .changepass-confirm-btn { flex:1;padding:8px;font-family:'VT323',monospace;font-size:18px;background:#006600;color:white;border:2px solid;border-color:#0a0 #030 #030 #0a0;cursor:pointer;letter-spacing:1px; }
+    .changepass-cancel-btn { flex:1;padding:8px;font-family:'VT323',monospace;font-size:18px;background:#800000;color:white;border:2px solid;border-color:#ff8080 #400000 #400000 #ff8080;cursor:pointer;letter-spacing:1px; }
+
     /* ── SETTINGS TABS ── */
     #settings-modal { max-width:420px; }
     .stab-bar { display:flex;border-bottom:2px solid var(--border-inset);margin-bottom:12px; }
@@ -198,7 +232,6 @@
     .stab.active { background:var(--bg-titlebar);color:white; }
     .stab-panel { display:none; }
     .stab-panel.active { display:block; }
-
     .settings-section { margin-bottom:16px; }
     .settings-label { font-size:16px;margin-bottom:6px;display:block;letter-spacing:1px; }
     .settings-note { font-size:13px;color:var(--text-system);margin-bottom:8px; }
@@ -215,13 +248,9 @@
     .settings-save-row { display:flex;gap:8px;margin-top:4px; }
     .settings-btn { flex:1;padding:8px;font-family:'VT323',monospace;font-size:18px;background:var(--bg-titlebar);color:var(--text-titlebar);border:2px solid;border-color:var(--border-main);cursor:pointer;letter-spacing:1px; }
     .settings-status { font-size:14px;color:#007700;min-height:18px;margin-top:6px;text-align:center; }
-
-    /* ── STATS ── */
     .stat-row { display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border-inset);font-size:16px; }
     .stat-label { color:var(--text-system); }
     .stat-value { color:var(--text-main);font-weight:bold; }
-
-    /* ── BADGES ── */
     .badge-grid { display:grid;grid-template-columns:1fr 1fr;gap:6px; }
     .badge-item { border:2px solid var(--border-inset);padding:6px 8px;font-size:14px;cursor:pointer;background:var(--bg-messages); }
     .badge-item.earned { border-color:#007700;background:var(--poll-bg); }
@@ -232,8 +261,6 @@
     .badge-desc { font-size:12px;color:var(--text-system);margin-top:2px; }
     .badge-active-label { font-size:11px;color:#ffd700;margin-top:2px; }
     .badge-set-note { font-size:13px;color:var(--text-system);margin-bottom:8px; }
-
-    /* ── HELP ── */
     .help-section { margin-bottom:14px; }
     .help-section-title { font-size:16px;font-weight:bold;color:var(--poll-question);margin-bottom:4px;letter-spacing:1px; }
     .help-cmd { font-size:14px;padding:2px 0;border-bottom:1px dotted var(--border-inset); }
@@ -253,9 +280,6 @@
     .profile-name { font-size:24px;font-weight:bold; }
     .profile-badge-display { font-size:16px;margin-top:2px;color:var(--text-system); }
     .profile-stats { margin-bottom:12px; }
-
-    /* ── PRIVATE ROOM PASSWORD PROMPT ── */
-    #room-password-modal .modal-box { max-width:320px; }
 
     /* ── SHOP ── */
     #shop-modal { max-width:520px; }
@@ -321,7 +345,7 @@
 <!-- Auth -->
 <div id="auth-screen">
   <div class="auth-titlebar"><span>chatroom</span><span class="auth-version">v2.0</span></div>
-  <div class="auth-disclaimer">a small project by mce. no ads, no data selling, no nonsense.</div>
+  <div class="auth-disclaimer">a small project by mce. no data harvesting, no asking for pictures of your face. just a chatroom</div>
   <div class="auth-tabs">
     <button class="auth-tab active" onclick="switchTab('login')">Login</button>
     <button class="auth-tab" onclick="switchTab('register')">Register</button>
@@ -371,8 +395,79 @@
       <ul id="messages"></ul>
       <div id="typing-bar"></div>
       <div id="bottom">
-        <input id="input" placeholder="Message, /me, /msg, /poll, /duel, /give, /create, claim..." autocomplete="off" />
+        <input id="input" placeholder="Message, /me, /msg, /poll, /duel, /give, /create, /kick, /changepass, claim..." autocomplete="off" />
         <button id="send-btn" onclick="send()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── KEYPAD MODAL ──────────────────────────────────────────────────────── -->
+<div id="keypad-modal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-titlebar">
+      <span>🔒 Enter Room Code</span>
+      <button class="modal-close" onclick="closeKeypad()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="keypad-room-name" id="keypad-room-label"></div>
+      <!-- Dots showing how many digits entered (up to 9) -->
+      <div class="keypad-dots" id="keypad-dots"></div>
+      <!-- 1–9 grid -->
+      <div class="keypad-grid">
+        <button class="keypad-btn" onclick="keypadPress('1')">1</button>
+        <button class="keypad-btn" onclick="keypadPress('2')">2</button>
+        <button class="keypad-btn" onclick="keypadPress('3')">3</button>
+        <button class="keypad-btn" onclick="keypadPress('4')">4</button>
+        <button class="keypad-btn" onclick="keypadPress('5')">5</button>
+        <button class="keypad-btn" onclick="keypadPress('6')">6</button>
+        <button class="keypad-btn" onclick="keypadPress('7')">7</button>
+        <button class="keypad-btn" onclick="keypadPress('8')">8</button>
+        <button class="keypad-btn" onclick="keypadPress('9')">9</button>
+      </div>
+      <!-- Bottom row: clear, 0, enter -->
+      <div class="keypad-bottom-row">
+        <button class="keypad-btn keypad-clear" onclick="keypadClear()">⌫</button>
+        <button class="keypad-btn" onclick="keypadPress('0')">0</button>
+        <button class="keypad-btn keypad-enter" onclick="keypadSubmit()">↵</button>
+      </div>
+      <div class="keypad-error" id="keypad-error"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ROOM CREATED MODAL ─────────────────────────────────────────────────── -->
+<div id="room-created-modal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-titlebar">
+      <span>🔒 Room Created</span>
+      <button class="modal-close" onclick="closeRoomCreated()">✕</button>
+    </div>
+    <div class="modal-body" style="text-align:center;">
+      <span class="room-created-icon">🏠</span>
+      <div style="font-size:17px;margin-bottom:4px;">Room <strong id="rc-room-name"></strong> is ready!</div>
+      <div class="room-code-label">Share this code with anyone you want to join:</div>
+      <div class="room-code-display" id="rc-room-code"></div>
+      <div class="room-code-note">The code also appears under the room name in your sidebar.</div>
+      <button class="settings-btn" style="margin-top:14px;width:100%" onclick="closeRoomCreated()">Got it</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── CHANGEPASS CONFIRM MODAL ───────────────────────────────────────────── -->
+<div id="changepass-modal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-titlebar">
+      <span>⚠ Confirm Code Change</span>
+      <button class="modal-close" onclick="closeChangepass()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="changepass-warning">⚠ This will kick ALL current members from the room. They will need the new code to re-join.</div>
+      <div style="font-size:14px;color:var(--text-system);margin-bottom:4px;">New code for <strong id="cp-room-name"></strong>:</div>
+      <div class="changepass-new-code" id="cp-new-code"></div>
+      <div class="changepass-row">
+        <button class="changepass-confirm-btn" onclick="confirmChangepass()">Confirm</button>
+        <button class="changepass-cancel-btn" onclick="closeChangepass()">Cancel</button>
       </div>
     </div>
   </div>
@@ -400,19 +495,6 @@
   </div>
 </div>
 
-<!-- Private Room Password -->
-<div id="room-password-modal" class="modal-overlay">
-  <div class="modal-box">
-    <div class="modal-titlebar"><span>🔒 Private Room</span><button class="modal-close" onclick="closeRoomPassword()">✕</button></div>
-    <div class="modal-body">
-      <p style="margin-bottom:8px;font-size:16px;">Enter the password for <strong id="rp-room-name"></strong>:</p>
-      <input id="rp-password" type="password" placeholder="Password..." style="width:100%;padding:6px;font-family:'VT323',monospace;font-size:20px;border:2px inset var(--border-inset);background:var(--bg-input);color:var(--text-main);" />
-      <button class="settings-btn" style="margin-top:10px;width:100%" onclick="submitRoomPassword()">Join Room</button>
-      <div style="color:#cc0000;font-size:14px;min-height:18px;margin-top:6px;" id="rp-error"></div>
-    </div>
-  </div>
-</div>
-
 <!-- Settings -->
 <div id="settings-overlay" class="modal-overlay">
   <div class="modal-box" id="settings-modal">
@@ -424,8 +506,6 @@
         <button class="stab" onclick="switchSettingsTab('stats')">Stats</button>
         <button class="stab" onclick="switchSettingsTab('help')">Help</button>
       </div>
-
-      <!-- Appearance -->
       <div id="stab-appearance" class="stab-panel active">
         <div class="settings-section">
           <span class="settings-label">Theme</span>
@@ -440,20 +520,14 @@
         <div class="settings-save-row"><button class="settings-btn" onclick="saveSettings()">Save</button></div>
         <div class="settings-status" id="settings-status"></div>
       </div>
-
-      <!-- Badges -->
       <div id="stab-badges" class="stab-panel">
         <div class="badge-set-note">Click an earned badge to set it as your active showcase badge.</div>
         <div class="badge-grid" id="badge-grid"></div>
         <div class="settings-status" id="badge-status"></div>
       </div>
-
-      <!-- Stats -->
       <div id="stab-stats" class="stab-panel">
         <div id="stats-content"><div style="text-align:center;padding:20px;color:var(--text-system);">Loading...</div></div>
       </div>
-
-      <!-- Help -->
       <div id="stab-help" class="stab-panel">
         <div style="max-height:340px;overflow-y:auto;">
           <div class="help-section">
@@ -464,41 +538,35 @@
           <div class="help-section">
             <div class="help-section-title">📊 Polls</div>
             <div class="help-cmd"><code>/poll "Question?" Yes No Maybe</code> — create a 5-min poll</div>
-            <div class="help-cmd">Click an option to vote. One vote per person.</div>
           </div>
           <div class="help-section">
             <div class="help-section-title">🎲 Duels</div>
             <div class="help-cmd"><code>/duel username amount</code> — challenge to coinflip</div>
-            <div class="help-cmd"><code>/accept</code> — accept a duel challenge</div>
-            <div class="help-cmd"><code>/decline</code> — decline a challenge</div>
+            <div class="help-cmd"><code>/accept</code> / <code>/decline</code> — respond to a challenge</div>
           </div>
           <div class="help-section">
             <div class="help-section-title">💸 Coins</div>
-            <div class="help-cmd"><code>/give username amount</code> — send coins to a user</div>
-            <div class="help-cmd"><code>claim</code> — grab free coins when the event fires</div>
-            <div class="help-cmd">+1 coin per message sent</div>
-            <div class="help-cmd">Claim daily bonus from the daily popup on login</div>
+            <div class="help-cmd"><code>/give username amount</code> — send coins</div>
+            <div class="help-cmd"><code>claim</code> — grab free coins during events</div>
           </div>
           <div class="help-section">
             <div class="help-section-title">🔒 Private Rooms</div>
-            <div class="help-cmd"><code>/create roomname password</code> — create a private room (max 3)</div>
-            <div class="help-cmd"><code>/deleteroom roomname</code> — delete your private room</div>
-            <div class="help-cmd">Click a 🔒 room in the sidebar to enter password and join</div>
+            <div class="help-cmd"><code>/create roomname code</code> — create a room with a numeric code</div>
+            <div class="help-cmd"><code>/joinroom roomname</code> — open the keypad to join a private room</div>
+            <div class="help-cmd"><code>/kick username</code> — (owner) kick someone from your room</div>
+            <div class="help-cmd"><code>/changepass newcode</code> — (owner) change the room code; kicks all members</div>
+            <div class="help-cmd"><code>/deleteroom roomname</code> — (owner) delete your private room</div>
+            <div class="help-cmd">Your room code always shows under the room name in the sidebar</div>
+            <div class="help-cmd">Codes are 1–9 digits only (e.g. 4729 or 123456789)</div>
           </div>
           <div class="help-section">
             <div class="help-section-title">😮 Reactions</div>
-            <div class="help-cmd">Hover a message → click the + button → pick an emoji</div>
-            <div class="help-cmd">Click an existing reaction pill to add/remove yours</div>
-          </div>
-          <div class="help-section">
-            <div class="help-section-title">👤 Profiles</div>
-            <div class="help-cmd">Click any username in chat or the user list to view their profile</div>
+            <div class="help-cmd">Hover a message → click + → pick an emoji</div>
           </div>
           <div class="help-section">
             <div class="help-section-title">🎮 Games</div>
-            <div class="help-cmd">Slots — match 3 symbols to win up to 25x your bet</div>
-            <div class="help-cmd">Dice — roll higher than the house to win 1.9x</div>
-            <div class="help-cmd">Click 🎮 in the toolbar to open games</div>
+            <div class="help-cmd">Slots — match 3 symbols, up to 25x bet</div>
+            <div class="help-cmd">Dice — beat the house, win 1.9x</div>
           </div>
         </div>
       </div>
@@ -580,6 +648,7 @@ function soundWin(){playTone(523,'sine',0.1,0.15);playTone(659,'sine',0.1,0.15,0
 function soundLose(){playTone(400,'sawtooth',0.1,0.12);playTone(300,'sawtooth',0.2,0.12,0.12)}
 function soundCoin(){playTone(1318,'sine',0.08,0.12);playTone(1568,'sine',0.12,0.14,0.08)}
 function soundClaim(){playTone(880,'sine',0.08,0.2);playTone(1046,'sine',0.08,0.2,0.1);playTone(1318,'sine',0.15,0.2,0.2);playTone(1568,'sine',0.3,0.25,0.35)}
+function soundKeypad(){playTone(1000,'square',0.04,0.08)}
 function toggleSound(){ soundEnabled=!soundEnabled; const btn=document.getElementById('sound-btn'); btn.textContent=soundEnabled?'🔊':'🔇'; btn.classList.toggle('on',soundEnabled); }
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
@@ -588,7 +657,13 @@ let myUsername=null, myColor='#000080', myCoins=0, selectedTheme='classic';
 let currentRoom='general', usersVisible=false, isTyping=false, typingTimer;
 const unreadCounts={}, polls={};
 let shopItems=[], selectedSettingsColor='#000080', selectedSettingsTheme='classic';
-let pendingRoomPassword=null; // room name waiting for password
+
+// Keypad state
+let keypadRoom=null, keypadCode='';
+// Changepass pending
+let pendingChangepass=null; // { room, newCode }
+// Owner room codes cache: roomName -> code string (so we can show it in sidebar)
+const ownerRoomCodes={};
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
@@ -607,8 +682,6 @@ function switchTab(tab){
   document.getElementById('login-panel').classList.toggle('active',tab==='login');
   document.getElementById('register-panel').classList.toggle('active',tab==='register');
 }
-
-// Load user count on page load
 fetch('/user-count').then(r=>r.json()).then(d=>{
   if(d.count) document.getElementById('auth-user-count').textContent=`👥 ${d.count} registered user${d.count===1?'':'s'}`;
 }).catch(()=>{});
@@ -648,39 +721,106 @@ function renderRooms(rooms){
   rooms.forEach(r=>{
     const name=typeof r==='string'?r:r.name;
     const isPrivate=typeof r==='object'&&r.isPrivate;
+    const isOwner=typeof r==='object'&&r.isOwner;
+
     const btn=document.createElement('button');
     btn.className='room-btn'+(name===currentRoom?' active':'');
     btn.dataset.room=name;
     btn.innerHTML=(isPrivate?'<span class="room-private-icon">🔒</span>':'')+`#${name}`;
     if(unreadCounts[name])btn.innerHTML+=`<span class="room-unread">${unreadCounts[name]}</span>`;
-    btn.onclick=()=>switchRoom(name,isPrivate);
+
+    // All rooms in the list the user can already access — click to switch directly
+    btn.onclick=()=>switchRoom(name);
     list.appendChild(btn);
+
+    // Show the code underneath for owners
+    if(isOwner && ownerRoomCodes[name]){
+      const badge=document.createElement('span');
+      badge.className='room-code-badge';
+      badge.textContent=`code: ${ownerRoomCodes[name]}`;
+      list.appendChild(badge);
+    }
   });
 }
 
-function switchRoom(room, isPrivate){
+function switchRoom(room){
   if(room===currentRoom)return;
-  if(isPrivate){
-    pendingRoomPassword=room;
-    document.getElementById('rp-room-name').textContent='#'+room;
-    document.getElementById('rp-password').value='';
-    document.getElementById('rp-error').textContent='';
-    document.getElementById('room-password-modal').classList.add('open');
-    return;
-  }
-  document.getElementById('messages').innerHTML='';currentRoom=room;
-  socket.emit('switch room',{room});unreadCounts[room]=0;
+  document.getElementById('messages').innerHTML='';
+  currentRoom=room;
+  socket.emit('switch room',{room});
+  unreadCounts[room]=0;
 }
 
-function closeRoomPassword(){document.getElementById('room-password-modal').classList.remove('open');pendingRoomPassword=null}
-function submitRoomPassword(){
-  const pw=document.getElementById('rp-password').value;
-  if(!pw){document.getElementById('rp-error').textContent='Enter a password.';return}
-  document.getElementById('room-password-modal').classList.remove('open');
+// ── KEYPAD ────────────────────────────────────────────────────────────────────
+function openKeypad(room){
+  keypadRoom=room;keypadCode='';
+  document.getElementById('keypad-room-label').textContent=`#${room}`;
+  document.getElementById('keypad-error').textContent='';
+  renderKeypadDots();
+  document.getElementById('keypad-modal').classList.add('open');
+}
+function closeKeypad(){
+  document.getElementById('keypad-modal').classList.remove('open');
+  keypadRoom=null;keypadCode='';
+}
+function renderKeypadDots(){
+  const wrap=document.getElementById('keypad-dots');
+  wrap.innerHTML='';
+  // Show up to 9 dots
+  const len=Math.max(keypadCode.length,1);
+  for(let i=0;i<Math.min(len,9);i++){
+    const d=document.createElement('div');
+    d.className='keypad-dot'+(i<keypadCode.length?' filled':'');
+    wrap.appendChild(d);
+  }
+}
+function keypadPress(digit){
+  if(keypadCode.length>=9)return;
+  soundKeypad();
+  keypadCode+=digit;
+  document.getElementById('keypad-error').textContent='';
+  renderKeypadDots();
+}
+function keypadClear(){
+  if(!keypadCode.length)return;
+  keypadCode=keypadCode.slice(0,-1);
+  renderKeypadDots();
+}
+function keypadSubmit(){
+  if(!keypadCode){document.getElementById('keypad-error').textContent='Enter a code first.';return;}
   document.getElementById('messages').innerHTML='';
-  currentRoom=pendingRoomPassword;
-  socket.emit('switch room',{room:pendingRoomPassword,password:pw});
-  pendingRoomPassword=null;
+  currentRoom=keypadRoom;
+  socket.emit('switch room',{room:keypadRoom,code:keypadCode});
+  // Don't close yet — wait for success (room changed) or error (keypad error)
+}
+// Keyboard support for keypad
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('keypad-modal').classList.contains('open'))return;
+  if(e.key>='0'&&e.key<='9')keypadPress(e.key);
+  else if(e.key==='Backspace')keypadClear();
+  else if(e.key==='Enter')keypadSubmit();
+});
+
+// ── ROOM CREATED MODAL ────────────────────────────────────────────────────────
+function openRoomCreated(room,code){
+  document.getElementById('rc-room-name').textContent=`#${room}`;
+  document.getElementById('rc-room-code').textContent=code;
+  document.getElementById('room-created-modal').classList.add('open');
+}
+function closeRoomCreated(){document.getElementById('room-created-modal').classList.remove('open');}
+
+// ── CHANGEPASS CONFIRM MODAL ──────────────────────────────────────────────────
+function openChangepassConfirm(room,newCode){
+  pendingChangepass={room,newCode};
+  document.getElementById('cp-room-name').textContent=`#${room}`;
+  document.getElementById('cp-new-code').textContent=newCode;
+  document.getElementById('changepass-modal').classList.add('open');
+}
+function closeChangepass(){document.getElementById('changepass-modal').classList.remove('open');pendingChangepass=null;}
+function confirmChangepass(){
+  if(!pendingChangepass)return;
+  socket.emit('confirm changepass',pendingChangepass);
+  closeChangepass();
 }
 
 // ── SEND ──────────────────────────────────────────────────────────────────────
@@ -718,62 +858,34 @@ function addDmMessage(data){
   if(!data.noFlash&&!data.self)soundDM();
 }
 
-// Reaction click delegation
 document.getElementById('messages').addEventListener('click',e=>{
-  // React emoji picker
   const emojiBtn=e.target.closest('.react-emoji');
-  if(emojiBtn){
-    const li=emojiBtn.closest('.msg-row');
-    if(li&&li.dataset.msgId) socket.emit('react',{messageId:parseInt(li.dataset.msgId),emoji:emojiBtn.dataset.emoji});
-    return;
-  }
-  // Reaction pill toggle
+  if(emojiBtn){const li=emojiBtn.closest('.msg-row');if(li&&li.dataset.msgId)socket.emit('react',{messageId:parseInt(li.dataset.msgId),emoji:emojiBtn.dataset.emoji});return;}
   const pill=e.target.closest('.reaction-pill');
-  if(pill){
-    const li=pill.closest('.msg-row');
-    if(!li||!li.dataset.msgId)return;
-    const emoji=pill.dataset.emoji;
-    const myReaction=li.dataset.myReaction;
-    if(myReaction===emoji) socket.emit('unreact',{messageId:parseInt(li.dataset.msgId)});
-    else socket.emit('react',{messageId:parseInt(li.dataset.msgId),emoji});
-    return;
-  }
-  // Poll vote
+  if(pill){const li=pill.closest('.msg-row');if(!li||!li.dataset.msgId)return;const emoji=pill.dataset.emoji,myReaction=li.dataset.myReaction;if(myReaction===emoji)socket.emit('unreact',{messageId:parseInt(li.dataset.msgId)});else socket.emit('react',{messageId:parseInt(li.dataset.msgId),emoji});return;}
   const opt=e.target.closest('.poll-option');
-  if(opt&&!opt.classList.contains('concluded')){
-    const pollId=parseInt(opt.dataset.poll);const option=opt.dataset.opt;
-    if(pollId&&option)socket.emit('poll vote',{pollId,option});
-    return;
-  }
-  // Username click → profile
+  if(opt&&!opt.classList.contains('concluded')){const pollId=parseInt(opt.dataset.poll),option=opt.dataset.opt;if(pollId&&option)socket.emit('poll vote',{pollId,option});return;}
   const userEl=e.target.closest('.msg-user');
-  if(userEl&&userEl.dataset.username) openProfile(userEl.dataset.username);
+  if(userEl&&userEl.dataset.username)openProfile(userEl.dataset.username);
 });
 
-function updateReactions(li, reactions, myReaction){
+function updateReactions(li,reactions,myReaction){
   let wrap=li.querySelector('.msg-reactions');
   if(!wrap){wrap=document.createElement('div');wrap.className='msg-reactions';li.appendChild(wrap)}
-  wrap.innerHTML='';
-  li.dataset.myReaction=myReaction||'';
+  wrap.innerHTML='';li.dataset.myReaction=myReaction||'';
   Object.entries(reactions).forEach(([emoji,count])=>{
     if(count<=0)return;
-    const pill=document.createElement('span');
-    pill.className='reaction-pill'+(myReaction===emoji?' selected':'');
-    pill.dataset.emoji=emoji;
-    pill.innerHTML=`${emoji}<span class="r-count">${count}</span>`;
-    wrap.appendChild(pill);
+    const pill=document.createElement('span');pill.className='reaction-pill'+(myReaction===emoji?' selected':'');pill.dataset.emoji=emoji;
+    pill.innerHTML=`${emoji}<span class="r-count">${count}</span>`;wrap.appendChild(pill);
   });
 }
 
 // ── POLLS ─────────────────────────────────────────────────────────────────────
 function renderPoll(poll){
-  polls[poll.id]=poll;
-  const existing=document.getElementById(`poll-${poll.id}`);
+  polls[poll.id]=poll;const existing=document.getElementById(`poll-${poll.id}`);
   if(existing){existing.innerHTML=buildPollHtml(poll);return}
-  const messages=document.getElementById('messages');
-  const atBottom=messages.scrollHeight-messages.scrollTop-messages.clientHeight<40;
-  const li=document.createElement('li');li.style.listStyle='none';
-  li.id=`poll-${poll.id}`;li.className='msg-row';li.innerHTML=buildPollHtml(poll);
+  const messages=document.getElementById('messages');const atBottom=messages.scrollHeight-messages.scrollTop-messages.clientHeight<40;
+  const li=document.createElement('li');li.style.listStyle='none';li.id=`poll-${poll.id}`;li.className='msg-row';li.innerHTML=buildPollHtml(poll);
   messages.appendChild(li);if(atBottom)messages.scrollTop=messages.scrollHeight;
 }
 function buildPollHtml(poll){
@@ -799,13 +911,10 @@ function renderHistory(history){
   addMessage(`<span class="msg-system">── message history ──</span>`);
   history.forEach(row=>{
     const ts=new Date(row.created_at).getTime();
-    if(row.type==='system') addMessage(`<span class="msg-system">*** ${row.text} ***</span>`,'',ts);
-    else if(row.type==='action') addMessage(`<span class="msg-action">*** <span class="msg-user" data-username="${escHtml(row.sender)}" style="color:${row.color}">${row.sender}</span> ${row.text} ***</span>`,'',ts);
-    else if(row.type==='dm') addDmMessage({from:row.sender,to:row.recipient,text:row.text,self:row.sender===myUsername,noFlash:true});
-    else{
-      const li=addMessage(`<span class="msg-user" data-username="${escHtml(row.sender)}" style="color:${row.color}">${row.sender}:</span> <span class="msg-text">${row.text}</span>`,row.sender===myUsername?'msg-own':'',ts,row.id);
-      if(row.reactions&&Object.keys(row.reactions).length) updateReactions(li,row.reactions,null);
-    }
+    if(row.type==='system')addMessage(`<span class="msg-system">*** ${row.text} ***</span>`,'',ts);
+    else if(row.type==='action')addMessage(`<span class="msg-action">*** <span class="msg-user" data-username="${escHtml(row.sender)}" style="color:${row.color}">${row.sender}</span> ${row.text} ***</span>`,'',ts);
+    else if(row.type==='dm')addDmMessage({from:row.sender,to:row.recipient,text:row.text,self:row.sender===myUsername,noFlash:true});
+    else{const li=addMessage(`<span class="msg-user" data-username="${escHtml(row.sender)}" style="color:${row.color}">${row.sender}:</span> <span class="msg-text">${row.text}</span>`,row.sender===myUsername?'msg-own':'',ts,row.id);if(row.reactions&&Object.keys(row.reactions).length)updateReactions(li,row.reactions,null);}
   });
   addMessage(`<span class="msg-system">── live ──</span>`);
   messages.scrollTop=messages.scrollHeight;
@@ -813,13 +922,53 @@ function renderHistory(history){
 
 // ── SOCKET EVENTS ─────────────────────────────────────────────────────────────
 socket.on('rooms list',rooms=>renderRooms(rooms));
-socket.on('room changed',room=>{currentRoom=room;document.querySelectorAll('.room-btn').forEach(b=>b.classList.toggle('active',b.dataset.room===room))});
+
+socket.on('room changed',room=>{
+  currentRoom=room;
+  // Close keypad on success
+  if(document.getElementById('keypad-modal').classList.contains('open'))closeKeypad();
+  document.querySelectorAll('.room-btn').forEach(b=>b.classList.toggle('active',b.dataset.room===room));
+});
+
 socket.on('history',history=>renderHistory(history));
-socket.on('room requires password',room=>{pendingRoomPassword=room;document.getElementById('rp-room-name').textContent='#'+room;document.getElementById('rp-password').value='';document.getElementById('rp-error').textContent='';document.getElementById('room-password-modal').classList.add('open')});
+
+// Server asks client to show keypad (triggered by /joinroom or clicking a locked room)
+socket.on('room requires code',room=>{openKeypad(room)});
+
+// Wrong code entered
+socket.on('keypad error',msg=>{
+  document.getElementById('keypad-error').textContent=msg||'Wrong code.';
+  keypadCode='';renderKeypadDots();
+  playTone(200,'sawtooth',0.15,0.15); // error buzz
+});
+
+// Server sends back confirmation request for /changepass
+socket.on('confirm changepass',({room,newCode})=>{openChangepassConfirm(room,newCode)});
+
+// After changepass confirmed + executed, server tells owner the new code
+socket.on('room code changed',({room,newCode})=>{
+  ownerRoomCodes[room]=String(newCode);
+  // Re-render sidebar so the new code badge appears
+  socket.emit('rooms list refresh'); // not needed — sidebar will update on next rooms list
+  // Force a sidebar refresh by re-requesting rooms — we can't do that directly,
+  // so we update the badge if the element exists
+  document.querySelectorAll('.room-code-badge').forEach(el=>{
+    // find the preceding room button
+    const prev=el.previousElementSibling;
+    if(prev&&prev.dataset&&prev.dataset.room===room)el.textContent=`code: ${newCode}`;
+  });
+  addMessage(`<span class="msg-system">✅ Room code changed to: ${newCode}</span>`);
+});
+
+// Owner created a room — show the code modal and cache the code for the sidebar
+socket.on('room created',({room,code})=>{
+  ownerRoomCodes[room]=String(code);
+  openRoomCreated(room,code);
+});
 
 socket.on('chat message',({id,user,color,text,type,timestamp})=>{
   const isOwn=user===myUsername;
-  if(type==='action') addMessage(`<span class="msg-action">*** <span class="msg-user" data-username="${escHtml(user)}" style="color:${color}">${user}</span> ${text} ***</span>`,'',timestamp);
+  if(type==='action')addMessage(`<span class="msg-action">*** <span class="msg-user" data-username="${escHtml(user)}" style="color:${color}">${user}</span> ${text} ***</span>`,'',timestamp);
   else addMessage(`<span class="msg-user" data-username="${escHtml(user)}" style="color:${color}">${user}:</span> <span class="msg-text">${text}</span>`,isOwn?'msg-own':'',timestamp||Date.now(),id);
   if(!isOwn)soundMessage();
 });
@@ -835,10 +984,7 @@ socket.on('coins update',({coins})=>{myCoins=coins;updateCoinDisplay();updateGam
 
 socket.on('reaction update',({messageId,reactions})=>{
   const li=document.querySelector(`[data-msg-id="${messageId}"]`);
-  if(!li)return;
-  // figure out my reaction
-  // we don't have per-user breakdown from the update, but we can check local state
-  updateReactions(li,reactions,li.dataset.myReaction||null);
+  if(!li)return;updateReactions(li,reactions,li.dataset.myReaction||null);
 });
 
 socket.on('link preview',({url,title,image,description})=>{
@@ -888,11 +1034,7 @@ async function openProfile(username){
     const badge=d.activeBadge?`<span title="${d.activeBadge.name}">${d.activeBadge.emoji} ${d.activeBadge.name}</span>`:'<span style="color:var(--text-system)">No badge</span>';
     const badgesHtml=d.earnedBadges.length?d.earnedBadges.map(b=>`<span title="${b.description}" style="font-size:20px;cursor:help">${b.emoji}</span>`).join(' '):'<span style="color:var(--text-system);font-size:14px">No badges yet</span>';
     document.getElementById('profile-modal-body').innerHTML=`
-      <div class="profile-header">
-        <div class="profile-avatar">👤</div>
-        <div><div class="profile-name" style="color:${d.color||'var(--text-main)'}">${escHtml(d.username)}</div>
-        <div class="profile-badge-display">${badge}</div></div>
-      </div>
+      <div class="profile-header"><div class="profile-avatar">👤</div><div><div class="profile-name" style="color:${d.color||'var(--text-main)'}">${escHtml(d.username)}</div><div class="profile-badge-display">${badge}</div></div></div>
       <div class="profile-stats">
         <div class="stat-row"><span class="stat-label">Joined</span><span class="stat-value">${formatDate(d.createdAt)}</span></div>
         <div class="stat-row"><span class="stat-label">Coins</span><span class="stat-value">🪙 ${d.coins}</span></div>
@@ -911,8 +1053,7 @@ function switchSettingsTab(tab){
   document.querySelectorAll('.stab').forEach((t,i)=>{const tabs=['appearance','badges','stats','help'];t.classList.toggle('active',tabs[i]===tab)});
   document.querySelectorAll('.stab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('stab-'+tab).classList.add('active');
-  if(tab==='stats')loadStats();
-  if(tab==='badges')loadBadges();
+  if(tab==='stats')loadStats();if(tab==='badges')loadBadges();
 }
 async function openSettings(){
   document.getElementById('settings-overlay').classList.add('open');
@@ -956,8 +1097,7 @@ async function loadBadges(){
   const grid=document.getElementById('badge-grid');grid.innerHTML='<div style="color:var(--text-system);font-size:14px">Loading...</div>';
   try{
     const res=await fetch('/stats',{credentials:'include'});const data=await res.json();if(!res.ok)return;
-    const earnedIds=new Set(data.earnedBadges.map(b=>b.id));
-    const activeBadgeId=data.activeBadge?.id||null;
+    const earnedIds=new Set(data.earnedBadges.map(b=>b.id));const activeBadgeId=data.activeBadge?.id||null;
     const allBadges=[
       {id:'lurker_no_more',emoji:'💬',name:'Lurker No More',description:'Send 10 messages'},
       {id:'regular',emoji:'🗣️',name:'Regular',description:'Send 50 messages'},
@@ -974,25 +1114,21 @@ async function loadBadges(){
     grid.innerHTML='';
     allBadges.forEach(b=>{
       const earned=earnedIds.has(b.id),isActive=b.id===activeBadgeId;
-      const div=document.createElement('div');
-      div.className='badge-item'+(earned?' earned':'  locked')+(isActive?' active-badge':'');
+      const div=document.createElement('div');div.className='badge-item'+(earned?' earned':'  locked')+(isActive?' active-badge':'');
       div.innerHTML=`<span class="badge-emoji">${b.emoji}</span><div class="badge-name">${b.name}</div><div class="badge-desc">${b.description}</div>${isActive?'<div class="badge-active-label">★ Active showcase</div>':''}`;
       if(earned){div.onclick=()=>setActiveBadge(b.id,data.activeBadge?.id)}
       grid.appendChild(div);
     });
   }catch{document.getElementById('badge-grid').innerHTML='<div style="color:#cc0000">Error loading badges.</div>'}
 }
-
-async function setActiveBadge(badgeId, currentActiveId){
-  const newId=badgeId===currentActiveId?null:badgeId; // toggle off if already active
+async function setActiveBadge(badgeId,currentActiveId){
+  const newId=badgeId===currentActiveId?null:badgeId;
   try{
     const res=await fetch('/badge/set',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({badgeId:newId})});
-    const data=await res.json();
-    const statusEl=document.getElementById('badge-status');
+    const data=await res.json();const statusEl=document.getElementById('badge-status');
     if(!res.ok){statusEl.textContent=data.error;statusEl.style.color='#cc0000';return}
     statusEl.textContent=newId?'Badge set as showcase!':'Badge removed.';statusEl.style.color='#007700';
-    setTimeout(()=>{statusEl.textContent=''},2000);
-    loadBadges();
+    setTimeout(()=>{statusEl.textContent=''},2000);loadBadges();
   }catch{}
 }
 
@@ -1057,7 +1193,6 @@ async function playSlots(){
   catch{document.getElementById('slots-result').innerHTML='<span class="result-lose">Error. Try again.</span>';[0,1,2].forEach(i=>document.getElementById('reel-'+i).classList.remove('spinning'))}
   slotsSpinning=false;btn.disabled=false;
 }
-
 let diceRolling=false;
 async function playDice(){
   if(diceRolling)return;const bet=parseInt(document.getElementById('dice-bet').value,10);
@@ -1074,7 +1209,6 @@ async function playDice(){
   catch{document.getElementById('dice-result').innerHTML='<span class="result-lose">Error. Try again.</span>'}
   diceRolling=false;btn.disabled=false;
 }
-
 async function loadLeaderboard(){
   const container=document.getElementById('leaderboard-rows');container.innerHTML='<div style="text-align:center;color:var(--text-system);padding:20px;">Loading...</div>';
   try{const res=await fetch('/leaderboard',{credentials:'include'});const data=await res.json();
@@ -1088,13 +1222,14 @@ setInterval(()=>{document.querySelectorAll('.user-entry').forEach(entry=>{const 
 setInterval(()=>{document.querySelectorAll('.poll-timer').forEach(el=>{const left=Math.max(0,Math.ceil((parseInt(el.dataset.ends,10)-Date.now())/1000));if(left===0){el.textContent='ending...';el.classList.add('urgent')}else{const m=Math.floor(left/60),s=left%60;el.textContent=m>0?`${m}m ${s}s left`:`${s}s left`;el.classList.toggle('urgent',left<=30)}})},1000);
 
 let activityThrottle=0;
-document.addEventListener('keydown',()=>{const now=Date.now();if(now-activityThrottle>30000){activityThrottle=now;socket.emit('activity')}});
+document.addEventListener('keydown',e=>{
+  const now=Date.now();if(now-activityThrottle>30000){activityThrottle=now;socket.emit('activity')}
+  // Global Escape
+  if(e.key==='Escape'){closeSettings();closeGames();closeShop();closeProfile();closeKeypad();closeRoomCreated();closeChangepass();}
+});
 document.getElementById('input').addEventListener('keydown',e=>{if(e.key==='Enter')send()});
 ['login-username','login-password'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()}));
 ['reg-username','reg-password','reg-password2'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doRegister()}));
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSettings();closeGames();closeShop();closeProfile();closeRoomPassword()}});
-document.getElementById('room-password-modal').addEventListener('click',e=>{if(e.target===document.getElementById('room-password-modal'))closeRoomPassword()});
-document.getElementById('rp-password').addEventListener('keydown',e=>{if(e.key==='Enter')submitRoomPassword()});
 
 // ── AUTO-LOGIN ────────────────────────────────────────────────────────────────
 fetch('/me').then(async res=>{if(res.ok){const data=await res.json();enterChat(data.username,data.color,data.theme||'classic',data.coins||0,data.token,data.dailyAvailable)}});
