@@ -125,6 +125,7 @@
     .msg-dm-row { background:#fff0f8;padding:0 4px;border-left:3px solid #cc0088; }
     .msg-dm-label { color:#cc0088;font-size:15px;margin-right:4px; }
     .msg-text { color:var(--text-main); }
+    .msg-mention { background: rgba(255,230,0,0.06); border-left:3px solid #ffcc00; padding-left:6px; }
     .msg-own .msg-user { opacity:0.8; }
     .msg-kicked { color:#cc0000;font-style:italic; }
     .msg-claim-event { color:#ffaa00;font-weight:bold;font-style:italic;animation:claimPulse 1s ease-in-out 3; }
@@ -689,7 +690,8 @@ const ownerRoomCodes={};
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function updateCoinDisplay(){document.getElementById('coin-display').textContent=`🪙 ${myCoins}`}
+function formatNumber(n){if(n===null||n===undefined)return'0';const num=Number(n);if(Number.isNaN(num))return String(n);return num.toLocaleString()}
+function updateCoinDisplay(){document.getElementById('coin-display').textContent=`🪙 ${formatNumber(myCoins)}`}
 function formatDuration(ms){const t=Math.floor(ms/1000),d=Math.floor(t/86400),h=Math.floor((t%86400)/3600),m=Math.floor((t%3600)/60),s=t%60;if(d>0)return d+"D "+h+"HR "+m+"M";if(h>0)return h+"HR "+m+"M";if(m>0)return m+"M "+s+"S";return s+"S"}
 function formatSeconds(s){if(s<60)return s+'s';if(s<3600)return Math.floor(s/60)+'m';if(s<86400)return Math.floor(s/3600)+'h '+Math.floor((s%3600)/60)+'m';return Math.floor(s/86400)+'d '+Math.floor((s%86400)/3600)+'h'}
 function formatTime(ts){return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
@@ -888,6 +890,22 @@ function addMessage(html, extraClass='', timestamp=null, msgId=null){
   return li;
 }
 
+// Room unread badge updater
+function updateRoomBadge(room){
+  const btn = document.querySelector(`.room-btn[data-room="${room}"]`);
+  if (!btn) return;
+  // remove existing badge
+  const existing = btn.querySelector('.room-unread');
+  if (existing) existing.remove();
+  const count = unreadCounts[room] || 0;
+  if (count > 0) {
+    const span = document.createElement('span');
+    span.className = 'room-unread';
+    span.textContent = count>99? '99+' : count;
+    btn.appendChild(span);
+  }
+}
+
 function addDmMessage(data){
   const messages=document.getElementById('messages');
   const atBottom=messages.scrollHeight-messages.scrollTop-messages.clientHeight<40;
@@ -898,6 +916,23 @@ function addDmMessage(data){
   messages.appendChild(li);
   if(atBottom)messages.scrollTop=messages.scrollHeight;
   if(!data.noFlash&&!data.self)soundDM();
+}
+
+// Highlight mentions in general chat messages when added
+const origAddMessage = addMessage;
+addMessage = function(html, extraClass='', timestamp=null, msgId=null){
+  // detect mention of current user
+  const temp = document.createElement('div'); temp.innerHTML = html;
+  const msgTextEl = temp.querySelector('.msg-text');
+  const msgText = msgTextEl ? msgTextEl.textContent : temp.textContent || '';
+  const mentionRegex = myUsername ? new RegExp(`@${myUsername.replace(/[.*+?^${}()|[\\]\\]/g,'\\\\$&')}\\b`, 'i') : null;
+  const willMention = mentionRegex && mentionRegex.test(msgText);
+  const li = origAddMessage(html, extraClass, timestamp, msgId);
+  if (willMention) {
+    li.classList.add('msg-mention');
+    playTone(880,'square',0.06,0.18);
+  }
+  return li;
 }
 
 document.getElementById('messages').addEventListener('click',e=>{
@@ -984,6 +1019,7 @@ socket.on('room changed',room=>{
   currentRoom=room;
   pendingRoom=null;
   unreadCounts[room]=0;
+  updateRoomBadge(room);
   document.getElementById('messages').innerHTML='';
   if(document.getElementById('keypad-modal').classList.contains('open'))closeKeypad();
   document.querySelectorAll('.room-btn').forEach(b=>b.classList.toggle('active',b.dataset.room===room));
@@ -1025,8 +1061,21 @@ socket.on('room created',({room,code})=>{
 socket.on('chat message',({id,user,color,text,type,timestamp})=>{
   const isOwn=user===myUsername;
   if(type==='action')addMessage(`<span class="msg-action">*** <span class="msg-user" data-username="${escHtml(user)}" style="color:${color}">${user}</span> ${text} ***</span>`,'',timestamp);
-  else addMessage(`<span class="msg-user" data-username="${escHtml(user)}" style="color:${color}">${user}:</span> <span class="msg-text">${text}</span>`,isOwn?'msg-own':'',timestamp||Date.now(),id);
+  else {
+    addMessage(`<span class="msg-user" data-username="${escHtml(user)}" style="color:${color}">${user}:</span> <span class="msg-text">${text}</span>`,isOwn?'msg-own':'',timestamp||Date.now(),id);
+    // If message from someone else in another room will be notified by 'room message'.
+  }
   if(!isOwn)soundMessage();
+});
+
+socket.on('room message', ({room, user}) => {
+  try{
+    if (!myUsername) return;
+    if (room === currentRoom) return; // visible already
+    if (user && user.toLowerCase() === myUsername.toLowerCase()) return; // ignore own messages
+    unreadCounts[room] = (unreadCounts[room] || 0) + 1;
+    updateRoomBadge(room);
+  }catch(e){}
 });
 
 socket.on('system message',msg=>{
@@ -1082,7 +1131,7 @@ function showDailyModal(){document.getElementById('daily-modal').classList.add('
 function closeDailyModal(){document.getElementById('daily-modal').classList.remove('open')}
 async function claimDaily(){
   try{const res=await fetch('/daily',{method:'POST',credentials:'include'});const data=await res.json();if(!res.ok){closeDailyModal();return}
-  myCoins=data.coins;updateCoinDisplay();soundCoin();soundWin();closeDailyModal();addMessage(`<span class="msg-system">Daily reward claimed! +${data.reward} coins. Balance: ${data.coins} 🪙</span>`)}catch{closeDailyModal()}
+  myCoins=data.coins;updateCoinDisplay();soundCoin();soundWin();closeDailyModal();addMessage(`<span class="msg-system">Daily reward claimed! +${formatNumber(data.reward)} coins. Balance: ${formatNumber(data.coins)} 🪙</span>`)}catch{closeDailyModal()}
 }
 
 // ── PROFILE ───────────────────────────────────────────────────────────────────
@@ -1098,11 +1147,11 @@ async function openProfile(username){
     document.getElementById('profile-modal-body').innerHTML=`
       <div class="profile-header"><div class="profile-avatar">👤</div><div><div class="profile-name" style="color:${d.color||'var(--text-main)'}">${escHtml(d.username)}</div><div class="profile-badge-display">${badge}</div></div></div>
       <div class="profile-stats">
-        <div class="stat-row"><span class="stat-label">Joined</span><span class="stat-value">${formatDate(d.createdAt)}</span></div>
-        <div class="stat-row"><span class="stat-label">Coins</span><span class="stat-value">🪙 ${d.coins}</span></div>
-        <div class="stat-row"><span class="stat-label">Messages sent</span><span class="stat-value">${d.messagesSent}</span></div>
-        <div class="stat-row"><span class="stat-label">Time online</span><span class="stat-value">${formatSeconds(d.timeOnlineSeconds)}</span></div>
-      </div>
+          <div class="stat-row"><span class="stat-label">Joined</span><span class="stat-value">${formatDate(d.createdAt)}</span></div>
+          <div class="stat-row"><span class="stat-label">Coins</span><span class="stat-value">🪙 ${formatNumber(d.coins)}</span></div>
+          <div class="stat-row"><span class="stat-label">Messages sent</span><span class="stat-value">${d.messagesSent}</span></div>
+          <div class="stat-row"><span class="stat-label">Time online</span><span class="stat-value">${formatSeconds(d.timeOnlineSeconds)}</span></div>
+        </div>
       <div style="font-size:15px;margin-bottom:4px;">Badges earned:</div>
       <div style="padding:4px 0">${badgesHtml}</div>`;
   }catch{document.getElementById('profile-modal-body').textContent='Error loading profile.'}
@@ -1219,9 +1268,9 @@ async function loadStats(){
     el.innerHTML=`
       <div class="stat-row"><span class="stat-label">Username</span><span class="stat-value" style="color:${myColor}">${escHtml(d.username)}</span></div>
       <div class="stat-row"><span class="stat-label">Member since</span><span class="stat-value">${formatDate(d.createdAt)}</span></div>
-      <div class="stat-row"><span class="stat-label">Current coins</span><span class="stat-value">🪙 ${d.coins}</span></div>
-      <div class="stat-row"><span class="stat-label">Total earned</span><span class="stat-value">🪙 ${d.coinsEarned}</span></div>
-      <div class="stat-row"><span class="stat-label">Total spent</span><span class="stat-value">🪙 ${d.coinsSpent}</span></div>
+      <div class="stat-row"><span class="stat-label">Current coins</span><span class="stat-value">🪙 ${formatNumber(d.coins)}</span></div>
+      <div class="stat-row"><span class="stat-label">Total earned</span><span class="stat-value">🪙 ${formatNumber(d.coinsEarned)}</span></div>
+      <div class="stat-row"><span class="stat-label">Total spent</span><span class="stat-value">🪙 ${formatNumber(d.coinsSpent)}</span></div>
       <div class="stat-row"><span class="stat-label">Messages sent</span><span class="stat-value">${d.messagesSent}</span></div>
       <div class="stat-row"><span class="stat-label">Time online</span><span class="stat-value">${formatSeconds(d.timeOnlineSeconds)}</span></div>
       <div class="stat-row"><span class="stat-label">Badges earned</span><span class="stat-value">${d.earnedBadges.length}</span></div>
@@ -1230,23 +1279,23 @@ async function loadStats(){
 }
 
 // ── SHOP ──────────────────────────────────────────────────────────────────────
-async function openShop(){document.getElementById('shop-overlay').classList.add('open');document.getElementById('shop-balance').textContent=`Balance: 🪙 ${myCoins}`;document.getElementById('shop-status').textContent='';await loadShopItems()}
+async function openShop(){document.getElementById('shop-overlay').classList.add('open');document.getElementById('shop-balance').textContent=`Balance: 🪙 ${formatNumber(myCoins)}`;document.getElementById('shop-status').textContent='';await loadShopItems()}
 function closeShop(){document.getElementById('shop-overlay').classList.remove('open')}
 function switchShopTab(tab){document.querySelectorAll('.shop-tab').forEach(t=>t.classList.toggle('active',t.textContent.toLowerCase().includes(tab==='themes'?'theme':'colour')));document.getElementById('shop-themes').classList.toggle('active',tab==='themes');document.getElementById('shop-colors').classList.toggle('active',tab==='colors')}
 async function loadShopItems(){try{const res=await fetch('/shop',{credentials:'include'});shopItems=await res.json();renderShopThemes();renderShopColors()}catch{document.getElementById('shop-status').textContent='Error loading shop.';document.getElementById('shop-status').className='shop-status err'}}
 function renderShopThemes(){document.getElementById('shop-themes').innerHTML=`<div class="shop-grid">${shopItems.filter(i=>i.type==='theme').map(shopItemHtml).join('')}</div>`}
 function renderShopColors(){document.getElementById('shop-colors').innerHTML=`<div class="shop-grid">${shopItems.filter(i=>i.type==='color').map(shopItemHtml).join('')}</div>`}
 function shopItemHtml(item){
-  const priceLabel=item.price===0?`<span class="shop-item-price free">FREE</span>`:`<span class="shop-item-price">🪙 ${item.price}</span>`;
+  const priceLabel=item.price===0?`<span class="shop-item-price free">FREE</span>`:`<span class="shop-item-price">🪙 ${formatNumber(item.price)}</span>`;
   const badge=item.owned?`<span class="shop-item-owned-badge">✓ OWNED</span>`:'';
-  const btn=item.owned?`<button class="shop-buy-btn" disabled>Owned</button>`:`<button class="shop-buy-btn" onclick="buyItem('${item.id}')">Buy ${item.price===0?'(Free)':`🪙 ${item.price}`}</button>`;
+  const btn=item.owned?`<button class="shop-buy-btn" disabled>Owned</button>`:`<button class="shop-buy-btn" onclick="buyItem('${item.id}')">Buy ${item.price===0?'(Free)':`🪙 ${formatNumber(item.price)}`}</button>`;
   return `<div class="shop-item${item.owned?' owned':''}" id="shop-item-${item.id}">${badge}<div class="shop-item-swatch" style="background:${item.preview}"></div><div class="shop-item-name">${escHtml(item.name)}</div><div class="shop-item-desc">${escHtml(item.description||'')}</div>${priceLabel}${btn}</div>`;
 }
 async function buyItem(itemId){
   const statusEl=document.getElementById('shop-status');statusEl.textContent='Purchasing...';statusEl.className='shop-status';
   try{const res=await fetch('/shop/buy',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({itemId})});
   const data=await res.json();if(!res.ok){statusEl.textContent=data.error;statusEl.className='shop-status err';return}
-  myCoins=data.coins;updateCoinDisplay();document.getElementById('shop-balance').textContent=`Balance: 🪙 ${myCoins}`;
+  myCoins=data.coins;updateCoinDisplay();document.getElementById('shop-balance').textContent=`Balance: 🪙 ${formatNumber(myCoins)}`;
   const idx=shopItems.findIndex(i=>i.id===itemId);if(idx>=0)shopItems[idx].owned=true;
   renderShopThemes();renderShopColors();statusEl.textContent=`✓ Purchased ${data.item.name}!`;statusEl.className='shop-status';soundCoin()}catch{statusEl.textContent='Purchase failed.';statusEl.className='shop-status err'}
 }
@@ -1256,7 +1305,7 @@ document.getElementById('shop-overlay').addEventListener('click',e=>{if(e.target
 function openGames(){updateGameBalances();document.getElementById('games-overlay').classList.add('open');loadLeaderboard()}
 function closeGames(){document.getElementById('games-overlay').classList.remove('open')}
 function switchGame(name){document.querySelectorAll('.game-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.games-tab').forEach(t=>t.classList.remove('active'));document.getElementById('game-'+name).classList.add('active');document.querySelectorAll('.games-tab').forEach(t=>{if(t.textContent.toLowerCase().includes(name==='leaderboard'?'board':name))t.classList.add('active')});if(name==='leaderboard')loadLeaderboard();updateGameBalances()}
-function updateGameBalances(){['slots','dice'].forEach(g=>{const el=document.getElementById(g+'-balance');if(el)el.textContent=`Balance: 🪙 ${myCoins}`})}
+function updateGameBalances(){['slots','dice'].forEach(g=>{const el=document.getElementById(g+'-balance');if(el)el.textContent=`Balance: 🪙 ${formatNumber(myCoins)}`})}
 function setBet(game,amount){document.getElementById(game+'-bet').value=amount}
 
 let slotsSpinning=false;
@@ -1268,7 +1317,7 @@ async function playSlots(){
   try{const res=await fetch('/game/slots',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({bet})});const data=await res.json();
   [0,1,2].forEach(i=>{const el=document.getElementById('reel-'+i);el.classList.remove('spinning');el.textContent=data.reels?data.reels[i]:'?'});
   if(!res.ok)document.getElementById('slots-result').innerHTML=`<span class="result-lose">${data.error}</span>`;
-  else{myCoins=data.coins;updateCoinDisplay();updateGameBalances();if(data.winAmount>0){document.getElementById('slots-result').innerHTML=`<span class="result-win">🎉 WIN! ${data.multiplier}x = +${data.winAmount} coins!</span>`;soundWin()}else{document.getElementById('slots-result').innerHTML=`<span class="result-lose">No match. Better luck next time!</span>`;soundLose()}}}
+  else{myCoins=data.coins;updateCoinDisplay();updateGameBalances();if(data.winAmount>0){document.getElementById('slots-result').innerHTML=`<span class="result-win">🎉 WIN! ${data.multiplier}x = +${formatNumber(data.winAmount)} coins!</span>`;soundWin()}else{document.getElementById('slots-result').innerHTML=`<span class="result-lose">No match. Better luck next time!</span>`;soundLose()}}}
   catch{document.getElementById('slots-result').innerHTML='<span class="result-lose">Error. Try again.</span>';[0,1,2].forEach(i=>document.getElementById('reel-'+i).classList.remove('spinning'))}
   slotsSpinning=false;btn.disabled=false;
 }
@@ -1282,7 +1331,7 @@ async function playDice(){
   try{const res=await fetch('/game/dice',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({bet})});const data=await res.json();
   if(!res.ok)document.getElementById('dice-result').innerHTML=`<span class="result-lose">${data.error}</span>`;
   else{document.getElementById('dice-player').textContent=data.playerRoll;document.getElementById('dice-house').textContent=data.houseRoll;myCoins=data.coins;updateCoinDisplay();updateGameBalances();
-  if(data.result==='win'){document.getElementById('dice-result').innerHTML=`<span class="result-win">🎉 You win! +${data.winAmount} coins!</span>`;soundWin()}
+  if(data.result==='win'){document.getElementById('dice-result').innerHTML=`<span class="result-win">🎉 You win! +${formatNumber(data.winAmount)} coins!</span>`;soundWin()}
   else if(data.result==='tie')document.getElementById('dice-result').innerHTML=`<span class="result-tie">🤝 Tie! Bet returned.</span>`;
   else{document.getElementById('dice-result').innerHTML=`<span class="result-lose">House wins. Better luck next time!</span>`;soundLose()}}}
   catch{document.getElementById('dice-result').innerHTML='<span class="result-lose">Error. Try again.</span>'}
@@ -1292,7 +1341,7 @@ async function loadLeaderboard(){
   const container=document.getElementById('leaderboard-rows');container.innerHTML='<div style="text-align:center;color:var(--text-system);padding:20px;">Loading...</div>';
   try{const res=await fetch('/leaderboard',{credentials:'include'});const data=await res.json();
   if(!res.ok){container.innerHTML='<div style="color:#cc0000;text-align:center;padding:12px;">Error loading.</div>';return}
-  container.innerHTML=data.map((row,i)=>`<div class="lb-row"><span class="lb-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`}</span><span class="lb-name">${escHtml(row.username)}</span><span class="lb-coins">🪙 ${row.coins}</span></div>`).join('')}
+  container.innerHTML=data.map((row,i)=>`<div class="lb-row"><span class="lb-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`}</span><span class="lb-name">${escHtml(row.username)}</span><span class="lb-coins">🪙 ${formatNumber(row.coins)}</span></div>`).join('')}
   catch{container.innerHTML='<div style="color:#cc0000;text-align:center;padding:12px;">Error loading.</div>'}
 }
 

@@ -1,5 +1,5 @@
 const { db } = require('../lib/db');
-const { escapeHtml, extractUrl } = require('../lib/utils');
+const { escapeHtml, extractUrl, formatNumber } = require('../lib/utils');
 const { consumeSocketToken } = require('../lib/socketAuth');
 const { addCoins, deductCoins, getCoins, broadcastCoins } = require('../lib/coins');
 const { fetchLinkPreview } = require('../lib/linkPreview');
@@ -411,6 +411,8 @@ function initChat(io) {
         if (!action) return;
         await saveMessage({ room, sender: user.username, type: 'action', text: action });
         io.to(room).emit('chat message', { user: user.username, color: user.color, text: action, type: 'action' });
+        // Notify clients about activity in this room (for unread badges)
+        io.emit('room message', { room, user: user.username });
         return;
       }
 
@@ -681,7 +683,7 @@ function initChat(io) {
         const targetSocketId = userSocketMap[targetName.toLowerCase()];
         if (!targetSocketId) { socket.emit('system message', `User "${escapeHtml(targetName)}" is not online.`); return; }
         const challengerCoins = await getCoins(user.username);
-        if (challengerCoins < amount) { socket.emit('system message', `You only have ${challengerCoins} coins.`); return; }
+        if (challengerCoins < amount) { socket.emit('system message', `You only have ${formatNumber(challengerCoins)} coins.`); return; }
         const targetUser = connectedUsers[targetSocketId];
         pendingDuels[targetName.toLowerCase()] = { from: user.username, fromSocketId: socket.id, amount, expiresAt: Date.now() + 30000 };
         io.to(room).emit('system message', `🎲 ${user.username} challenges ${targetUser.username} to a coinflip for ${amount} coins! Type /accept or /decline (30s)`);
@@ -709,8 +711,8 @@ function initChat(io) {
         broadcastCoins(winner, winnerCoins);
         const loserCoins = await getCoins(loser);
         broadcastCoins(loser, loserCoins);
-        io.to(room).emit('system message', `🎲 COINFLIP: ${winner} wins ${prize} coins from ${loser}! 🏆`);
-        await broadcastGambling(`🎲 COINFLIP: ${winner} beat ${loser} for ${prize} coins!`);
+        io.to(room).emit('system message', `🎲 COINFLIP: ${winner} wins ${formatNumber(prize)} coins from ${loser}! 🏆`);
+        await broadcastGambling(`🎲 COINFLIP: ${winner} beat ${loser} for ${formatNumber(prize)} coins!`);
         return;
       }
 
@@ -737,13 +739,13 @@ function initChat(io) {
         const newSenderBal = await deductCoins(user.username, amount);
         if (newSenderBal === false) {
           const senderCoins = await getCoins(user.username);
-          socket.emit('system message', `You only have ${senderCoins} coins.`);
+          socket.emit('system message', `You only have ${formatNumber(senderCoins)} coins.`);
           return;
         }
         const newTargetBal = await addCoins(targetUsername, amount);
         broadcastCoins(user.username, newSenderBal);
         broadcastCoins(targetUsername, newTargetBal);
-        io.to(room).emit('system message', `💸 ${user.username} gave ${amount} coins to ${targetUsername}!`);
+        io.to(room).emit('system message', `💸 ${user.username} gave ${formatNumber(amount)} coins to ${targetUsername}!`);
         return;
       }
 
@@ -760,7 +762,7 @@ function initChat(io) {
           if (!r.rows.length) { socket.emit('system message', `User "${escapeHtml(targetName)}" not found.`); return; }
           const updated = r.rows[0];
           broadcastCoins(updated.username, updated.coins);
-          io.to(user.room).emit('system message', `🔧 ${user.username} set ${updated.username}'s coins to ${updated.coins}.`);
+          io.to(user.room).emit('system message', `🔧 ${user.username} set ${updated.username}'s coins to ${formatNumber(updated.coins)}.`);
         } catch (err) {
           console.error('Admin /coins error:', err);
           socket.emit('system message', 'Error executing /coins command.');
@@ -788,6 +790,8 @@ function initChat(io) {
       db.query(`UPDATE users SET messages_sent = messages_sent + 1 WHERE LOWER(username) = LOWER($1)`, [user.username]).catch(() => {});
 
       io.to(room).emit('chat message', { id: messageId, user: user.username, color: user.color, text: sanitized, type: 'chat', timestamp: Date.now() });
+      // Notify all clients that this room received a message so they can show unread badges
+      io.emit('room message', { room, user: user.username });
       addCoins(user.username, 1).then(newBal => broadcastCoins(user.username, newBal)).catch(() => {});
       if (foundUrl) fetchLinkPreview(foundUrl).then(preview => { if (preview) io.to(room).emit('link preview', { url: foundUrl, ...preview }); });
     });

@@ -4,7 +4,7 @@ const router = express.Router();
 
 const { db } = require('../lib/db');
 const { getCoins, addCoins, deductCoins, broadcastCoins } = require('../lib/coins');
-const { DAILY_REWARD } = require('../lib/utils');
+const { DAILY_REWARD, formatNumber } = require('../lib/utils');
 
 let _io = null;
 function initGambling(io) { _io = io; }
@@ -112,9 +112,9 @@ router.post('/game/slots', async (req, res) => {
   broadcastCoins(req.session.username, finalCoins);
 
   if (winAmount > 0) {
-    await broadcastGambling(`🎰 ${req.session.username} won ${winAmount} coins on slots! [${reels.join('')}] ${multiplier}x bet of ${betAmount}`);
+    await broadcastGambling(`🎰 ${req.session.username} won ${formatNumber(winAmount)} coins on slots! [${reels.join('')}] ${multiplier}x bet of ${formatNumber(betAmount)}`);
   } else {
-    await broadcastGambling(`🎰 ${req.session.username} lost ${betAmount} coins on slots [${reels.join('')}]`);
+    await broadcastGambling(`🎰 ${req.session.username} lost ${formatNumber(betAmount)} coins on slots [${reels.join('')}]`);
   }
   res.json({ reels, multiplier, winAmount, coins: finalCoins });
 });
@@ -146,11 +146,11 @@ router.post('/game/dice', async (req, res) => {
   broadcastCoins(req.session.username, finalCoins);
 
   if (result === 'win') {
-    await broadcastGambling(`🎲 ${req.session.username} won ${winAmount} coins on dice! (rolled ${playerRoll} vs house ${houseRoll})`);
+    await broadcastGambling(`🎲 ${req.session.username} won ${formatNumber(winAmount)} coins on dice! (rolled ${playerRoll} vs house ${houseRoll})`);
   } else if (result === 'tie') {
-    await broadcastGambling(`🎲 ${req.session.username} tied on dice (both rolled ${playerRoll}), bet of ${betAmount} returned`);
+    await broadcastGambling(`🎲 ${req.session.username} tied on dice (both rolled ${playerRoll}), bet of ${formatNumber(betAmount)} returned`);
   } else {
-    await broadcastGambling(`🎲 ${req.session.username} lost ${betAmount} coins on dice (rolled ${playerRoll} vs house ${houseRoll})`);
+    await broadcastGambling(`🎲 ${req.session.username} lost ${formatNumber(betAmount)} coins on dice (rolled ${playerRoll} vs house ${houseRoll})`);
   }
   res.json({ playerRoll, houseRoll, result, winAmount, coins: finalCoins });
 });

@@ -1,4 +1,5 @@
 const { addCoins, broadcastCoins } = require('../lib/coins');
+const { formatNumber } = require('../lib/utils');
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let activeClaim = null; // { expiresAt: timestamp } or null
@@ -26,7 +27,7 @@ function triggerClaimEvent(io, scheduleNext) {
   if (activeClaim) { scheduleNext(); return; } // don't overlap
   activeClaim = { expiresAt: Date.now() + 60000 };
   // Broadcast to ALL rooms
-  io.emit('system message', '🎁 TYPE "claim" FOR 100 FREE COINS! First person wins!');
+  io.emit('system message', `🎁 TYPE "claim" FOR ${formatNumber(100)} FREE COINS! First person wins!`);
   scheduleNext();
 }
 
@@ -41,7 +42,7 @@ async function handleClaim(io, username) {
 
   const newCoins = await addCoins(username, 100);
   broadcastCoins(username, newCoins);
-  io.emit('system message', `🎉 ${username} claimed the reward and won 100 coins!`);
+  io.emit('system message', `🎉 ${username} claimed the reward and won ${formatNumber(100)} coins!`);
   return true;
 }
 
