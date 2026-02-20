@@ -228,6 +228,8 @@ async function performRoomSwitch(io, socket, user, newRoom) {
   io.to(oldRoom).emit('system message', `${user.username} left #${oldRoom}`);
   user.room = newRoom;
   socket.join(newRoom);
+  // Notify client that the room has changed first so it can clear UI
+  socket.emit('room changed', newRoom);
 
   const roomInfo = await db.query('SELECT is_private FROM rooms WHERE name = $1', [newRoom]);
   const historyLimit = roomInfo.rows[0]?.is_private ? 1000 : 30;
@@ -237,7 +239,6 @@ async function performRoomSwitch(io, socket, user, newRoom) {
   socket.emit('history', historyWithColors);
   broadcastUserList(io, newRoom);
   io.to(newRoom).emit('system message', `${user.username} joined #${newRoom}`);
-  socket.emit('room changed', newRoom);
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────

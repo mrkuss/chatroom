@@ -977,7 +977,11 @@ socket.on('room changed',room=>{
   document.querySelectorAll('.room-btn').forEach(b=>b.classList.toggle('active',b.dataset.room===room));
 });
 
-socket.on('history',history=>renderHistory(history));
+socket.on('history', history => {
+  // Ensure previous room messages are cleared before rendering new history
+  document.getElementById('messages').innerHTML = '';
+  renderHistory(history);
+});
 
 socket.on('room requires code',room=>{
   pendingRoom=room;
