@@ -67,7 +67,7 @@ async function saveMessage({ room, sender, recipient, type, text, clientId }) {
   return r.rows[0].id;
 }
 
-async function getHistory(room, username, limit = 5) {
+async function getHistory(room, username, limit = 25) {
   const result = await db.query(
     `SELECT m.id, m.sender, m.recipient, m.type, m.text, m.created_at,
             COALESCE(
@@ -183,7 +183,7 @@ function initChat(io) {
 
       await sendRoomsList(socket, username);
 
-      const history = await getHistory(defaultRoom, username, 5);
+      const history = await getHistory(defaultRoom, username, 25);
       const historyWithColors = await enrichHistoryWithColors(history);
       socket.emit('history', historyWithColors);
 
