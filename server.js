@@ -99,7 +99,7 @@ initDb().catch((err) => {
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.set('trust proxy', 1);  
 app.use(session({
   store: new pgSession({
     pool: db,
@@ -112,6 +112,7 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
+     sameSite: 'lax',  
     maxAge: 7 * 24 * 60 * 60 * 1000,
   },
 }));
