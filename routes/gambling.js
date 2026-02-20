@@ -6,8 +6,6 @@ const { db } = require('../lib/db');
 const { getCoins, addCoins, deductCoins, broadcastCoins } = require('../lib/coins');
 const { DAILY_REWARD } = require('../lib/utils');
 
-// ─── Broadcast a message to the gambling room ─────────────────────────────────
-// io is injected at init time
 let _io = null;
 function initGambling(io) { _io = io; }
 
@@ -21,6 +19,29 @@ async function broadcastGambling(msg) {
   if (_io) _io.to('gambling').emit('system message', msg);
 }
 
+// ─── Mark first gamble + big win on user row ──────────────────────────────────
+async function recordGambleStats(username, winAmount) {
+  if (winAmount > 1000) {
+    await db.query(
+      `UPDATE users SET first_gamble = true, big_win = true WHERE LOWER(username) = LOWER($1)`,
+      [username]
+    ).catch(() => {
+      // big_win column might not exist yet if migration hasn't run — add it safely
+    });
+    // Safe fallback if big_win column doesn't exist yet
+    await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS big_win BOOLEAN NOT NULL DEFAULT false`);
+    await db.query(
+      `UPDATE users SET first_gamble = true, big_win = true WHERE LOWER(username) = LOWER($1)`,
+      [username]
+    );
+  } else {
+    await db.query(
+      `UPDATE users SET first_gamble = true WHERE LOWER(username) = LOWER($1)`,
+      [username]
+    );
+  }
+}
+
 // ─── Daily Reward ─────────────────────────────────────────────────────────────
 router.post('/daily', async (req, res) => {
   if (!req.session.username) return res.status(401).json({ error: 'Not logged in' });
@@ -32,7 +53,8 @@ router.post('/daily', async (req, res) => {
     if (!row) return res.status(404).json({ error: 'User not found' });
     if (row.last_daily && new Date(row.last_daily) >= todayUTC) return res.status(400).json({ error: 'Already claimed today' });
     const result = await db.query(
-      'UPDATE users SET coins = coins + $1, last_daily = NOW() WHERE LOWER(username) = LOWER($2) RETURNING coins',
+      `UPDATE users SET coins = coins + $1, coins_earned = coins_earned + $1, last_daily = NOW()
+       WHERE LOWER(username) = LOWER($2) RETURNING coins`,
       [DAILY_REWARD, req.session.username]
     );
     const newCoins = result.rows[0].coins;
@@ -86,7 +108,9 @@ router.post('/game/slots', async (req, res) => {
     finalCoins = await addCoins(req.session.username, winAmount);
   }
 
+  await recordGambleStats(req.session.username, winAmount);
   broadcastCoins(req.session.username, finalCoins);
+
   if (winAmount > 0) {
     await broadcastGambling(`🎰 ${req.session.username} won ${winAmount} coins on slots! [${reels.join('')}] ${multiplier}x bet of ${betAmount}`);
   } else {
@@ -118,7 +142,9 @@ router.post('/game/dice', async (req, res) => {
     result = 'tie';
   }
 
+  await recordGambleStats(req.session.username, winAmount);
   broadcastCoins(req.session.username, finalCoins);
+
   if (result === 'win') {
     await broadcastGambling(`🎲 ${req.session.username} won ${winAmount} coins on dice! (rolled ${playerRoll} vs house ${houseRoll})`);
   } else if (result === 'tie') {

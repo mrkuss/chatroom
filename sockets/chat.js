@@ -6,13 +6,16 @@ const { fetchLinkPreview } = require('../lib/linkPreview');
 const { broadcastGambling } = require('../routes/gambling');
 const { handleClaim } = require('./claimEvents');
 
-// ─── Shared State ─────────────────────────────────────────────────────────────
-const connectedUsers  = {};  // socketId → { username, color, room, joinedAt, lastActivity }
-const userSocketMap   = {};  // username.toLowerCase() → socketId
-const rateLimits      = {};  // socketId → { count, resetTime, lockedUntil? }
-const typingTimeouts  = {};  // socketId → timeoutId
-const typingByRoom    = {};  // room → Set of socketIds
-const pendingDuels    = {};  // username.toLowerCase() → { from, fromSocketId, amount, expiresAt }
+const connectedUsers  = {};
+const userSocketMap   = {};
+const rateLimits      = {};
+const typingTimeouts  = {};
+const typingByRoom    = {};
+const pendingDuels    = {};
+// Track when each user connected so we can add to time_online_seconds on disconnect
+const sessionStartTimes = {};
+// Track which private rooms a socket has been granted access to this session
+const privateRoomAccess = {}; // socketId → Set of room names
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function broadcastUserList(io, room) {
@@ -44,19 +47,43 @@ function stopTypingForSocket(io, socket, room) {
   broadcastTyping(io, room);
 }
 
+async function addOnlineTime(username, socketId) {
+  const start = sessionStartTimes[socketId];
+  if (!start) return;
+  const seconds = Math.floor((Date.now() - start) / 1000);
+  if (seconds > 0) {
+    await db.query(
+      `UPDATE users SET time_online_seconds = time_online_seconds + $1 WHERE LOWER(username) = LOWER($2)`,
+      [seconds, username]
+    ).catch(() => {});
+  }
+  delete sessionStartTimes[socketId];
+}
+
 // ─── Message persistence & history ───────────────────────────────────────────
-async function saveMessage({ room, sender, recipient, type, text }) {
-  await db.query(
-    'INSERT INTO messages (room, sender, recipient, type, text) VALUES ($1,$2,$3,$4,$5)',
-    [room || null, sender, recipient || null, type, text]
+async function saveMessage({ room, sender, recipient, type, text, clientId }) {
+  const r = await db.query(
+    'INSERT INTO messages (room, sender, recipient, type, text, client_id) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id',
+    [room || null, sender, recipient || null, type, text, clientId || null]
   );
+  return r.rows[0].id;
 }
 
 async function getHistory(room, username, limit = 5) {
   const result = await db.query(
-    `SELECT sender, recipient, type, text, created_at FROM messages
-     WHERE room = $1 OR (type = 'dm' AND (LOWER(sender) = LOWER($2) OR LOWER(recipient) = LOWER($2)))
-     ORDER BY created_at DESC LIMIT $3`,
+    `SELECT m.id, m.sender, m.recipient, m.type, m.text, m.created_at,
+            COALESCE(
+              json_object_agg(r.emoji, r.cnt) FILTER (WHERE r.emoji IS NOT NULL),
+              '{}'
+            ) as reactions
+     FROM messages m
+     LEFT JOIN (
+       SELECT message_id, emoji, COUNT(*) as cnt
+       FROM reactions GROUP BY message_id, emoji
+     ) r ON r.message_id = m.id
+     WHERE m.room = $1 OR (m.type = 'dm' AND (LOWER(m.sender) = LOWER($2) OR LOWER(m.recipient) = LOWER($2)))
+     GROUP BY m.id
+     ORDER BY m.created_at DESC LIMIT $3`,
     [room, username, limit]
   );
   return result.rows.reverse();
@@ -75,20 +102,17 @@ async function enrichHistoryWithColors(rows) {
 }
 
 function formatPollData(poll) {
-  return {
-    id: poll.id,
-    question: poll.question,
-    options: poll.options,
-    votes: poll.votes,
-    creator: poll.creator,
-    endsAt: poll.ends_at,
-    concluded: poll.concluded,
-  };
+  return { id: poll.id, question: poll.question, options: poll.options, votes: poll.votes, creator: poll.creator, endsAt: poll.ends_at, concluded: poll.concluded };
 }
 
-// ─── Register socket events ───────────────────────────────────────────────────
+async function getRoomsForUser(username) {
+  // Public rooms + private rooms the user created or has accessed this session
+  const r = await db.query('SELECT name, is_private, creator FROM rooms ORDER BY id');
+  return r.rows;
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
 function initChat(io) {
-  // Prune expired duels
   setInterval(() => {
     const now = Date.now();
     for (const key in pendingDuels) {
@@ -96,10 +120,10 @@ function initChat(io) {
     }
   }, 10000);
 
-  // Periodically push updated user lists (for idle detection)
   setInterval(() => broadcastAllUserLists(io), 30000);
 
   io.on('connection', (socket) => {
+    privateRoomAccess[socket.id] = new Set();
 
     // ── Join ────────────────────────────────────────────────────────────────
     socket.on('join', async (token) => {
@@ -118,7 +142,6 @@ function initChat(io) {
         color = r.rows[0]?.color || '#000080';
       } catch {}
 
-      // Kick existing session for same user
       const existingId = userSocketMap[key];
       if (existingId && existingId !== socket.id) {
         const existingSocket = io.sockets.sockets.get(existingId);
@@ -127,18 +150,23 @@ function initChat(io) {
           existingSocket.disconnect(true);
         }
         const oldUser = connectedUsers[existingId];
-        if (oldUser && typingByRoom[oldUser.room]) typingByRoom[oldUser.room].delete(existingId);
+        if (oldUser) {
+          await addOnlineTime(oldUser.username, existingId);
+          if (typingByRoom[oldUser.room]) typingByRoom[oldUser.room].delete(existingId);
+        }
         delete connectedUsers[existingId];
         delete rateLimits[existingId];
+        delete privateRoomAccess[existingId];
       }
 
       const defaultRoom = 'general';
       connectedUsers[socket.id] = { username, color, room: defaultRoom, joinedAt: Date.now(), lastActivity: Date.now() };
       userSocketMap[key] = socket.id;
+      sessionStartTimes[socket.id] = Date.now();
       socket.join(defaultRoom);
 
-      const roomsResult = await db.query('SELECT name FROM rooms ORDER BY id');
-      socket.emit('rooms list', roomsResult.rows.map(r => r.name));
+      // Send rooms list (public + private rooms created by this user)
+      await sendRoomsList(socket, username);
 
       const history = await getHistory(defaultRoom, username, 5);
       const historyWithColors = await enrichHistoryWithColors(history);
@@ -151,12 +179,36 @@ function initChat(io) {
       io.to(defaultRoom).emit('system message', `${username} has joined #${defaultRoom}`);
     });
 
+    async function sendRoomsList(socket, username) {
+      const rooms = await db.query('SELECT name, is_private, creator FROM rooms ORDER BY id');
+      // Show public rooms + private rooms this user created
+      const visible = rooms.rows.filter(r =>
+        !r.is_private ||
+        r.creator?.toLowerCase() === username?.toLowerCase() ||
+        privateRoomAccess[socket.id]?.has(r.name)
+      );
+      socket.emit('rooms list', visible.map(r => ({ name: r.name, isPrivate: r.is_private, isOwner: r.creator?.toLowerCase() === username?.toLowerCase() })));
+    }
+
     // ── Switch room ─────────────────────────────────────────────────────────
-    socket.on('switch room', async (newRoom) => {
+    socket.on('switch room', async ({ room: newRoom, password }) => {
       const user = connectedUsers[socket.id];
       if (!user) return;
-      const r = await db.query('SELECT name FROM rooms WHERE name = $1', [newRoom]);
-      if (!r.rows.length) return;
+
+      const r = await db.query('SELECT name, is_private, password_hash FROM rooms WHERE name = $1', [newRoom]);
+      if (!r.rows.length) { socket.emit('system message', 'Room not found.'); return; }
+
+      const roomRow = r.rows[0];
+
+      // Check private room access
+      if (roomRow.is_private && !privateRoomAccess[socket.id].has(newRoom)) {
+        if (!password) { socket.emit('room requires password', newRoom); return; }
+        const match = await require('bcrypt').compare(password, roomRow.password_hash);
+        if (!match) { socket.emit('system message', 'Wrong password for that room.'); return; }
+        privateRoomAccess[socket.id].add(newRoom);
+        await sendRoomsList(socket, user.username);
+      }
+
       const oldRoom = user.room;
       stopTypingForSocket(io, socket, oldRoom);
       socket.leave(oldRoom);
@@ -179,7 +231,6 @@ function initChat(io) {
       const user = connectedUsers[socket.id];
       if (!user) return;
 
-      // Rate limiting
       const now = Date.now();
       const rl = rateLimits[socket.id];
       if (rl && rl.lockedUntil && now < rl.lockedUntil) {
@@ -255,6 +306,74 @@ function initChat(io) {
         return;
       }
 
+      // ── /create (private room) ─────────────────────────────────────────────
+      if (raw.startsWith('/create ')) {
+        const parts = raw.slice(8).trim().split(' ');
+        if (parts.length < 2) { socket.emit('system message', 'Usage: /create roomname password'); return; }
+        const roomName = parts[0].toLowerCase();
+        const roomPassword = parts.slice(1).join(' ');
+        try {
+          const res = await fetch(`http://localhost:${process.env.PORT || 3000}/rooms/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Cookie': `connect.sid=ignored` },
+          });
+        } catch {}
+        // Call the logic directly instead of HTTP
+        const bcrypt = require('bcrypt');
+        if (!/^[a-zA-Z0-9_-]+$/.test(roomName) || roomName.length < 2 || roomName.length > 20) {
+          socket.emit('system message', 'Room name: 2-20 chars, letters/numbers/dash/underscore only'); return;
+        }
+        if (roomPassword.length < 3) { socket.emit('system message', 'Password must be at least 3 characters.'); return; }
+        const owned = await db.query(
+          `SELECT COUNT(*) FROM rooms WHERE LOWER(creator) = LOWER($1) AND is_private = true`,
+          [user.username]
+        );
+        if (parseInt(owned.rows[0].count, 10) >= 3) {
+          socket.emit('system message', 'You can only have 3 private rooms at once.'); return;
+        }
+        try {
+          const hash = await bcrypt.hash(roomPassword, 10);
+          await db.query(
+            `INSERT INTO rooms (name, is_private, password_hash, creator) VALUES ($1, true, $2, $3)`,
+            [roomName, hash, user.username]
+          );
+          privateRoomAccess[socket.id].add(roomName);
+          await sendRoomsList(socket, user.username);
+          socket.emit('system message', `🔒 Private room #${roomName} created! Share the password with friends.`);
+        } catch (err) {
+          if (err.code === '23505') socket.emit('system message', 'A room with that name already exists.');
+          else socket.emit('system message', 'Error creating room.');
+        }
+        return;
+      }
+
+      // ── /deleteroom ────────────────────────────────────────────────────────
+      if (raw.startsWith('/deleteroom ')) {
+        const roomName = raw.slice(12).trim().toLowerCase();
+        const r = await db.query(`SELECT creator FROM rooms WHERE name = $1 AND is_private = true`, [roomName]);
+        if (!r.rows.length) { socket.emit('system message', 'Private room not found.'); return; }
+        if (r.rows[0].creator.toLowerCase() !== user.username.toLowerCase()) {
+          socket.emit('system message', 'Only the creator can delete this room.'); return;
+        }
+        await db.query(`DELETE FROM rooms WHERE name = $1`, [roomName]);
+        // Kick anyone in that room back to general
+        Object.entries(connectedUsers).forEach(([sid, u]) => {
+          if (u.room === roomName) {
+            const s = io.sockets.sockets.get(sid);
+            if (s) {
+              u.room = 'general';
+              s.leave(roomName);
+              s.join('general');
+              s.emit('room changed', 'general');
+              s.emit('system message', `The room #${roomName} was deleted.`);
+            }
+          }
+        });
+        await sendRoomsList(socket, user.username);
+        socket.emit('system message', `🗑️ Room #${roomName} deleted.`);
+        return;
+      }
+
       // ── /duel ─────────────────────────────────────────────────────────────
       if (raw.startsWith('/duel ')) {
         const parts = raw.slice(6).trim().split(' ');
@@ -273,7 +392,6 @@ function initChat(io) {
         return;
       }
 
-      // ── /accept duel ──────────────────────────────────────────────────────
       if (raw.trim() === '/accept') {
         const key = user.username.toLowerCase();
         const duel = pendingDuels[key];
@@ -300,7 +418,6 @@ function initChat(io) {
         return;
       }
 
-      // ── /decline duel ─────────────────────────────────────────────────────
       if (raw.trim() === '/decline') {
         const key = user.username.toLowerCase();
         const duel = pendingDuels[key];
@@ -336,13 +453,56 @@ function initChat(io) {
 
       // ── Regular chat ───────────────────────────────────────────────────────
       const sanitized = escapeHtml(raw);
-      await saveMessage({ room, sender: user.username, type: 'chat', text: sanitized });
-      io.to(room).emit('chat message', { user: user.username, color: user.color, text: sanitized, type: 'chat', timestamp: Date.now() });
-      // +1 coin per message
+      const clientId = `${user.username}-${Date.now()}`;
+      const messageId = await saveMessage({ room, sender: user.username, type: 'chat', text: sanitized, clientId });
+
+      // Increment message count
+      db.query(`UPDATE users SET messages_sent = messages_sent + 1 WHERE LOWER(username) = LOWER($1)`, [user.username]).catch(() => {});
+
+      io.to(room).emit('chat message', { id: messageId, user: user.username, color: user.color, text: sanitized, type: 'chat', timestamp: Date.now() });
       addCoins(user.username, 1).then(newBal => broadcastCoins(user.username, newBal)).catch(() => {});
-      // Link preview
       const url = extractUrl(raw);
       if (url) fetchLinkPreview(url).then(preview => { if (preview) io.to(room).emit('link preview', { url, ...preview }); });
+    });
+
+    // ── Reaction ─────────────────────────────────────────────────────────────
+    socket.on('react', async ({ messageId, emoji }) => {
+      const user = connectedUsers[socket.id];
+      if (!user) return;
+      const allowed = ['👍', '❤️', '😂', '😮'];
+      if (!allowed.includes(emoji)) return;
+      try {
+        await db.query(
+          `INSERT INTO reactions (message_id, username, emoji)
+           VALUES ($1, $2, $3)
+           ON CONFLICT (message_id, username) DO UPDATE SET emoji = $3`,
+          [messageId, user.username, emoji]
+        );
+        // Get updated counts
+        const r = await db.query(
+          `SELECT emoji, COUNT(*) as count FROM reactions WHERE message_id = $1 GROUP BY emoji`,
+          [messageId]
+        );
+        const reactions = {};
+        r.rows.forEach(row => { reactions[row.emoji] = parseInt(row.count, 10); });
+        // Broadcast to room
+        io.to(user.room).emit('reaction update', { messageId, reactions });
+      } catch (err) { console.error('React error:', err); }
+    });
+
+    socket.on('unreact', async ({ messageId }) => {
+      const user = connectedUsers[socket.id];
+      if (!user) return;
+      try {
+        await db.query(`DELETE FROM reactions WHERE message_id = $1 AND LOWER(username) = LOWER($2)`, [messageId, user.username]);
+        const r = await db.query(
+          `SELECT emoji, COUNT(*) as count FROM reactions WHERE message_id = $1 GROUP BY emoji`,
+          [messageId]
+        );
+        const reactions = {};
+        r.rows.forEach(row => { reactions[row.emoji] = parseInt(row.count, 10); });
+        io.to(user.room).emit('reaction update', { messageId, reactions });
+      } catch (err) { console.error('Unreact error:', err); }
     });
 
     // ── Poll vote ────────────────────────────────────────────────────────────
@@ -353,15 +513,11 @@ function initChat(io) {
         const result = await db.query('SELECT * FROM polls WHERE id = $1 AND room = $2', [pollId, user.room]);
         const poll = result.rows[0];
         if (!poll || poll.concluded || !poll.options.includes(option)) return;
-
-        // Overwrite any previous vote for this user (one vote per user enforced here)
         const votes = poll.votes || {};
         votes[user.username] = option;
         await db.query('UPDATE polls SET votes = $1 WHERE id = $2', [JSON.stringify(votes), pollId]);
         io.to(user.room).emit('poll update', { ...formatPollData(poll), votes });
-      } catch (err) {
-        console.error('Poll vote error:', err);
-      }
+      } catch (err) { console.error('Poll vote error:', err); }
     });
 
     // ── Typing ───────────────────────────────────────────────────────────────
@@ -385,14 +541,13 @@ function initChat(io) {
       stopTypingForSocket(io, socket, user.room);
     });
 
-    // ── Activity ping ────────────────────────────────────────────────────────
     socket.on('activity', () => {
       const user = connectedUsers[socket.id];
       if (user) { user.lastActivity = Date.now(); broadcastUserList(io, user.room); }
     });
 
     // ── Disconnect ───────────────────────────────────────────────────────────
-    socket.on('disconnect', () => {
+    socket.on('disconnect', async () => {
       const user = connectedUsers[socket.id];
       if (user) {
         const room = user.room;
@@ -400,8 +555,10 @@ function initChat(io) {
         if (userSocketMap[key] === socket.id) delete userSocketMap[key];
         if (typingByRoom[room]) typingByRoom[room].delete(socket.id);
         clearTimeout(typingTimeouts[socket.id]);
+        await addOnlineTime(user.username, socket.id);
         delete connectedUsers[socket.id];
         delete rateLimits[socket.id];
+        delete privateRoomAccess[socket.id];
         broadcastUserList(io, room);
         broadcastTyping(io, room);
         io.to(room).emit('system message', `${user.username} has left #${room}`);

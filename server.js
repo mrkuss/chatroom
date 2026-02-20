@@ -15,8 +15,8 @@ const { initGambling, router: gamblingRouter } = require('./routes/gambling');
 const authRouter     = require('./routes/auth');
 const settingsRouter = require('./routes/settings');
 const shopRouter     = require('./routes/shop');
+const { router: socialRouter } = require('./routes/social');
 
-// ─── App Setup ────────────────────────────────────────────────────────────────
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
@@ -38,26 +38,17 @@ app.use(session({
   },
 }));
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
 app.use(authRouter);
 app.use(settingsRouter);
 app.use(shopRouter);
 app.use(gamblingRouter);
+app.use(socialRouter);
 
-// ─── Init & Start ─────────────────────────────────────────────────────────────
 async function start() {
   await initDb();
-
-  // Wire up coin broadcasting (needs io + userSocketMap)
   initCoins(io, userSocketMap);
-
-  // Wire up gambling broadcast (needs io)
   initGambling(io);
-
-  // Register all socket handlers
   initChat(io);
-
-  // Background jobs
   initPollJobs(io);
   initClaimEvents(io);
 
