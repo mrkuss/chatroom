@@ -6,6 +6,7 @@ const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
 const { Pool } = require('pg');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 const server = http.createServer(app);
@@ -44,16 +45,17 @@ initDb().catch((err) => {
   process.exit(1);
 });
 
-// ─── Session store (shared between HTTP and Socket lookup) ────────────────────
+// ─── Middleware ───────────────────────────────────────────────────────────────
 
-const store = new pgSession({
-  pool: db,
-  tableName: 'session',
-  pruneSessionInterval: 60 * 15,
-});
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-const sessionMiddleware = session({
-  store,
+app.use(session({
+  store: new pgSession({
+    pool: db,
+    tableName: 'session',
+    pruneSessionInterval: 60 * 15,
+  }),
   secret: process.env.SESSION_SECRET || 'change-this-in-production',
   resave: false,
   saveUninitialized: false,
@@ -62,13 +64,35 @@ const sessionMiddleware = session({
     httpOnly: true,
     maxAge: 7 * 24 * 60 * 60 * 1000,
   },
-});
+}));
 
-// ─── Middleware ───────────────────────────────────────────────────────────────
+// ─── Socket Auth Tokens ───────────────────────────────────────────────────────
+// Short-lived tokens: token -> { username, expires }
+// Generated after login/register, consumed once on socket join.
 
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(sessionMiddleware);
+const socketTokens = {};
+
+function createSocketToken(username) {
+  const token = crypto.randomBytes(32).toString('hex');
+  socketTokens[token] = { username, expires: Date.now() + 30000 }; // 30s to use
+  return token;
+}
+
+function consumeSocketToken(token) {
+  const entry = socketTokens[token];
+  if (!entry) return null;
+  delete socketTokens[token];
+  if (Date.now() > entry.expires) return null;
+  return entry.username;
+}
+
+// Clean up expired tokens every minute
+setInterval(() => {
+  const now = Date.now();
+  for (const token in socketTokens) {
+    if (socketTokens[token].expires < now) delete socketTokens[token];
+  }
+}, 60000);
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -79,31 +103,6 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-// Parse session from a raw cookie string using the store directly
-function getSessionUsername(cookieHeader) {
-  return new Promise((resolve) => {
-    if (!cookieHeader) return resolve(null);
-
-    // Extract the connect.sid value from the cookie header
-    const cookies = {};
-    cookieHeader.split(';').forEach(part => {
-      const [k, ...v] = part.trim().split('=');
-      cookies[k.trim()] = decodeURIComponent(v.join('='));
-    });
-
-    const raw = cookies['connect.sid'];
-    if (!raw) return resolve(null);
-
-    // Strip the signature added by cookie-parser (s:SESSIONID.SIGNATURE)
-    const sid = raw.startsWith('s:') ? raw.slice(2).split('.')[0] : raw;
-
-    store.get(sid, (err, sessionData) => {
-      if (err || !sessionData) return resolve(null);
-      resolve(sessionData.username || null);
-    });
-  });
 }
 
 // ─── Auth Routes ──────────────────────────────────────────────────────────────
@@ -124,10 +123,8 @@ app.post('/register', async (req, res) => {
     const hash = await bcrypt.hash(password, 12);
     await db.query('INSERT INTO users (username, password_hash) VALUES ($1, $2)', [username, hash]);
     req.session.username = username;
-    await new Promise((resolve, reject) =>
-      req.session.save(err => err ? reject(err) : resolve())
-    );
-    res.json({ ok: true, username });
+    const token = createSocketToken(username);
+    res.json({ ok: true, username, token });
   } catch (err) {
     if (err.code === '23505')
       return res.status(409).json({ error: 'Username already taken' });
@@ -157,10 +154,8 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid username or password' });
 
     req.session.username = user.username;
-    await new Promise((resolve, reject) =>
-      req.session.save(err => err ? reject(err) : resolve())
-    );
-    res.json({ ok: true, username: user.username });
+    const token = createSocketToken(user.username);
+    res.json({ ok: true, username: user.username, token });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -176,7 +171,9 @@ app.post('/logout', (req, res) => {
 
 app.get('/me', (req, res) => {
   if (req.session.username) {
-    res.json({ username: req.session.username });
+    // Issue a fresh token for auto-login on page refresh
+    const token = createSocketToken(req.session.username);
+    res.json({ username: req.session.username, token });
   } else {
     res.status(401).json({ error: 'Not logged in' });
   }
@@ -208,13 +205,12 @@ function broadcastTyping() {
 
 io.on('connection', (socket) => {
 
-  socket.on('join', async () => {
-    // Read session directly from the store using the cookie on the socket's request
-    const cookieHeader = socket.request.headers.cookie;
-    const sessionUsername = await getSessionUsername(cookieHeader);
+  socket.on('join', (token) => {
+    // Validate the one-time token issued at login
+    const sessionUsername = consumeSocketToken(token);
 
     if (!sessionUsername) {
-      socket.emit('kicked', 'Not authenticated. Please log in again.');
+      socket.emit('system message', 'Authentication failed. Please refresh and log in again.');
       socket.disconnect(true);
       return;
     }

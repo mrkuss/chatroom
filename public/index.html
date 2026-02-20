@@ -158,7 +158,6 @@
       text-overflow: ellipsis;
     }
 
-    /* Clickable user count button */
     #user-count-btn {
       font-family: 'VT323', monospace;
       font-size: 15px;
@@ -378,7 +377,7 @@
       });
       const data = await res.json();
       if (!res.ok) { errEl.textContent = data.error; return; }
-      enterChat(data.username);
+      enterChat(data.username, data.token);
     }
 
     async function doRegister() {
@@ -396,7 +395,7 @@
       });
       const data = await res.json();
       if (!res.ok) { errEl.textContent = data.error; return; }
-      enterChat(data.username);
+      enterChat(data.username, data.token);
     }
 
     async function doLogout() {
@@ -406,7 +405,7 @@
     }
 
     // ── ENTER CHAT ──
-    function enterChat(username) {
+    function enterChat(username, token) {
       myUsername = username;
       document.getElementById('auth-screen').style.display = 'none';
       document.getElementById('chat-screen').style.display = 'flex';
@@ -415,7 +414,7 @@
 
       socket.connect();
       socket.once('connect', () => {
-        socket.emit('join', username);
+        socket.emit('join', token);
       });
     }
 
@@ -467,7 +466,6 @@
 
     socket.on('user list', (list) => {
       document.getElementById('user-count-btn').textContent = `👤 ${list.length} online`;
-
       const panel = document.getElementById('users-panel');
       panel.innerHTML = '';
       list.forEach(({ username, joinedAt }) => {
@@ -481,11 +479,7 @@
 
     socket.on('typing', ({ text }) => {
       const bar = document.getElementById('typing-bar');
-      if (!text) {
-        bar.innerHTML = '';
-      } else {
-        bar.innerHTML = text + ' <span class="dots"><span></span><span></span><span></span></span>';
-      }
+      bar.innerHTML = text ? text + ' <span class="dots"><span></span><span></span><span></span></span>' : '';
     });
 
     socket.on('kicked', (reason) => {
@@ -542,7 +536,7 @@
     fetch('/me').then(async res => {
       if (res.ok) {
         const data = await res.json();
-        enterChat(data.username);
+        enterChat(data.username, data.token);
       }
     });
   </script>
