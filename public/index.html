@@ -28,7 +28,7 @@
       border: 3px solid;
       border-color: white #808080 #808080 white;
       width: 90%;
-      max-width: 360px;
+      max-width: 380px;
     }
 
     .auth-tabs {
@@ -49,11 +49,7 @@
     }
 
     .auth-tab:last-child { border-right: none; }
-
-    .auth-tab.active {
-      background: #000080;
-      color: white;
-    }
+    .auth-tab.active { background: #000080; color: white; }
 
     .auth-titlebar {
       background: #000080;
@@ -63,17 +59,12 @@
       letter-spacing: 1px;
     }
 
-    .auth-body {
-      padding: 20px;
-    }
+    .auth-body { padding: 20px; }
 
     .auth-panel { display: none; }
     .auth-panel.active { display: block; }
 
-    .auth-panel p {
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
+    .auth-panel p { margin-bottom: 10px; font-size: 16px; }
 
     .auth-panel input {
       width: 100%;
@@ -110,26 +101,117 @@
       min-height: 20px;
     }
 
+    /* ── COLOR PICKER ── */
+    .color-picker-label {
+      display: block;
+      font-size: 15px;
+      margin: 8px 0 4px;
+    }
+
+    .color-swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+
+    .color-swatch {
+      width: 24px;
+      height: 24px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+
+    .color-swatch.selected {
+      border-color: black;
+      outline: 1px solid white;
+    }
+
     /* ── CHAT SCREEN ── */
     #chat-screen {
       display: none;
-      flex-direction: column;
       width: 100%;
       height: 100vh;
       height: 100dvh;
       background: #c0c0c0;
       border: none;
+      overflow: hidden;
     }
 
-    @media (min-width: 600px) {
+    @media (min-width: 700px) {
       #chat-screen {
-        width: 700px;
+        width: 760px;
         height: 90vh;
         border: 3px solid;
         border-color: white #808080 #808080 white;
       }
     }
 
+    /* ── LAYOUT: rooms sidebar + main ── */
+    #chat-layout {
+      display: flex;
+      flex: 1;
+      height: calc(100% - 40px); /* subtract titlebar */
+      overflow: hidden;
+    }
+
+    /* ── ROOMS SIDEBAR ── */
+    #rooms-sidebar {
+      width: 110px;
+      background: #000060;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      border-right: 2px solid #808080;
+      flex-shrink: 0;
+    }
+
+    #rooms-sidebar h3 {
+      font-size: 14px;
+      padding: 6px 8px;
+      background: #000040;
+      border-bottom: 1px solid #4040a0;
+      letter-spacing: 1px;
+      color: #aad4ff;
+    }
+
+    .room-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 6px 8px;
+      font-family: 'VT323', monospace;
+      font-size: 16px;
+      background: none;
+      border: none;
+      color: #c0c0ff;
+      cursor: pointer;
+      border-bottom: 1px solid #000040;
+    }
+
+    .room-btn:hover { background: #0000a0; }
+    .room-btn.active { background: #0000c0; color: white; font-weight: bold; }
+    .room-btn .room-unread {
+      float: right;
+      background: #cc0000;
+      color: white;
+      font-size: 12px;
+      padding: 0 4px;
+      border-radius: 2px;
+      min-width: 16px;
+      text-align: center;
+    }
+
+    /* ── MAIN AREA ── */
+    #main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── TITLEBAR ── */
     #titlebar {
       background: #000080;
       color: white;
@@ -141,6 +223,7 @@
       letter-spacing: 1px;
       flex-shrink: 0;
       gap: 8px;
+      height: 40px;
     }
 
     #titlebar-left {
@@ -171,9 +254,21 @@
       cursor: pointer;
     }
 
-    #user-count-btn:active {
-      border-color: #004040 #80c0c0 #80c0c0 #004040;
+    #user-count-btn:active { border-color: #004040 #80c0c0 #80c0c0 #004040; }
+
+    #sound-btn {
+      font-family: 'VT323', monospace;
+      font-size: 14px;
+      background: #404040;
+      color: white;
+      border: 1px solid;
+      border-color: #888 #333 #333 #888;
+      padding: 2px 8px;
+      cursor: pointer;
+      flex-shrink: 0;
     }
+
+    #sound-btn.on { background: #006600; border-color: #0a0 #030 #030 #0a0; }
 
     #logout-btn {
       font-family: 'VT323', monospace;
@@ -200,13 +295,13 @@
       flex-shrink: 0;
     }
 
-    #users-panel.visible {
-      display: flex;
-    }
+    #users-panel.visible { display: flex; }
 
-    .user-entry .uname { color: #000080; font-weight: bold; }
+    .user-entry .uname { font-weight: bold; }
     .user-entry .utime { color: #808080; font-size: 13px; margin-left: 4px; }
+    .user-entry .uidle { color: #aa6600; font-size: 13px; margin-left: 2px; }
 
+    /* ── MESSAGES ── */
     #messages {
       flex: 1;
       overflow-y: auto;
@@ -220,15 +315,97 @@
       color: black;
     }
 
-    .msg-user { color: #000080; font-weight: bold; }
+    .msg-action { color: #555; font-style: italic; }
+    .msg-action .msg-user { color: #555; }
     .msg-system { color: #808080; font-style: italic; }
+    .msg-dm-row { background: #fff0f8; padding: 0 4px; border-left: 3px solid #cc0088; }
+    .msg-dm-label { color: #cc0088; font-size: 15px; margin-right: 4px; }
     .msg-text { color: black; }
-    .msg-own .msg-user { color: #800000; }
+    .msg-own .msg-user { opacity: 0.8; }
     .msg-kicked { color: #cc0000; font-style: italic; }
+
+    /* ── TIMESTAMP (hover) ── */
+    .msg-row {
+      position: relative;
+      padding: 2px 0;
+    }
+    .msg-row:hover .msg-ts {
+      display: inline;
+    }
+    .msg-ts {
+      display: none;
+      font-size: 12px;
+      color: #aaa;
+      margin-left: 8px;
+    }
+
+    /* ── LINK PREVIEW ── */
+    .link-preview {
+      display: inline-block;
+      margin: 4px 0 2px 12px;
+      padding: 6px 10px;
+      background: #f0f4ff;
+      border: 1px solid #c0c8e0;
+      border-left: 3px solid #000080;
+      font-size: 15px;
+      max-width: 420px;
+      color: #222;
+    }
+
+    .link-preview img {
+      max-width: 100%;
+      max-height: 80px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .link-preview .lp-title { font-weight: bold; color: #000080; }
+    .link-preview .lp-desc { color: #555; font-size: 13px; }
+
+    /* ── POLL ── */
+    .poll-card {
+      background: #f0f0ff;
+      border: 2px solid #000080;
+      margin: 6px 0;
+      padding: 8px 12px;
+      font-size: 16px;
+      color: black;
+    }
+
+    .poll-question { font-weight: bold; color: #000080; margin-bottom: 6px; font-size: 17px; }
+
+    .poll-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 3px 0;
+      cursor: pointer;
+    }
+
+    .poll-option:hover .poll-opt-label { text-decoration: underline; }
+    .poll-option.voted .poll-opt-label { color: #000080; font-weight: bold; }
+
+    .poll-bar-wrap {
+      flex: 1;
+      height: 14px;
+      background: #d0d0d0;
+      border: 1px solid #aaa;
+      overflow: hidden;
+    }
+
+    .poll-bar {
+      height: 100%;
+      background: #000080;
+      transition: width 0.3s;
+    }
+
+    .poll-pct { font-size: 13px; color: #555; width: 36px; text-align: right; }
+    .poll-opt-label { min-width: 80px; }
+    .poll-meta { font-size: 13px; color: #888; margin-top: 4px; }
 
     /* ── TYPING INDICATOR ── */
     #typing-bar {
-      min-height: 20px;
+      min-height: 22px;
       padding: 2px 10px;
       margin: 0 8px;
       font-size: 14px;
@@ -285,8 +462,15 @@
       flex-shrink: 0;
     }
 
-    #send-btn:active {
-      border-color: #808080 white white #808080;
+    #send-btn:active { border-color: #808080 white white #808080; }
+
+    /* ── DM NOTIFICATION BADGE ── */
+    .dm-flash {
+      animation: flash 0.4s 3;
+    }
+    @keyframes flash {
+      0%, 100% { background: #fff0f8; }
+      50% { background: #ffccee; }
     }
   </style>
 </head>
@@ -316,6 +500,9 @@
         <input id="reg-username" type="text" placeholder="Username (3-20 chars)..." maxlength="20" autocomplete="username" />
         <input id="reg-password" type="password" placeholder="Password (min 6 chars)..." autocomplete="new-password" />
         <input id="reg-password2" type="password" placeholder="Confirm password..." autocomplete="new-password" />
+        <span class="color-picker-label">Pick your name colour:</span>
+        <div class="color-swatches" id="color-swatches"></div>
+        <input type="hidden" id="reg-color" value="#000080" />
         <button class="primary" onclick="doRegister()">Create Account</button>
         <div class="auth-error" id="register-error"></div>
       </div>
@@ -330,31 +517,132 @@
         <span>chatroom</span>
         <span id="logged-in-as"></span>
       </div>
-      <div style="display:flex;align-items:center;gap:6px;">
+      <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
         <button id="user-count-btn" onclick="toggleUsers()">👤 0 online</button>
+        <button id="sound-btn" class="on" onclick="toggleSound()" title="Toggle sounds">🔊 SFX</button>
         <button id="logout-btn" onclick="doLogout()">exit</button>
       </div>
     </div>
 
-    <div id="users-panel"></div>
+    <div id="chat-layout">
+      <!-- Rooms sidebar -->
+      <div id="rooms-sidebar">
+        <h3>ROOMS</h3>
+        <div id="rooms-list"></div>
+      </div>
 
-    <ul id="messages"></ul>
-    <div id="typing-bar"></div>
-    <div id="bottom">
-      <input id="input" placeholder="Type a message..." autocomplete="off" />
-      <button id="send-btn" onclick="send()">Send</button>
+      <!-- Main chat area -->
+      <div id="main-area">
+        <div id="users-panel"></div>
+        <ul id="messages"></ul>
+        <div id="typing-bar"></div>
+        <div id="bottom">
+          <input id="input" placeholder="Type a message, /me, /msg, /poll..." autocomplete="off" />
+          <button id="send-btn" onclick="send()">Send</button>
+        </div>
+      </div>
     </div>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
+    // ── WEB AUDIO SOUNDS ──────────────────────────────────────────────────────
+    let soundEnabled = true;
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let actx = null;
+
+    function getActx() {
+      if (!actx) actx = new AudioContext();
+      return actx;
+    }
+
+    function playTone(freq, type, duration, vol = 0.15, delay = 0) {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getActx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+        gain.gain.setValueAtTime(vol, ctx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + duration + 0.01);
+      } catch {}
+    }
+
+    // Retro "blip" for incoming chat
+    function soundMessage() {
+      playTone(880, 'square', 0.06, 0.1);
+    }
+
+    // Rising chime for join
+    function soundJoin() {
+      playTone(523, 'sine', 0.15, 0.12);
+      playTone(659, 'sine', 0.15, 0.12, 0.12);
+      playTone(784, 'sine', 0.2, 0.14, 0.24);
+    }
+
+    // Descending for leave
+    function soundLeave() {
+      playTone(784, 'sine', 0.12, 0.1);
+      playTone(523, 'sine', 0.2, 0.1, 0.14);
+    }
+
+    // Two-tone beep for DM
+    function soundDM() {
+      playTone(1046, 'square', 0.08, 0.1);
+      playTone(1318, 'square', 0.12, 0.12, 0.1);
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('sound-btn');
+      btn.textContent = soundEnabled ? '🔊 SFX' : '🔇 SFX';
+      btn.classList.toggle('on', soundEnabled);
+    }
+
+    // ── COLORS ────────────────────────────────────────────────────────────────
+    const COLORS = [
+      '#000080','#800000','#008000','#800080','#008080',
+      '#0000cc','#cc0000','#007700','#aa00aa','#007777',
+      '#cc6600','#006699','#990000','#009900','#660099',
+    ];
+
+    let selectedColor = '#000080';
+
+    function buildColorSwatches() {
+      const wrap = document.getElementById('color-swatches');
+      COLORS.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'color-swatch' + (c === selectedColor ? ' selected' : '');
+        div.style.background = c;
+        div.title = c;
+        div.onclick = () => {
+          selectedColor = c;
+          document.getElementById('reg-color').value = c;
+          wrap.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+          div.classList.add('selected');
+        };
+        wrap.appendChild(div);
+      });
+    }
+    buildColorSwatches();
+
+    // ── SOCKET & STATE ────────────────────────────────────────────────────────
     const socket = io({ autoConnect: false });
     let myUsername = null;
+    let myColor = '#000080';
+    let currentRoom = 'general';
     let usersVisible = false;
     let isTyping = false;
     let typingTimer;
+    const unreadCounts = {}; // room -> count
+    const polls = {};        // pollId -> poll data
 
-    // ── TAB SWITCHING ──
+    // ── TAB SWITCHING ─────────────────────────────────────────────────────────
     function switchTab(tab) {
       document.querySelectorAll('.auth-tab').forEach((t, i) => {
         t.classList.toggle('active', (i === 0) === (tab === 'login'));
@@ -363,7 +651,7 @@
       document.getElementById('register-panel').classList.toggle('active', tab === 'register');
     }
 
-    // ── AUTH ──
+    // ── AUTH ──────────────────────────────────────────────────────────────────
     async function doLogin() {
       const username = document.getElementById('login-username').value.trim();
       const password = document.getElementById('login-password').value;
@@ -377,13 +665,14 @@
       });
       const data = await res.json();
       if (!res.ok) { errEl.textContent = data.error; return; }
-      enterChat(data.username, data.token);
+      enterChat(data.username, data.color || '#000080', data.token);
     }
 
     async function doRegister() {
       const username = document.getElementById('reg-username').value.trim();
       const password = document.getElementById('reg-password').value;
       const password2 = document.getElementById('reg-password2').value;
+      const color = document.getElementById('reg-color').value;
       const errEl = document.getElementById('register-error');
       errEl.textContent = '';
       if (!username || !password || !password2) { errEl.textContent = 'Please fill in all fields.'; return; }
@@ -391,11 +680,11 @@
       const res = await fetch('/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username, password, color })
       });
       const data = await res.json();
       if (!res.ok) { errEl.textContent = data.error; return; }
-      enterChat(data.username, data.token);
+      enterChat(data.username, data.color || '#000080', data.token);
     }
 
     async function doLogout() {
@@ -404,21 +693,46 @@
       location.reload();
     }
 
-    // ── ENTER CHAT ──
-    function enterChat(username, token) {
+    // ── ENTER CHAT ────────────────────────────────────────────────────────────
+    function enterChat(username, color, token) {
       myUsername = username;
+      myColor = color || '#000080';
       document.getElementById('auth-screen').style.display = 'none';
-      document.getElementById('chat-screen').style.display = 'flex';
-      document.getElementById('logged-in-as').textContent = `[${username}]`;
+      document.getElementById('chat-screen').style.display = 'block';
+      document.getElementById('logged-in-as').innerHTML =
+        `[<span style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.7)">${username}</span>]`;
       document.getElementById('input').focus();
 
       socket.connect();
-      socket.once('connect', () => {
-        socket.emit('join', token);
+      socket.once('connect', () => { socket.emit('join', token); });
+    }
+
+    // ── ROOMS ─────────────────────────────────────────────────────────────────
+    function renderRooms(rooms) {
+      const list = document.getElementById('rooms-list');
+      list.innerHTML = '';
+      rooms.forEach(room => {
+        const btn = document.createElement('button');
+        btn.className = 'room-btn' + (room === currentRoom ? ' active' : '');
+        btn.dataset.room = room;
+        btn.innerHTML = `#${room}`;
+        if (unreadCounts[room]) {
+          btn.innerHTML += `<span class="room-unread">${unreadCounts[room]}</span>`;
+        }
+        btn.onclick = () => switchRoom(room);
+        list.appendChild(btn);
       });
     }
 
-    // ── SEND ──
+    function switchRoom(room) {
+      if (room === currentRoom) return;
+      document.getElementById('messages').innerHTML = '';
+      currentRoom = room;
+      socket.emit('switch room', room);
+      unreadCounts[room] = 0;
+    }
+
+    // ── SEND ──────────────────────────────────────────────────────────────────
     function send() {
       const input = document.getElementById('input');
       const text = input.value.trim();
@@ -428,12 +742,10 @@
       stopTyping();
     }
 
-    // ── TYPING ──
+    // ── TYPING ────────────────────────────────────────────────────────────────
     document.getElementById('input').addEventListener('input', () => {
-      if (!isTyping) {
-        isTyping = true;
-        socket.emit('typing start');
-      }
+      socket.emit('activity');
+      if (!isTyping) { isTyping = true; socket.emit('typing start'); }
       clearTimeout(typingTimer);
       typingTimer = setTimeout(stopTyping, 2000);
     });
@@ -445,45 +757,232 @@
       socket.emit('typing stop');
     }
 
-    // ── TOGGLE USERS ──
+    // ── USERS PANEL ──────────────────────────────────────────────────────────
     function toggleUsers() {
       usersVisible = !usersVisible;
       document.getElementById('users-panel').classList.toggle('visible', usersVisible);
     }
 
-    // ── SOCKET EVENTS ──
-    socket.on('chat message', ({ user, text }) => {
-      const isOwn = user === myUsername;
-      addMessage(
-        `<span class="msg-user">${user}:</span> <span class="msg-text">${text}</span>`,
-        isOwn ? 'msg-own' : ''
+    // ── HELPERS ──────────────────────────────────────────────────────────────
+    function formatDuration(ms) {
+      const total = Math.floor(ms / 1000);
+      const d = Math.floor(total / 86400), h = Math.floor((total % 86400) / 3600);
+      const m = Math.floor((total % 3600) / 60), s = total % 60;
+      if (d > 0) return d + "D " + h + "HR " + m + "M";
+      if (h > 0) return h + "HR " + m + "M";
+      if (m > 0) return m + "M " + s + "S";
+      return s + "S";
+    }
+
+    function formatTime(ts) {
+      const d = new Date(ts);
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function addMessage(html, extraClass = '', timestamp = null) {
+      const messages = document.getElementById('messages');
+      const atBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 40;
+      const li = document.createElement('li');
+      li.style.listStyle = 'none';
+      li.className = 'msg-row' + (extraClass ? ' ' + extraClass : '');
+      const ts = timestamp ? `<span class="msg-ts">${formatTime(timestamp)}</span>` : '';
+      li.innerHTML = html + ts;
+      messages.appendChild(li);
+      if (atBottom) messages.scrollTop = messages.scrollHeight;
+      return li;
+    }
+
+    function addDmMessage(data) {
+      const messages = document.getElementById('messages');
+      const atBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 40;
+      const li = document.createElement('li');
+      li.style.listStyle = 'none';
+      li.className = 'msg-row msg-dm-row' + (data.self ? ' dm-flash' : '');
+      const label = data.self
+        ? `<span class="msg-dm-label">→ DM to ${data.to}:</span>`
+        : `<span class="msg-dm-label">DM from ${data.from}:</span>`;
+      li.innerHTML = label + `<span class="msg-text">${data.text}</span>`;
+      messages.appendChild(li);
+      if (atBottom) messages.scrollTop = messages.scrollHeight;
+      if (!data.self) { soundDM(); }
+    }
+
+    // ── POLLS ────────────────────────────────────────────────────────────────
+    function renderPoll(poll) {
+      polls[poll.id] = poll;
+      // Remove existing card if updating
+      const existing = document.getElementById(`poll-${poll.id}`);
+      if (existing) {
+        updatePollCard(existing, poll);
+        return;
+      }
+      // Create new card
+      const messages = document.getElementById('messages');
+      const li = document.createElement('li');
+      li.style.listStyle = 'none';
+      li.id = `poll-${poll.id}`;
+      li.className = 'msg-row';
+      li.innerHTML = buildPollHtml(poll);
+      messages.appendChild(li);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function buildPollHtml(poll) {
+      const totalVotes = Object.keys(poll.votes || {}).length;
+      const myVote = (poll.votes || {})[myUsername];
+      let optionsHtml = poll.options.map(opt => {
+        const count = Object.values(poll.votes || {}).filter(v => v === opt).length;
+        const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+        const isVoted = myVote === opt;
+        return `<div class="poll-option ${isVoted ? 'voted' : ''}" onclick="castVote(${poll.id}, '${opt.replace(/'/g, "\\'")}')">
+          <span class="poll-opt-label">${opt}</span>
+          <div class="poll-bar-wrap"><div class="poll-bar" style="width:${pct}%"></div></div>
+          <span class="poll-pct">${pct}%</span>
+          <span style="font-size:13px;color:#555">${count}</span>
+        </div>`;
+      }).join('');
+      return `<div class="poll-card">
+        <div class="poll-question">📊 ${poll.question}</div>
+        ${optionsHtml}
+        <div class="poll-meta">by ${poll.creator} · ${totalVotes} vote${totalVotes !== 1 ? 's' : ''}</div>
+      </div>`;
+    }
+
+    function updatePollCard(el, poll) {
+      el.innerHTML = buildPollHtml(poll);
+    }
+
+    function castVote(pollId, option) {
+      socket.emit('poll vote', { pollId, option });
+    }
+
+    // ── HISTORY ──────────────────────────────────────────────────────────────
+    function renderHistory(history) {
+      const messages = document.getElementById('messages');
+      messages.innerHTML = '';
+      if (history.length === 0) return;
+      addMessage(`<span class="msg-system">── message history ──</span>`);
+      history.forEach(row => {
+        const ts = new Date(row.created_at).getTime();
+        if (row.type === 'action') {
+          addMessage(
+            `<span class="msg-action">*** <span class="msg-user" style="color:${row.color}">${row.sender}</span> ${row.text} ***</span>`,
+            '', ts
+          );
+        } else if (row.type === 'dm') {
+          // skip DMs in history (they're private)
+        } else {
+          const isOwn = row.sender === myUsername;
+          addMessage(
+            `<span class="msg-user" style="color:${row.color}">${row.sender}:</span> <span class="msg-text">${row.text}</span>`,
+            isOwn ? 'msg-own' : '', ts
+          );
+        }
+      });
+      addMessage(`<span class="msg-system">── live ──</span>`);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    // ── SOCKET EVENTS ─────────────────────────────────────────────────────────
+    socket.on('rooms list', (rooms) => {
+      renderRooms(rooms);
+    });
+
+    socket.on('room changed', (room) => {
+      currentRoom = room;
+      renderRooms(
+        [...document.querySelectorAll('.room-btn')].map(b => b.dataset.room)
       );
     });
 
+    socket.on('history', (history) => {
+      renderHistory(history);
+    });
+
+    socket.on('chat message', ({ user, color, text, type, timestamp }) => {
+      const isOwn = user === myUsername;
+      if (type === 'action') {
+        addMessage(
+          `<span class="msg-action">*** <span class="msg-user" style="color:${color}">${user}</span> ${text} ***</span>`,
+          '', timestamp
+        );
+      } else {
+        addMessage(
+          `<span class="msg-user" style="color:${color}">${user}:</span> <span class="msg-text">${text}</span>`,
+          isOwn ? 'msg-own' : '', timestamp || Date.now()
+        );
+      }
+      if (!isOwn) soundMessage();
+    });
+
     socket.on('system message', (msg) => {
+      const isJoin = /has joined/.test(msg);
+      const isLeave = /has left/.test(msg);
       addMessage(`<span class="msg-system">*** ${msg} ***</span>`);
+      if (isJoin) soundJoin();
+      else if (isLeave) soundLeave();
+    });
+
+    socket.on('dm', (data) => {
+      addDmMessage(data);
+    });
+
+    socket.on('link preview', ({ url, title, image, description }) => {
+      const messages = document.getElementById('messages');
+      // Find the last message that contains this URL and append preview after it
+      const rows = messages.querySelectorAll('.msg-row');
+      let target = null;
+      for (let i = rows.length - 1; i >= 0; i--) {
+        if (rows[i].textContent.includes(url.slice(8, 40))) { target = rows[i]; break; }
+      }
+      const previewEl = document.createElement('div');
+      previewEl.className = 'link-preview';
+      let html = '';
+      if (image) html += `<img src="${image}" alt="" onerror="this.style.display='none'">`;
+      if (title) html += `<div class="lp-title">${title}</div>`;
+      if (description) html += `<div class="lp-desc">${description}</div>`;
+      previewEl.innerHTML = html;
+      const atBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 40;
+      if (target) {
+        target.appendChild(previewEl);
+      } else {
+        const li = document.createElement('li');
+        li.style.listStyle = 'none';
+        li.appendChild(previewEl);
+        messages.appendChild(li);
+      }
+      if (atBottom) messages.scrollTop = messages.scrollHeight;
+    });
+
+    socket.on('poll update', (poll) => {
+      renderPoll(poll);
     });
 
     socket.on('user list', (list) => {
       document.getElementById('user-count-btn').textContent = `👤 ${list.length} online`;
       const panel = document.getElementById('users-panel');
       panel.innerHTML = '';
-      list.forEach(({ username, joinedAt }) => {
+      list.forEach(({ username, color, joinedAt, idle }) => {
         const entry = document.createElement('span');
         entry.className = 'user-entry';
         entry.dataset.joinedAt = joinedAt;
-        entry.innerHTML = `<span class="uname">${username}</span><span class="utime">${formatDuration(Date.now() - joinedAt)}</span>`;
+        entry.innerHTML =
+          `<span class="uname" style="color:${color}">${username}</span>` +
+          (idle ? `<span class="uidle">⏸</span>` : '') +
+          `<span class="utime">${formatDuration(Date.now() - joinedAt)}</span>`;
         panel.appendChild(entry);
       });
     });
 
     socket.on('typing', ({ text }) => {
       const bar = document.getElementById('typing-bar');
-      bar.innerHTML = text ? text + ' <span class="dots"><span></span><span></span><span></span></span>' : '';
+      bar.innerHTML = text
+        ? text + ' <span class="dots"><span></span><span></span><span></span></span>'
+        : '';
     });
 
     socket.on('kicked', (reason) => {
-      addMessage(`<span class="msg-kicked">&#9888; ${reason || 'You were signed in from another device.'}</span>`);
+      addMessage(`<span class="msg-kicked">⚠ ${reason || 'You were signed in from another device.'}</span>`);
       document.getElementById('input').disabled = true;
       document.getElementById('send-btn').disabled = true;
       socket.disconnect();
@@ -498,28 +997,12 @@
       });
     }, 1000);
 
-    function formatDuration(ms) {
-      const total = Math.floor(ms / 1000);
-      const d = Math.floor(total / 86400);
-      const h = Math.floor((total % 86400) / 3600);
-      const m = Math.floor((total % 3600) / 60);
-      const s = total % 60;
-      if (d > 0) return d + "D " + h + "HR " + m + "M " + s + "S";
-      if (h > 0) return h + "HR " + m + "M " + s + "S";
-      if (m > 0) return m + "M " + s + "S";
-      return s + "S";
-    }
-
-    function addMessage(html, extraClass = '') {
-      const messages = document.getElementById('messages');
-      const li = document.createElement('li');
-      li.style.listStyle = 'none';
-      li.style.padding = '2px 0';
-      if (extraClass) li.classList.add(extraClass);
-      li.innerHTML = html;
-      messages.appendChild(li);
-      messages.scrollTop = messages.scrollHeight;
-    }
+    // Emit activity on mouse/keyboard movement
+    let activityThrottle = 0;
+    document.addEventListener('keydown', () => {
+      const now = Date.now();
+      if (now - activityThrottle > 30000) { activityThrottle = now; socket.emit('activity'); }
+    });
 
     // Enter key bindings
     document.getElementById('input').addEventListener('keydown', (e) => {
@@ -536,7 +1019,7 @@
     fetch('/me').then(async res => {
       if (res.ok) {
         const data = await res.json();
-        enterChat(data.username, data.token);
+        enterChat(data.username, data.color, data.token);
       }
     });
   </script>
