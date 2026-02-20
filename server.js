@@ -47,7 +47,7 @@ async function initDb() {
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
-  await db.query(`INSERT INTO rooms (name) VALUES ('general'), ('random') ON CONFLICT (name) DO NOTHING`);
+  await db.query(`INSERT INTO rooms (name) VALUES ('general'), ('random'), ('gambling') ON CONFLICT (name) DO NOTHING`);
   await db.query(`
     CREATE TABLE IF NOT EXISTS messages (
       id SERIAL PRIMARY KEY,
@@ -221,6 +221,10 @@ function broadcastCoins(username, coins) {
   }
 }
 
+function broadcastGambling(msg) {
+  io.to('gambling').emit('system message', msg);
+}
+
 // ─── Auth Routes ──────────────────────────────────────────────────────────────
 
 app.post('/register', async (req, res) => {
@@ -379,6 +383,11 @@ app.post('/game/slots', async (req, res) => {
   }
 
   broadcastCoins(req.session.username, finalCoins);
+  if (winAmount > 0) {
+    broadcastGambling(`🎰 ${req.session.username} won ${winAmount} coins on slots! [${reels.join('')}] ${multiplier}x bet of ${betAmount}`);
+  } else {
+    broadcastGambling(`🎰 ${req.session.username} lost ${betAmount} coins on slots [${reels.join('')}]`);
+  }
   res.json({ reels, multiplier, winAmount, coins: finalCoins });
 });
 
@@ -407,6 +416,13 @@ app.post('/game/dice', async (req, res) => {
   }
 
   broadcastCoins(req.session.username, finalCoins);
+  if (result === 'win') {
+    broadcastGambling(`🎲 ${req.session.username} won ${winAmount} coins on dice! (rolled ${playerRoll} vs house ${houseRoll})`);
+  } else if (result === 'tie') {
+    broadcastGambling(`🎲 ${req.session.username} tied on dice (both rolled ${playerRoll}), bet of ${betAmount} returned`);
+  } else {
+    broadcastGambling(`🎲 ${req.session.username} lost ${betAmount} coins on dice (rolled ${playerRoll} vs house ${houseRoll})`);
+  }
   res.json({ playerRoll, houseRoll, result, winAmount, coins: finalCoins });
 });
 
@@ -682,6 +698,7 @@ io.on('connection', (socket) => {
       const loserCoins = await getCoins(loser);
       broadcastCoins(loser, loserCoins);
       io.to(room).emit('system message', `🎲 COINFLIP: ${winner} wins ${prize} coins from ${loser}! 🏆`);
+      broadcastGambling(`🎲 COINFLIP: ${winner} beat ${loser} for ${prize} coins!`);
       return;
     }
 
