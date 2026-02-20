@@ -1252,7 +1252,7 @@ function renderSettingsColors(){
   const wrap=document.getElementById('settings-color-swatches');wrap.innerHTML='';
   ownedColors.forEach(item=>{
     const div=document.createElement('div');div.className='color-swatch'+(item.value===selectedSettingsColor?' selected':'');
-    const preview=document.createElement('div');preview.className='color-preview';preview.style.background=item.value;preview.textContent=item.value.substring(1).toUpperCase().substring(0,2);
+    const preview=document.createElement('div');preview.className='color-preview';preview.style.background=item.value;
     const name=document.createElement('div');name.className='color-name';name.textContent=item.name;
     const check=document.createElement('div');check.className='color-checkmark';check.textContent=item.value===selectedSettingsColor?'✓':'';
     div.appendChild(preview);div.appendChild(name);div.appendChild(check);

@@ -386,6 +386,7 @@ function initChat(io) {
           '/poll "Question?" Option1 Option2 — create a 5-min poll',
           '/give username amount — give coins',
           '/duel username amount — challenge to coinflip',
+          '/flip amount — 50/50 coin flip (double or lose it)',
           '/rob username percentage — attempt to steal coins (risky!)',
           '/accept — accept a duel',
           '/decline — decline a duel',
@@ -747,6 +748,36 @@ function initChat(io) {
         broadcastCoins(user.username, newSenderBal);
         broadcastCoins(targetUsername, newTargetBal);
         io.to(room).emit('system message', `💸 ${user.username} gave ${formatNumber(amount)} coins to ${targetUsername}!`);
+        return;
+      }
+
+      // ── /flip (amount) ────────────────────────────────────────────────────────
+      if (raw.startsWith('/flip ')) {
+        const amount = parseInt(raw.slice(6).trim(), 10);
+        if (isNaN(amount) || amount < 1) { socket.emit('system message', 'Usage: /flip amount (must be at least 1)'); return; }
+        
+        try {
+          const userCoins = await getCoins(user.username);
+          if (userCoins < amount) { socket.emit('system message', `You don't have enough coins! You have ${formatNumber(userCoins)}.`); return; }
+          
+          // 50/50 chance
+          const won = Math.random() < 0.5;
+          
+          if (won) {
+            // Win: add the amount (double their bet)
+            const newBal = await addCoins(user.username, amount);
+            broadcastCoins(user.username, newBal);
+            io.to(room).emit('system message', `🪙 ${user.username} flipped a coin and WON! +${formatNumber(amount)} coins! 🎉`);
+          } else {
+            // Lose: deduct the amount
+            const newBal = await deductCoins(user.username, amount);
+            broadcastCoins(user.username, newBal);
+            io.to(room).emit('system message', `🪙 ${user.username} flipped a coin and LOST! -${formatNumber(amount)} coins... 😢`);
+          }
+        } catch (err) {
+          console.error('Flip error:', err);
+          socket.emit('system message', 'Error executing /flip command.');
+        }
         return;
       }
 
