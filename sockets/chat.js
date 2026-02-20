@@ -67,21 +67,55 @@ async function saveMessage({ room, sender, recipient, type, text, clientId }) {
   return r.rows[0].id;
 }
 
-async function getHistory(room, username, limit = 25) {
+async function getHistory(room, username, limit = 5) {
   const result = await db.query(
-    `SELECT m.id, m.sender, m.recipient, m.type, m.text, m.created_at,
-            COALESCE(
-              json_object_agg(r.emoji, r.cnt) FILTER (WHERE r.emoji IS NOT NULL),
-              '{}'
-            ) as reactions
-     FROM messages m
-     LEFT JOIN (
-       SELECT message_id, emoji, COUNT(*) as cnt
-       FROM reactions GROUP BY message_id, emoji
-     ) r ON r.message_id = m.id
-     WHERE m.room = $1 OR (m.type = 'dm' AND (LOWER(m.sender) = LOWER($2) OR LOWER(m.recipient) = LOWER($2)))
-     GROUP BY m.id
-     ORDER BY m.created_at DESC LIMIT $3`,
+    `SELECT combined.id, combined.sender, combined.recipient, combined.type,
+            combined.text, combined.created_at, combined.reactions, combined.poll_data
+     FROM (
+       -- Regular messages with reactions
+       SELECT m.id,
+              m.sender,
+              m.recipient,
+              m.type,
+              m.text,
+              m.created_at,
+              COALESCE(
+                json_object_agg(r.emoji, r.cnt) FILTER (WHERE r.emoji IS NOT NULL),
+                '{}'
+              ) as reactions,
+              NULL::json as poll_data
+       FROM messages m
+       LEFT JOIN (
+         SELECT message_id, emoji, COUNT(*) as cnt
+         FROM reactions GROUP BY message_id, emoji
+       ) r ON r.message_id = m.id
+       WHERE m.room = $1 OR (m.type = 'dm' AND (LOWER(m.sender) = LOWER($2) OR LOWER(m.recipient) = LOWER($2)))
+       GROUP BY m.id
+
+       UNION ALL
+
+       -- Polls as inline history rows
+       SELECT p.id,
+              p.creator   AS sender,
+              NULL        AS recipient,
+              'poll'      AS type,
+              p.question  AS text,
+              p.created_at,
+              '{}'::json  AS reactions,
+              json_build_object(
+                'id',        p.id,
+                'question',  p.question,
+                'options',   p.options,
+                'votes',     p.votes,
+                'creator',   p.creator,
+                'endsAt',    p.ends_at,
+                'concluded', p.concluded
+              ) AS poll_data
+       FROM polls p
+       WHERE p.room = $1
+     ) combined
+     ORDER BY combined.created_at DESC
+     LIMIT $3`,
     [room, username, limit]
   );
   return result.rows.reverse();
@@ -120,8 +154,6 @@ async function performRoomSwitch(io, socket, user, newRoom) {
   const history = await getHistory(newRoom, user.username, historyLimit);
   const historyWithColors = await enrichHistoryWithColors(history);
   socket.emit('history', historyWithColors);
-  const pollsResult = await db.query('SELECT * FROM polls WHERE room = $1 ORDER BY created_at DESC LIMIT 20', [newRoom]);
-  pollsResult.rows.reverse().forEach(poll => socket.emit('poll update', formatPollData(poll)));
   broadcastUserList(io, newRoom);
   io.to(newRoom).emit('system message', `${user.username} joined #${newRoom}`);
   socket.emit('room changed', newRoom);
@@ -183,12 +215,9 @@ function initChat(io) {
 
       await sendRoomsList(socket, username);
 
-      const history = await getHistory(defaultRoom, username, 25);
+      const history = await getHistory(defaultRoom, username, 5);
       const historyWithColors = await enrichHistoryWithColors(history);
       socket.emit('history', historyWithColors);
-
-      const pollsResult = await db.query('SELECT * FROM polls WHERE room = $1 ORDER BY created_at DESC LIMIT 20', [defaultRoom]);
-      pollsResult.rows.reverse().forEach(poll => socket.emit('poll update', formatPollData(poll)));
 
       broadcastUserList(io, defaultRoom);
       io.to(defaultRoom).emit('system message', `${username} has joined #${defaultRoom}`);
@@ -648,6 +677,15 @@ function initChat(io) {
     socket.on('activity', () => {
       const user = connectedUsers[socket.id];
       if (user) { user.lastActivity = Date.now(); broadcastUserList(io, user.room); }
+    });
+
+    // ── Colour update (after settings save) ──────────────────────────────────
+    socket.on('color update', (newColor) => {
+      const user = connectedUsers[socket.id];
+      if (!user) return;
+      if (typeof newColor !== 'string' || !/^#[0-9a-fA-F]{6}$/.test(newColor)) return;
+      user.color = newColor;
+      broadcastUserList(io, user.room);
     });
 
     // ── Disconnect ───────────────────────────────────────────────────────────

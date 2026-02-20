@@ -345,7 +345,7 @@
 <!-- Auth -->
 <div id="auth-screen">
   <div class="auth-titlebar"><span>chatroom</span><span class="auth-version">v2.0</span></div>
-  <div class="auth-disclaimer">a small project by mce. no data harvesting, no asking for pictures of your face. just a chatroom</div>
+  <div class="auth-disclaimer">a small project by mce. no ads, no data selling, no nonsense.</div>
   <div class="auth-tabs">
     <button class="auth-tab active" onclick="switchTab('login')">Login</button>
     <button class="auth-tab" onclick="switchTab('register')">Register</button>
@@ -654,7 +654,7 @@ function toggleSound(){ soundEnabled=!soundEnabled; const btn=document.getElemen
 // ── STATE ─────────────────────────────────────────────────────────────────────
 const socket = io({ autoConnect: false });
 let myUsername=null, myColor='#000080', myCoins=0, selectedTheme='classic';
-let currentRoom='general', usersVisible=false, isTyping=false, typingTimer;
+let currentRoom='general', pendingRoom=null, usersVisible=false, isTyping=false, typingTimer;
 const unreadCounts={}, polls={};
 let shopItems=[], selectedSettingsColor='#000080', selectedSettingsTheme='classic';
 
@@ -744,11 +744,9 @@ function renderRooms(rooms){
 }
 
 function switchRoom(room){
-  if(room===currentRoom)return;
-  document.getElementById('messages').innerHTML='';
-  currentRoom=room;
+  if(room===currentRoom||room===pendingRoom)return;
+  pendingRoom=room;
   socket.emit('switch room',{room});
-  unreadCounts[room]=0;
 }
 
 // ── KEYPAD ────────────────────────────────────────────────────────────────────
@@ -788,8 +786,7 @@ function keypadClear(){
 }
 function keypadSubmit(){
   if(!keypadCode){document.getElementById('keypad-error').textContent='Enter a code first.';return;}
-  document.getElementById('messages').innerHTML='';
-  currentRoom=keypadRoom;
+  pendingRoom=keypadRoom;
   socket.emit('switch room',{room:keypadRoom,code:keypadCode});
   // Don't close yet — wait for success (room changed) or error (keypad error)
 }
@@ -911,10 +908,26 @@ function renderHistory(history){
   addMessage(`<span class="msg-system">── message history ──</span>`);
   history.forEach(row=>{
     const ts=new Date(row.created_at).getTime();
-    if(row.type==='system')addMessage(`<span class="msg-system">*** ${row.text} ***</span>`,'',ts);
-    else if(row.type==='action')addMessage(`<span class="msg-action">*** <span class="msg-user" data-username="${escHtml(row.sender)}" style="color:${row.color}">${row.sender}</span> ${row.text} ***</span>`,'',ts);
-    else if(row.type==='dm')addDmMessage({from:row.sender,to:row.recipient,text:row.text,self:row.sender===myUsername,noFlash:true});
-    else{const li=addMessage(`<span class="msg-user" data-username="${escHtml(row.sender)}" style="color:${row.color}">${row.sender}:</span> <span class="msg-text">${row.text}</span>`,row.sender===myUsername?'msg-own':'',ts,row.id);if(row.reactions&&Object.keys(row.reactions).length)updateReactions(li,row.reactions,null);}
+    if(row.type==='poll'){
+      // Poll rows carry their full data in poll_data
+      const poll=row.poll_data;
+      if(!poll)return;
+      polls[poll.id]=poll;
+      const msgEl=document.getElementById('messages');
+      const atBottom=msgEl.scrollHeight-msgEl.scrollTop-msgEl.clientHeight<40;
+      const li=document.createElement('li');li.style.listStyle='none';
+      li.id=`poll-${poll.id}`;li.className='msg-row';li.innerHTML=buildPollHtml(poll);
+      msgEl.appendChild(li);if(atBottom)msgEl.scrollTop=msgEl.scrollHeight;
+    } else if(row.type==='system'){
+      addMessage(`<span class="msg-system">*** ${row.text} ***</span>`,'',ts);
+    } else if(row.type==='action'){
+      addMessage(`<span class="msg-action">*** <span class="msg-user" data-username="${escHtml(row.sender)}" style="color:${row.color}">${row.sender}</span> ${row.text} ***</span>`,'',ts);
+    } else if(row.type==='dm'){
+      addDmMessage({from:row.sender,to:row.recipient,text:row.text,self:row.sender===myUsername,noFlash:true});
+    } else {
+      const li=addMessage(`<span class="msg-user" data-username="${escHtml(row.sender)}" style="color:${row.color}">${row.sender}:</span> <span class="msg-text">${row.text}</span>`,row.sender===myUsername?'msg-own':'',ts,row.id);
+      if(row.reactions&&Object.keys(row.reactions).length)updateReactions(li,row.reactions,null);
+    }
   });
   addMessage(`<span class="msg-system">── live ──</span>`);
   messages.scrollTop=messages.scrollHeight;
@@ -925,6 +938,9 @@ socket.on('rooms list',rooms=>renderRooms(rooms));
 
 socket.on('room changed',room=>{
   currentRoom=room;
+  pendingRoom=null;
+  unreadCounts[room]=0;
+  document.getElementById('messages').innerHTML='';
   // Close keypad on success
   if(document.getElementById('keypad-modal').classList.contains('open'))closeKeypad();
   document.querySelectorAll('.room-btn').forEach(b=>b.classList.toggle('active',b.dataset.room===room));
@@ -1089,6 +1105,7 @@ async function saveSettings(){
   try{const res=await fetch('/settings',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({color:selectedSettingsColor,theme:selectedSettingsTheme})});
   const data=await res.json();if(!res.ok){statusEl.textContent=data.error;statusEl.style.color='#cc0000';return}
   myColor=selectedSettingsColor;document.getElementById('logged-in-as').innerHTML=`<span style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.5)">${myUsername}</span>`;
+  socket.emit('color update',myColor);
   statusEl.textContent='Saved!';statusEl.style.color='#007700';setTimeout(()=>{statusEl.textContent=''},2000)}catch{statusEl.textContent='Error saving.';statusEl.style.color='#cc0000'}
 }
 
