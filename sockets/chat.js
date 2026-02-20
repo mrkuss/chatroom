@@ -463,6 +463,13 @@ function initChat(io) {
         return;
       }
 
+      // ── /leaveroom ─────────────────────────────────────────────────────
+      if (raw === '/leaveroom' || raw === '/leave') {
+        if (user.room === 'general') { socket.emit('system message', 'You are already in #general.'); return; }
+        await performRoomSwitch(io, socket, user, 'general');
+        return;
+      }
+
       // ── /deleteroom ────────────────────────────────────────────────────────
       if (raw.startsWith('/deleteroom ')) {
         const roomName = raw.slice(12).trim().toLowerCase();
@@ -713,7 +720,19 @@ function initChat(io) {
       }
 
       // ── Regular chat ───────────────────────────────────────────────────────
-      const sanitized = escapeHtml(raw);
+      // Enforce link rules and word filtering per-room
+      const roomRow = await db.query('SELECT is_private FROM rooms WHERE name = $1', [room]);
+      const isPrivate = !!roomRow.rows[0]?.is_private;
+      const foundUrl = extractUrl(raw);
+      if (foundUrl && !isPrivate) { socket.emit('system message', 'Links are only allowed in private rooms.'); return; }
+
+      let textForSave = raw;
+      try {
+        const { filterText } = require('../lib/utils');
+        if (!isPrivate) textForSave = filterText(textForSave);
+      } catch (e) { /* ignore filter errors */ }
+
+      const sanitized = escapeHtml(textForSave);
       const clientId = `${user.username}-${Date.now()}`;
       const messageId = await saveMessage({ room, sender: user.username, type: 'chat', text: sanitized, clientId });
 
@@ -721,8 +740,7 @@ function initChat(io) {
 
       io.to(room).emit('chat message', { id: messageId, user: user.username, color: user.color, text: sanitized, type: 'chat', timestamp: Date.now() });
       addCoins(user.username, 1).then(newBal => broadcastCoins(user.username, newBal)).catch(() => {});
-      const url = extractUrl(raw);
-      if (url) fetchLinkPreview(url).then(preview => { if (preview) io.to(room).emit('link preview', { url, ...preview }); });
+      if (foundUrl) fetchLinkPreview(foundUrl).then(preview => { if (preview) io.to(room).emit('link preview', { url: foundUrl, ...preview }); });
     });
 
     // ── Confirm changepass (after client confirms dialog) ─────────────────────
