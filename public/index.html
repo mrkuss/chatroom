@@ -802,7 +802,7 @@
       li.style.listStyle = 'none';
       li.className = 'msg-row msg-dm-row' + (!data.noFlash && !data.self ? ' dm-flash' : '');
       const label = data.self
-        ? `<span class="msg-dm-label">→ DM to ${data.to}:</span>`
+        ? `<span class="msg-dm-label">DM to ${data.to}:</span>`
         : `<span class="msg-dm-label">DM from ${data.from}:</span>`;
       li.innerHTML = label + `<span class="msg-text">${data.text}</span>`;
       messages.appendChild(li);

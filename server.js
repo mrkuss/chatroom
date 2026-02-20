@@ -454,16 +454,17 @@ io.on('connection', (socket) => {
     const roomsResult = await db.query('SELECT name FROM rooms ORDER BY id');
     socket.emit('rooms list', roomsResult.rows.map(r => r.name));
 
-    // Send polls for this room (recent 20, including concluded ones so history is visible)
+    const history = await getHistory(defaultRoom, username, 50);
+    const historyWithColors = await enrichHistoryWithColors(history);
+    socket.emit('history', historyWithColors);
+
+    // Send polls AFTER history so renderHistory() doesn't wipe them
     const pollsResult = await db.query(
       'SELECT * FROM polls WHERE room = $1 ORDER BY created_at DESC LIMIT 20',
       [defaultRoom]
     );
     pollsResult.rows.reverse().forEach(poll => socket.emit('poll update', formatPollData(poll)));
 
-    const history = await getHistory(defaultRoom, username, 50);
-    const historyWithColors = await enrichHistoryWithColors(history);
-    socket.emit('history', historyWithColors);
 
     broadcastUserList(defaultRoom);
     io.to(defaultRoom).emit('system message', `${username} has joined #${defaultRoom}`);
@@ -485,15 +486,17 @@ io.on('connection', (socket) => {
     user.room = newRoom;
     socket.join(newRoom);
 
+  
+    const history = await getHistory(newRoom, user.username, 50);
+    const historyWithColors = await enrichHistoryWithColors(history);
+    socket.emit('history', historyWithColors);
+
+    // Send polls AFTER history
     const pollsResult = await db.query(
       'SELECT * FROM polls WHERE room = $1 ORDER BY created_at DESC LIMIT 20',
       [newRoom]
     );
     pollsResult.rows.reverse().forEach(poll => socket.emit('poll update', formatPollData(poll)));
-
-    const history = await getHistory(newRoom, user.username, 50);
-    const historyWithColors = await enrichHistoryWithColors(history);
-    socket.emit('history', historyWithColors);
 
     broadcastUserList(newRoom);
     io.to(newRoom).emit('system message', `${user.username} joined #${newRoom}`);
