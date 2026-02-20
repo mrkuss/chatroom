@@ -623,8 +623,8 @@ io.on('connection', (socket) => {
     rateLimits[socket.id].count++;
     // Trigger lockout on 5th message within the 10s window
     if (rateLimits[socket.id].count >= 5) {
-      rateLimits[socket.id].lockedUntil = now + 25000;
-      socket.emit('system message', '🔇 You have been muted for 25 seconds for sending too many messages.');
+      rateLimits[socket.id].lockedUntil = now + 10000;
+      socket.emit('system message', 'You have been muted for 10 seconds for sending too many messages.');
       return;
     }
 
