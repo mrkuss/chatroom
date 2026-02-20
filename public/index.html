@@ -503,6 +503,7 @@
         <button class="stab active" onclick="switchSettingsTab('appearance')">Look</button>
         <button class="stab" onclick="switchSettingsTab('badges')">Badges</button>
         <button class="stab" onclick="switchSettingsTab('stats')">Stats</button>
+        <button class="stab" onclick="switchSettingsTab('account')">Account</button>
         <button class="stab" onclick="switchSettingsTab('help')">Help</button>
       </div>
       <div id="stab-appearance" class="stab-panel active">
@@ -526,6 +527,17 @@
       </div>
       <div id="stab-stats" class="stab-panel">
         <div id="stats-content"><div style="text-align:center;padding:20px;color:var(--text-system);">Loading...</div></div>
+      </div>
+      <div id="stab-account" class="stab-panel" style="padding:6px 0 0;">
+        <div class="settings-section">
+          <span class="settings-label">Change Password</span>
+          <div class="settings-note">Provide your current password, then choose a new one.</div>
+          <input id="pw-old" type="password" placeholder="Current password" style="width:100%;margin:8px 0;padding:6px;font-family:'VT323',monospace;font-size:16px;" />
+          <input id="pw-new" type="password" placeholder="New password (min 6 chars)" style="width:100%;margin:8px 0;padding:6px;font-family:'VT323',monospace;font-size:16px;" />
+          <input id="pw-new2" type="password" placeholder="Confirm new password" style="width:100%;margin:8px 0;padding:6px;font-family:'VT323',monospace;font-size:16px;" />
+          <div class="settings-save-row"><button class="settings-btn" onclick="changePassword()">Change Password</button></div>
+          <div class="settings-status" id="pw-status"></div>
+        </div>
       </div>
       <div id="stab-help" class="stab-panel">
         <div style="max-height:340px;overflow-y:auto;">

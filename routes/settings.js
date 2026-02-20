@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { db } = require('../lib/db');
 const { getValidColors, getValidThemes } = require('../lib/shopCatalogue');
+const bcrypt = require('bcrypt');
 
 // ─── Save Settings ────────────────────────────────────────────────────────────
 // Color and theme must be owned before they can be applied.
@@ -53,3 +54,26 @@ async function isOwned(username, type, value) {
 }
 
 module.exports = router;
+
+// ─── Change password ───────────────────────────────────────────────────────
+router.post('/password', async (req, res) => {
+  if (!req.session.username) return res.status(401).json({ error: 'Not logged in' });
+  const { oldPassword, newPassword, newPassword2 } = req.body || {};
+  if (!oldPassword || !newPassword || !newPassword2) return res.status(400).json({ error: 'All fields are required' });
+  if (newPassword !== newPassword2) return res.status(400).json({ error: 'New passwords do not match' });
+  if (newPassword.length < 6) return res.status(400).json({ error: 'New password must be at least 6 characters' });
+
+  try {
+    const r = await db.query('SELECT password_hash FROM users WHERE LOWER(username) = LOWER($1)', [req.session.username]);
+    const row = r.rows[0];
+    if (!row) return res.status(404).json({ error: 'User not found' });
+    const ok = await bcrypt.compare(String(oldPassword), row.password_hash);
+    if (!ok) return res.status(403).json({ error: 'Old password is incorrect' });
+    const hash = await bcrypt.hash(String(newPassword), 12);
+    await db.query('UPDATE users SET password_hash = $1 WHERE LOWER(username) = LOWER($2)', [hash, req.session.username]);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Change password error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
