@@ -1112,7 +1112,7 @@ document.getElementById('profile-modal').addEventListener('click',e=>{if(e.targe
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────────
 function switchSettingsTab(tab){
-  document.querySelectorAll('.stab').forEach((t,i)=>{const tabs=['appearance','badges','stats','help'];t.classList.toggle('active',tabs[i]===tab)});
+  document.querySelectorAll('.stab').forEach((t,i)=>{const tabs=['appearance','badges','stats','account','help'];t.classList.toggle('active',tabs[i]===tab)});
   document.querySelectorAll('.stab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('stab-'+tab).classList.add('active');
   if(tab==='stats')loadStats();if(tab==='badges')loadBadges();
@@ -1153,6 +1153,22 @@ async function saveSettings(){
   myColor=selectedSettingsColor;document.getElementById('logged-in-as').innerHTML=`<span style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.5)">${myUsername}</span>`;
   socket.emit('color update',myColor);
   statusEl.textContent='Saved!';statusEl.style.color='#007700';setTimeout(()=>{statusEl.textContent=''},2000)}catch{statusEl.textContent='Error saving.';statusEl.style.color='#cc0000'}
+}
+
+async function changePassword(){
+  const statusEl = document.getElementById('pw-status');
+  const oldP = document.getElementById('pw-old').value;
+  const newP = document.getElementById('pw-new').value;
+  const newP2 = document.getElementById('pw-new2').value;
+  statusEl.textContent = 'Changing...'; statusEl.style.color = 'inherit';
+  try{
+    const res = await fetch('/settings/password', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ oldPassword: oldP, newPassword: newP, newPassword2: newP2 }) });
+    const data = await res.json();
+    if (!res.ok) { statusEl.textContent = data.error || 'Error'; statusEl.style.color = '#cc0000'; return; }
+    statusEl.textContent = 'Password changed!'; statusEl.style.color = '#007700';
+    document.getElementById('pw-old').value='';document.getElementById('pw-new').value='';document.getElementById('pw-new2').value='';
+    setTimeout(()=>{ statusEl.textContent=''; }, 2500);
+  } catch (err) { statusEl.textContent='Server error'; statusEl.style.color='#cc0000'; }
 }
 
 // ── BADGES ────────────────────────────────────────────────────────────────────
