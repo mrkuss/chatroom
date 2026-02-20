@@ -856,7 +856,7 @@
       socket.emit('poll vote', { pollId, option });
     }
 
-    // ── HISTORY ──────────────────────────────────────────────────────────────
+      // ── HISTORY ──────────────────────────────────────────────────────────────
     function renderHistory(history) {
       const messages = document.getElementById('messages');
       messages.innerHTML = '';
@@ -870,7 +870,14 @@
             '', ts
           );
         } else if (row.type === 'dm') {
-          // skip DMs in history (they're private)
+          const isSelf = row.sender === myUsername;
+          addDmMessage({
+            from: row.sender,
+            to: row.recipient,
+            text: row.text,
+            self: isSelf,
+            noFlash: true,
+          });
         } else {
           const isOwn = row.sender === myUsername;
           addMessage(
