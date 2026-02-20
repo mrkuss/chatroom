@@ -266,7 +266,7 @@
     <span>chatroom</span>
     <span class="auth-version">v1.0</span>
   </div>
-  <div class="auth-disclaimer">⚠ This chatroom is for invited users only. Be respectful at all times.</div>
+  <div class="auth-disclaimer">a small project by mce. since all social platforms are selling your data, pushing micro-transaction in your face and ASKING for a pic of your face</div>
   <div class="auth-tabs">
     <button class="auth-tab active" onclick="switchTab('login')">Login</button>
     <button class="auth-tab" onclick="switchTab('register')">Register</button>
@@ -876,7 +876,9 @@
     addMessage(`<span class="msg-system">── message history ──</span>`);
     history.forEach(row => {
       const ts = new Date(row.created_at).getTime();
-      if (row.type === 'action') {
+      if (row.type === 'system') {
+        addMessage(`<span class="msg-system">*** ${row.text} ***</span>`, '', ts);
+      } else if (row.type === 'action') {
         addMessage(`<span class="msg-action">*** <span class="msg-user" style="color:${row.color}">${row.sender}</span> ${row.text} ***</span>`, '', ts);
       } else if (row.type === 'dm') {
         addDmMessage({ from: row.sender, to: row.recipient, text: row.text, self: row.sender === myUsername, noFlash: true });

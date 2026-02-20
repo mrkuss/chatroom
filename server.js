@@ -221,7 +221,13 @@ function broadcastCoins(username, coins) {
   }
 }
 
-function broadcastGambling(msg) {
+async function broadcastGambling(msg) {
+  try {
+    await db.query(
+      "INSERT INTO messages (room, sender, type, text) VALUES ($1, $2, $3, $4)",
+      ['gambling', 'system', 'system', msg]
+    );
+  } catch (e) { console.error('broadcastGambling save error:', e); }
   io.to('gambling').emit('system message', msg);
 }
 
@@ -384,9 +390,9 @@ app.post('/game/slots', async (req, res) => {
 
   broadcastCoins(req.session.username, finalCoins);
   if (winAmount > 0) {
-    broadcastGambling(`🎰 ${req.session.username} won ${winAmount} coins on slots! [${reels.join('')}] ${multiplier}x bet of ${betAmount}`);
+    await broadcastGambling(`🎰 ${req.session.username} won ${winAmount} coins on slots! [${reels.join('')}] ${multiplier}x bet of ${betAmount}`);
   } else {
-    broadcastGambling(`🎰 ${req.session.username} lost ${betAmount} coins on slots [${reels.join('')}]`);
+    await broadcastGambling(`🎰 ${req.session.username} lost ${betAmount} coins on slots [${reels.join('')}]`);
   }
   res.json({ reels, multiplier, winAmount, coins: finalCoins });
 });
@@ -417,11 +423,11 @@ app.post('/game/dice', async (req, res) => {
 
   broadcastCoins(req.session.username, finalCoins);
   if (result === 'win') {
-    broadcastGambling(`🎲 ${req.session.username} won ${winAmount} coins on dice! (rolled ${playerRoll} vs house ${houseRoll})`);
+    await broadcastGambling(`🎲 ${req.session.username} won ${winAmount} coins on dice! (rolled ${playerRoll} vs house ${houseRoll})`);
   } else if (result === 'tie') {
-    broadcastGambling(`🎲 ${req.session.username} tied on dice (both rolled ${playerRoll}), bet of ${betAmount} returned`);
+    await broadcastGambling(`🎲 ${req.session.username} tied on dice (both rolled ${playerRoll}), bet of ${betAmount} returned`);
   } else {
-    broadcastGambling(`🎲 ${req.session.username} lost ${betAmount} coins on dice (rolled ${playerRoll} vs house ${houseRoll})`);
+    await broadcastGambling(`🎲 ${req.session.username} lost ${betAmount} coins on dice (rolled ${playerRoll} vs house ${houseRoll})`);
   }
   res.json({ playerRoll, houseRoll, result, winAmount, coins: finalCoins });
 });
@@ -472,7 +478,7 @@ async function saveMessage({ room, sender, recipient, type, text }) {
   await db.query('INSERT INTO messages (room, sender, recipient, type, text) VALUES ($1,$2,$3,$4,$5)', [room || null, sender, recipient || null, type, text]);
 }
 
-async function getHistory(room, username, limit = 50) {
+async function getHistory(room, username, limit = 5) {
   const result = await db.query(
     `SELECT sender, recipient, type, text, created_at FROM messages
      WHERE room = $1 OR (type = 'dm' AND (LOWER(sender) = LOWER($2) OR LOWER(recipient) = LOWER($2)))
@@ -567,7 +573,7 @@ io.on('connection', (socket) => {
     const roomsResult = await db.query('SELECT name FROM rooms ORDER BY id');
     socket.emit('rooms list', roomsResult.rows.map(r => r.name));
 
-    const history = await getHistory(defaultRoom, username, 50);
+    const history = await getHistory(defaultRoom, username, 5);
     const historyWithColors = await enrichHistoryWithColors(history);
     socket.emit('history', historyWithColors);
 
@@ -590,7 +596,7 @@ io.on('connection', (socket) => {
     io.to(oldRoom).emit('system message', `${user.username} left #${oldRoom}`);
     user.room = newRoom;
     socket.join(newRoom);
-    const history = await getHistory(newRoom, user.username, 50);
+    const history = await getHistory(newRoom, user.username, 5);
     const historyWithColors = await enrichHistoryWithColors(history);
     socket.emit('history', historyWithColors);
     const pollsResult = await db.query('SELECT * FROM polls WHERE room = $1 ORDER BY created_at DESC LIMIT 20', [newRoom]);
@@ -698,7 +704,7 @@ io.on('connection', (socket) => {
       const loserCoins = await getCoins(loser);
       broadcastCoins(loser, loserCoins);
       io.to(room).emit('system message', `🎲 COINFLIP: ${winner} wins ${prize} coins from ${loser}! 🏆`);
-      broadcastGambling(`🎲 COINFLIP: ${winner} beat ${loser} for ${prize} coins!`);
+      await broadcastGambling(`🎲 COINFLIP: ${winner} beat ${loser} for ${prize} coins!`);
       return;
     }
 
