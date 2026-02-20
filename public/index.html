@@ -721,7 +721,6 @@ function enterChat(username,color,theme,coins,token,dailyAvailable){
   updateCoinDisplay();
   document.getElementById('input').focus();
   socket.connect();
-  socket.once('connect',()=>socket.emit('join',token));
   if(dailyAvailable)setTimeout(()=>showDailyModal(),1500);
 }
 
