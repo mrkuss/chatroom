@@ -1,163 +1,161 @@
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-const bcrypt = require('bcrypt');
-const session = require('express-session');
-const Database = require('better-sqlite3');
-const path = require('path');
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+const bcrypt = require("bcrypt");
+const session = require("express-session");
+const Database = require("better-sqlite3");
+const path = require("path");
+
+/* -------------------- APP SETUP -------------------- */
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Database setup
-const db = new Database('chat.db');
+/* -------------------- DATABASE -------------------- */
+
+const dbPath = process.env.RAILWAY_VOLUME_MOUNT_PATH
+  ? process.env.RAILWAY_VOLUME_MOUNT_PATH + "/chat.db"
+  : "chat.db";
+
+const db = new Database(dbPath);
+
 db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL COLLATE NOCASE,
-    password_hash TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT UNIQUE NOT NULL COLLATE NOCASE,
+  password_hash TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS messages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT NOT NULL,
+  text TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 `);
 
-// Middleware
+/* -------------------- MIDDLEWARE -------------------- */
+
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'change-this-in-production',
+app.use(express.static(path.join(__dirname, "public")));
+
+const sessionMiddleware = session({
+  secret: process.env.SESSION_SECRET || "dev-secret",
   resave: false,
   saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-  }
-}));
+  cookie: { secure: false }
+});
 
-// Helper: escape HTML to prevent XSS
+app.use(sessionMiddleware);
+io.engine.use(sessionMiddleware);
+
+/* -------------------- HELPERS -------------------- */
+
 function escapeHtml(str) {
   return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
-// Auth routes
-app.post('/register', async (req, res) => {
+function formatDuration(ms) {
+  const s = Math.floor(ms / 1000);
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+
+  const parts = [];
+  if (d) parts.push(d + "D");
+  if (h) parts.push(h + "H");
+  if (m) parts.push(m + "M");
+  if (sec || !parts.length) parts.push(sec + "S");
+  return parts.join(" ");
+}
+
+/* -------------------- AUTH ROUTES -------------------- */
+
+app.post("/register", async (req, res) => {
   const { username, password } = req.body;
 
-  if (!username || !password) {
-    return res.status(400).json({ error: 'Username and password are required' });
-  }
-  if (username.length < 3 || username.length > 20) {
-    return res.status(400).json({ error: 'Username must be 3-20 characters' });
-  }
-  if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-    return res.status(400).json({ error: 'Username can only contain letters, numbers, and underscores' });
-  }
-  if (password.length < 6) {
-    return res.status(400).json({ error: 'Password must be at least 6 characters' });
-  }
+  if (!username || !password) return res.status(400).json({ error: "Missing fields" });
+
+  const hash = await bcrypt.hash(password, 12);
 
   try {
-    const hash = await bcrypt.hash(password, 12);
-    db.prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)').run(username, hash);
+    db.prepare("INSERT INTO users (username, password_hash) VALUES (?, ?)").run(username, hash);
     req.session.username = username;
     res.json({ ok: true, username });
-  } catch (err) {
-    if (err.message.includes('UNIQUE')) {
-      return res.status(409).json({ error: 'Username already taken' });
-    }
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+  } catch {
+    res.status(409).json({ error: "Username taken" });
   }
 });
 
-app.post('/login', async (req, res) => {
+app.post("/login", async (req, res) => {
   const { username, password } = req.body;
+  const user = db.prepare("SELECT * FROM users WHERE username = ?").get(username);
 
-  if (!username || !password) {
-    return res.status(400).json({ error: 'Username and password are required' });
-  }
+  if (!user || !(await bcrypt.compare(password, user.password_hash)))
+    return res.status(401).json({ error: "Invalid login" });
 
-  const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
-  if (!user) {
-    return res.status(401).json({ error: 'Invalid username or password' });
-  }
-
-  const match = await bcrypt.compare(password, user.password_hash);
-  if (!match) {
-    return res.status(401).json({ error: 'Invalid username or password' });
-  }
-
-  req.session.username = user.username;
-  res.json({ ok: true, username: user.username });
+  req.session.username = username;
+  res.json({ ok: true, username });
 });
 
-app.post('/logout', (req, res) => {
-  req.session.destroy();
-  res.json({ ok: true });
+app.post("/logout", (req, res) => {
+  req.session.destroy(() => res.json({ ok: true }));
 });
 
-app.get('/me', (req, res) => {
-  if (req.session.username) {
-    res.json({ username: req.session.username });
-  } else {
-    res.status(401).json({ error: 'Not logged in' });
+app.get("/me", (req, res) => {
+  if (!req.session.username) return res.status(401).end();
+  res.json({ username: req.session.username });
+});
+
+/* -------------------- SOCKET -------------------- */
+
+const users = {}; // socket.id -> { username, joined }
+
+io.on("connection", (socket) => {
+  const username = socket.request.session.username;
+  if (!username) return socket.disconnect();
+
+  users[socket.id] = { username, joined: Date.now() };
+
+  socket.emit("history", db.prepare("SELECT * FROM messages ORDER BY id DESC LIMIT 50").all().reverse());
+
+  io.emit("system", `${username} joined`);
+
+  function broadcastUsers() {
+    io.emit(
+      "users",
+      Object.values(users).map(u => ({
+        username: u.username,
+        online: formatDuration(Date.now() - u.joined)
+      }))
+    );
   }
-});
 
-// Socket.io
-const connectedUsers = {}; // socket.id -> username
-const rateLimits = {};     // socket.id -> { count, resetTime }
+  broadcastUsers();
+  const interval = setInterval(broadcastUsers, 1000);
 
-io.on('connection', (socket) => {
+  socket.on("msg", text => {
+    text = escapeHtml(text.trim().slice(0, 500));
+    if (!text) return;
 
-  socket.on('join', (username) => {
-    // Basic validation
-    if (!username || typeof username !== 'string') return;
-    connectedUsers[socket.id] = escapeHtml(username.slice(0, 20));
-    io.emit('user count', Object.keys(connectedUsers).length);
-    io.emit('system message', `${connectedUsers[socket.id]} has joined the chat`);
+    db.prepare("INSERT INTO messages (username, text) VALUES (?, ?)").run(username, text);
+    io.emit("msg", { username, text });
   });
 
-  socket.on('chat message', (msg) => {
-    const username = connectedUsers[socket.id];
-    if (!username) return;
-
-    // Rate limiting: max 5 messages per 3 seconds
-    const now = Date.now();
-    if (!rateLimits[socket.id] || now > rateLimits[socket.id].resetTime) {
-      rateLimits[socket.id] = { count: 0, resetTime: now + 3000 };
-    }
-    rateLimits[socket.id].count++;
-    if (rateLimits[socket.id].count > 5) {
-      socket.emit('system message', 'You are sending messages too fast. Please slow down.');
-      return;
-    }
-
-    if (typeof msg !== 'string') return;
-    const sanitized = escapeHtml(msg.trim().slice(0, 500));
-    if (!sanitized) return;
-
-    io.emit('chat message', { user: username, text: sanitized });
-  });
-
-  socket.on('disconnect', () => {
-    const username = connectedUsers[socket.id];
-    if (username) {
-      delete connectedUsers[socket.id];
-      delete rateLimits[socket.id];
-      io.emit('user count', Object.keys(connectedUsers).length);
-      io.emit('system message', `${username} has left the chat`);
-    }
+  socket.on("disconnect", () => {
+    clearInterval(interval);
+    delete users[socket.id];
+    io.emit("system", `${username} left`);
   });
 });
+
+/* -------------------- START -------------------- */
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
-});
+server.listen(PORT, "0.0.0.0", () => console.log("running", PORT));
