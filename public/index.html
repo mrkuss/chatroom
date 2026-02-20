@@ -800,13 +800,18 @@
 
   <!-- Auth Screen -->
   <div id="auth-screen">
-    <div class="auth-titlebar">chatroom</div>
+    <div class="auth-titlebar">
+      chatroom
+      <span style="font-size:13px;opacity:0.5;float:right;line-height:1.8">v1.0</span>
+    </div>
+    <div style="background:#a8a8a8;color:#333;font-size:13px;padding:6px 10px;border-bottom:1px solid #808080;font-family:'VT323',monospace;">
+      ⚠ This chatroom is for invited users only. Be respectful at all times.
+    </div>
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchTab('login')">Login</button>
       <button class="auth-tab" onclick="switchTab('register')">Register</button>
     </div>
     <div class="auth-body">
-
       <!-- Login -->
       <div id="login-panel" class="auth-panel active">
         <p>Sign in to your account:</p>
@@ -815,7 +820,6 @@
         <button class="primary" onclick="doLogin()">Login</button>
         <div class="auth-error" id="login-error"></div>
       </div>
-
       <!-- Register -->
       <div id="register-panel" class="auth-panel">
         <p>Create a new account:</p>
@@ -828,7 +832,6 @@
         <button class="primary" onclick="doRegister()">Create Account</button>
         <div class="auth-error" id="register-error"></div>
       </div>
-
     </div>
   </div>
 
