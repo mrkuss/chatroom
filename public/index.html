@@ -1337,7 +1337,7 @@ async function openSettings(){
   document.getElementById('settings-overlay').classList.add('open');
   document.getElementById('settings-status').textContent='';
   selectedSettingsColor=myColor; selectedSettingsTheme=selectedTheme;
-  if(!shopItems.length) await loadShopItems();
+  await loadShopItems();
   renderSettingsThemes(); renderSettingsColors();
 }
 function closeSettings(){ document.getElementById('settings-overlay').classList.remove('open'); }
@@ -1454,9 +1454,9 @@ async function loadStats(){
     el.innerHTML=`
       <div class="stat-row"><span class="stat-label">Username</span><span class="stat-value" style="color:${myColor}">${escHtml(d.username)}</span></div>
       <div class="stat-row"><span class="stat-label">Member since</span><span class="stat-value">${formatDate(d.createdAt)}</span></div>
-      <div class="stat-row"><span class="stat-label">Current coins</span><span class="stat-value">${si('coinIcon.png',32,32,'coin')} ${fmtNum(d.coins)}</span></div>
-      <div class="stat-row"><span class="stat-label">Total earned</span><span class="stat-value">${si('coinIcon.png',32,32,'coin')} ${fmtNum(d.coinsEarned)}</span></div>
-      <div class="stat-row"><span class="stat-label">Total spent</span><span class="stat-value">${si('coinIcon.png',32,32,'coin')} ${fmtNum(d.coinsSpent)}</span></div>
+      <div class="stat-row"><span class="stat-label">Current coins</span><span class="stat-value">${si('coinIcon.png',16,16,'coin')} ${fmtNum(d.coins)}</span></div>
+      <div class="stat-row"><span class="stat-label">Total earned</span><span class="stat-value">${si('coinIcon.png',16,16,'coin')} ${fmtNum(d.coinsEarned)}</span></div>
+      <div class="stat-row"><span class="stat-label">Total spent</span><span class="stat-value">${si('coinIcon.png',16,16,'coin')} ${fmtNum(d.coinsSpent)}</span></div>
       <div class="stat-row"><span class="stat-label">Messages sent</span><span class="stat-value">${d.messagesSent}</span></div>
       <div class="stat-row"><span class="stat-label">Time online</span><span class="stat-value">${formatSeconds(d.timeOnlineSeconds)}</span></div>
       <div class="stat-row"><span class="stat-label">Badges earned</span><span class="stat-value">${si('trophyIcon.png',14,14,'trophy')} ${d.earnedBadges.length}</span></div>
