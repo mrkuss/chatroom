@@ -391,7 +391,7 @@
     <div id="titlebar-right">
       <span id="logged-in-as"></span>
       <span id="coin-display">
-        <img class="sprite" src="/sprites/coinIcon.png" width="16" height="16" alt="coins" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/coinIcon.png" width="32" height="32" alt="coins" onerror="this.src='/sprites/placeholder.png'">
         <span id="coin-amount">0</span>
       </span>
       <button class="icon-btn" onclick="sfxClick();openShop()" title="Shop">
@@ -518,7 +518,7 @@
       <div class="daily-title">Daily Bonus Available!</div>
       <div style="font-size:15px;color:var(--text-system);margin-bottom:4px;">Claim your free coins for today</div>
       <div class="daily-amount">
-        <img class="sprite" src="/sprites/coinIcon.png" width="24" height="24" alt="coin" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/coinIcon.png" width="32" height="32" alt="coin" onerror="this.src='/sprites/placeholder.png'">
         +50 coins
       </div>
       <button class="daily-claim-btn" onclick="sfxClick();claimDaily()">Claim Reward</button>
@@ -642,14 +642,14 @@
   <div class="modal-box" id="shop-modal">
     <div class="modal-titlebar">
       <span>
-        <img class="sprite" src="/sprites/shopButtonIcon.png" width="16" height="16" alt="Shop" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/shopButtonIcon.png" width="32" height="32" alt="Shop" onerror="this.src='/sprites/placeholder.png'">
         Shop
       </span>
       <button class="modal-close" onclick="sfxClick();closeShop()">✕</button>
     </div>
     <div style="padding:0 16px;">
       <div class="shop-balance" id="shop-balance">
-        <img class="sprite" src="/sprites/coinIcon.png" width="16" height="16" alt="coin" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/coinIcon.png" width="32" height="32" alt="coin" onerror="this.src='/sprites/placeholder.png'">
         Balance: <span id="shop-balance-amt">0</span>
       </div>
       <div class="shop-tabs">
@@ -694,7 +694,7 @@
     <!-- SLOTS -->
     <div id="game-slots" class="game-panel active" style="padding:0 16px 16px;">
       <div class="game-balance" id="slots-balance">
-        <img class="sprite" src="/sprites/coinIcon.png" width="16" height="16" alt="coin" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/coinIcon.png" width="32" height="32" alt="coin" onerror="this.src='/sprites/placeholder.png'">
         Balance: <span id="slots-balance-amt">0</span>
       </div>
       <div class="slots-reels">
@@ -724,7 +724,7 @@
     <!-- DICE -->
     <div id="game-dice" class="game-panel" style="padding:0 16px 16px;">
       <div class="game-balance" id="dice-balance">
-        <img class="sprite" src="/sprites/coinIcon.png" width="16" height="16" alt="coin" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/coinIcon.png" width="32" height="32" alt="coin" onerror="this.src='/sprites/placeholder.png'">
         Balance: <span id="dice-balance-amt">0</span>
       </div>
       <div class="dice-display">
@@ -748,7 +748,7 @@
     <!-- ROULETTE -->
     <div id="game-roulette" class="game-panel" style="padding:0 16px 16px;">
       <div class="game-balance" id="roulette-balance">
-        <img class="sprite" src="/sprites/coinIcon.png" width="16" height="16" alt="coin" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/coinIcon.png" width="32" height="32" alt="coin" onerror="this.src='/sprites/placeholder.png'">
         Balance: <span id="roulette-balance-amt">0</span>
       </div>
       <div style="display:flex;justify-content:center;margin:16px 0;">
@@ -1503,9 +1503,9 @@ async function loadStats() {
     el.innerHTML=`
       <div class="stat-row"><span class="stat-label">Username</span><span class="stat-value" style="color:${myColor}">${escHtml(d.username)}</span></div>
       <div class="stat-row"><span class="stat-label">Member since</span><span class="stat-value">${formatDate(d.createdAt)}</span></div>
-      <div class="stat-row"><span class="stat-label">Current coins</span><span class="stat-value">${si('coinIcon.png',14,14,'coin')} ${fmtNum(d.coins)}</span></div>
-      <div class="stat-row"><span class="stat-label">Total earned</span><span class="stat-value">${si('coinIcon.png',14,14,'coin')} ${fmtNum(d.coinsEarned)}</span></div>
-      <div class="stat-row"><span class="stat-label">Total spent</span><span class="stat-value">${si('coinIcon.png',14,14,'coin')} ${fmtNum(d.coinsSpent)}</span></div>
+      <div class="stat-row"><span class="stat-label">Current coins</span><span class="stat-value">${si('coinIcon.png',32,32,'coin')} ${fmtNum(d.coins)}</span></div>
+      <div class="stat-row"><span class="stat-label">Total earned</span><span class="stat-value">${si('coinIcon.png',32,32,'coin')} ${fmtNum(d.coinsEarned)}</span></div>
+      <div class="stat-row"><span class="stat-label">Total spent</span><span class="stat-value">${si('coinIcon.png',32,32,'coin')} ${fmtNum(d.coinsSpent)}</span></div>
       <div class="stat-row"><span class="stat-label">Messages sent</span><span class="stat-value">${d.messagesSent}</span></div>
       <div class="stat-row"><span class="stat-label">Time online</span><span class="stat-value">${formatSeconds(d.timeOnlineSeconds)}</span></div>
       <div class="stat-row"><span class="stat-label">Badges earned</span><span class="stat-value">${si('trophyIcon.png',14,14,'trophy')} ${d.earnedBadges.length}</span></div>
@@ -1678,7 +1678,7 @@ async function loadLeaderboard() {
       const rank=i<3
         ?`<img class="sprite" src="/sprites/${medals[i]}" width="20" height="20" alt="#${i+1}" onerror="this.onerror=null;this.src='/sprites/placeholder.png'">`
         :`#${i+1}`;
-      return `<div class="lb-row"><span class="lb-rank">${rank}</span><span class="lb-name">${escHtml(row.username)}</span><span class="lb-coins">${si('coinIcon.png',14,14,'coin')} ${fmtNum(row.coins)}</span></div>`;
+      return `<div class="lb-row"><span class="lb-rank">${rank}</span><span class="lb-name">${escHtml(row.username)}</span><span class="lb-coins">${si('coinIcon.png',32,32,'coin')} ${fmtNum(row.coins)}</span></div>`;
     }).join('');
   } catch { container.innerHTML='<div style="color:#cc0000;text-align:center;padding:12px;">Error loading.</div>'; }
 }
