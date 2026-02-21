@@ -364,19 +364,6 @@
     .dice-value { font-size:48px;min-width:60px;height:60px;background:var(--bg-messages);border:3px inset var(--border-inset);display:flex;align-items:center;justify-content:center; }
     .dice-vs { font-size:20px;color:var(--text-system); }
     
-    /* ── COIN CLICKER ── */
-    #coin-clicker-container { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;margin:20px 0;position:relative;min-height:150px; }
-    #coin-clicker-coin { font-size:100px;cursor:pointer;user-select:none;filter:drop-shadow(0 0 20px rgba(255,215,0,0.4));transition:filter 0.1s; }
-    #coin-clicker-coin:hover { filter:drop-shadow(0 0 30px rgba(255,215,0,0.8)); }
-    #coin-clicker-coin.clicking { animation:coinClick 0.15s ease-out; }
-    #coin-clicker-coin.breaking { animation:coinBreak 0.3s ease-out; }
-    @keyframes coinClick { 0%{transform:scale(1)}30%{transform:scale(0.95) rotate(-5deg)}60%{transform:scale(1.05) rotate(5deg)}100%{transform:scale(1) rotate(0deg)} }
-    @keyframes coinBreak { 0%{transform:scale(1) rotate(0deg);opacity:1}50%{transform:scale(1.1);opacity:1}100%{transform:scale(0) rotate(360deg);opacity:0} }
-    .coin-float { position:absolute;font-weight:bold;font-size:28px;color:#00ff00;pointer-events:none;font-family:'VT323',monospace;text-shadow:0 0 8px rgba(0,255,0,0.6); }
-    @keyframes floatUp { 0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-80px) scale(0.8);opacity:0} }
-    .coin-float.animate { animation:floatUp 1s ease-out forwards; }
-    #coin-clicker-info { font-size:14px;color:var(--text-system);text-align:center;min-height:0; }
-    
     .lb-row { display:flex;justify-content:space-between;padding:4px 8px;border-bottom:1px solid var(--border-inset);font-size:16px; }
     .lb-row:nth-child(odd) { background:var(--poll-bg); }
     .lb-rank { color:var(--text-system);width:30px; }
@@ -660,7 +647,6 @@
         <button class="games-tab active" onclick="switchGame('slots')">🎰 Slots</button>
         <button class="games-tab" onclick="switchGame('dice')">🎲 Dice</button>
         <button class="games-tab" onclick="switchGame('roulette')">🎡 Roulette</button>
-        <button class="games-tab" onclick="switchGame('coin-clicker')">🪙 Clicker</button>
         <button class="games-tab" onclick="switchGame('leaderboard')">🏆 Board</button>
       </div>
     </div>
@@ -700,14 +686,6 @@
       <div id="roulette-number-grid"></div>
       <div class="game-result" id="roulette-result"></div>
       <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Red/Black/Even/Odd = 1.8x · Number = 50x. Spin 0 is green (house win)</div>
-    </div>
-    <div id="game-coin-clicker" class="game-panel" style="padding:0 16px 16px;">
-      <div class="game-balance" id="coin-clicker-balance">Balance: 🪙 0</div>
-      <div id="coin-clicker-container">
-        <div id="coin-clicker-coin" onclick="clickCoin()">🪙</div>
-        <div id="coin-clicker-info"></div>
-      </div>
-      <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Tap the coin repeatedly to break it and earn 1-3 coins! Limit: 1000 breaks per day</div>
     </div>
     <div id="game-leaderboard" class="game-panel" style="padding:0 16px 16px;">
       <div class="lb-header"><span>Rank</span><span>Player</span><span>Coins</span></div>
@@ -1446,8 +1424,8 @@ function closeGames(){document.getElementById('games-overlay').classList.remove(
 function openPatchNotes(){document.getElementById('patchnotes-modal').classList.add('open')}
 function closePatchNotes(){document.getElementById('patchnotes-modal').classList.remove('open')}
 function closeAnnouncement(){document.getElementById('announcement-modal').classList.remove('open')}
-function switchGame(name){document.querySelectorAll('.game-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.games-tab').forEach(t=>t.classList.remove('active'));document.getElementById('game-'+name).classList.add('active');document.querySelectorAll('.games-tab').forEach(t=>{if(t.textContent.toLowerCase().includes(name==='leaderboard'?'board':name==='coin-clicker'?'clicker':name))t.classList.add('active')});if(name==='leaderboard')loadLeaderboard();if(name==='roulette')initRouletteNumbers();if(name==='coin-clicker')clickerState={nextClickTime:0,tapCount:0,requiredTaps:Math.floor(Math.random()*4)+2,isBreaking:false};updateGameBalances()}
-function updateGameBalances(){['slots','dice','roulette','coin-clicker'].forEach(g=>{const el=document.getElementById(g+'-balance');if(el)el.textContent=`Balance: 🪙 ${formatNumber(myCoins)}`})}
+function switchGame(name){document.querySelectorAll('.game-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.games-tab').forEach(t=>t.classList.remove('active'));document.getElementById('game-'+name).classList.add('active');document.querySelectorAll('.games-tab').forEach(t=>{if(t.textContent.toLowerCase().includes(name==='leaderboard'?'board':name))t.classList.add('active')});if(name==='leaderboard')loadLeaderboard();if(name==='roulette')initRouletteNumbers();updateGameBalances()}
+function updateGameBalances(){['slots','dice','roulette'].forEach(g=>{const el=document.getElementById(g+'-balance');if(el)el.textContent=`Balance: 🪙 ${formatNumber(myCoins)}`})}
 function setBet(game,amount){document.getElementById(game+'-bet').value=amount}
 
 let slotsSpinning=false;
@@ -1514,23 +1492,6 @@ async function loadLeaderboard(){
   catch{container.innerHTML='<div style="color:#cc0000;text-align:center;padding:12px;">Error loading.</div>'}
 }
 
-// ── COIN CLICKER ──────────────────────────────────────────────────────────────
-let clickerState={nextClickTime:0,tapCount:0,requiredTaps:0,isBreaking:false};
-async function clickCoin(){
-  const now=Date.now();if(now<clickerState.nextClickTime||clickerState.isBreaking)return;const coin=document.getElementById('coin-clicker-coin');
-  if(!clickerState.requiredTaps)clickerState.requiredTaps=Math.floor(Math.random()*4)+2;
-  clickerState.nextClickTime=now+80;coin.classList.remove('clicking');void coin.offsetWidth;coin.classList.add('clicking');soundClick();
-  clickerState.tapCount++;if(clickerState.tapCount>=clickerState.requiredTaps){clickerState.isBreaking=true;await breakCoin()}
-}
-async function breakCoin(){
-  const coin=document.getElementById('coin-clicker-coin');coin.classList.remove('clicking');coin.classList.add('breaking');soundBreak();
-  try{const res=await fetch('/game/coin-clicker',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});const data=await res.json();
-  if(!res.ok){return}
-  myCoins=data.coins;updateCoinDisplay();updateGameBalances();const earned=data.coinsEarned;floatCoinText('+'+earned);setTimeout(()=>{coin.classList.remove('breaking');clickerState={nextClickTime:0,tapCount:0,requiredTaps:Math.floor(Math.random()*4)+2,isBreaking:false}},300)}
-  catch{}
-}
-function soundClick(){const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=800;osc.type='sine';gain.gain.setValueAtTime(0.3,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.1);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.1)}
-function soundBreak(){const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=400;osc.type='sine';gain.gain.setValueAtTime(0.15,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.15);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.15)}
 
 // ── TICKERS ───────────────────────────────────────────────────────────────────
 setInterval(()=>{document.querySelectorAll('.user-entry').forEach(entry=>{const span=entry.querySelector('.utime');if(span)span.textContent=formatDuration(Date.now()-parseInt(entry.dataset.joinedAt,10))})},1000);
