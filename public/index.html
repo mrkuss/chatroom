@@ -1525,10 +1525,10 @@ async function clickCoin(){
 async function breakCoin(){
   const coin=document.getElementById('coin-clicker-coin');coin.classList.remove('clicking');coin.classList.add('breaking');soundBreak();
   try{const res=await fetch('/game/coin-clicker',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});const data=await res.json();
-  if(!res.ok){document.getElementById('coin-clicker-result').innerHTML=`<span class="result-lose">${data.error}</span>`;return}
-  myCoins=data.coins;updateCoinDisplay();updateGameBalances();const earned=data.coinsEarned;floatCoinText('+'+earned);setTimeout(()=>{coin.classList.remove('breaking');clickerState={nextClickTime:0,tapCount:0,requiredTaps:Math.floor(Math.random()*4)+2,isBreaking:false}},300)}}
-  catch{document.getElementById('coin-clicker-result').innerHTML='<span class="result-lose">Error. Try again.</span>'}}
-function floatCoinText(text){const container=document.getElementById('coin-clicker-container');const float=document.createElement('div');float.className='coin-float';float.textContent=text;float.style.left='50%';float.style.top='50%';container.style.position='relative';container.appendChild(float);float.offsetHeight;float.classList.add('animate');setTimeout(()=>float.remove(),1000)}
+  if(!res.ok){return}
+  myCoins=data.coins;updateCoinDisplay();updateGameBalances();const earned=data.coinsEarned;floatCoinText('+'+earned);setTimeout(()=>{coin.classList.remove('breaking');clickerState={nextClickTime:0,tapCount:0,requiredTaps:Math.floor(Math.random()*4)+2,isBreaking:false}},300)}
+  catch{}
+}
 function soundClick(){const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=800;osc.type='sine';gain.gain.setValueAtTime(0.3,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.1);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.1)}
 function soundBreak(){const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=400;osc.type='sine';gain.gain.setValueAtTime(0.15,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.15);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.15)}
 
