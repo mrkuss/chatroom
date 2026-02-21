@@ -372,7 +372,7 @@ function initChat(io) {
       stopTypingForSocket(io, socket, room);
 
       // ── claim ──────────────────────────────────────────────────────────────
-      if (raw.toLowerCase() === 'claim') {
+      if (raw.toLowerCase() === '/claim') {
         const won = await handleClaim(io, user.username);
         if (!won) socket.emit('system message', 'There is no active claim event right now.');
         return;

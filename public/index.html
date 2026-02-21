@@ -626,7 +626,7 @@
           <div class="help-section">
             <div class="help-section-title">Coins</div>
             <div class="help-cmd"><code>/give username amount</code> — send coins</div>
-            <div class="help-cmd"><code>claim</code> — grab free coins during events</div>
+            <div class="help-cmd"><code>/claim</code> — grab free coins during events</div>
           </div>
           <div class="help-section">
             <div class="help-section-title">Private Rooms</div>
@@ -1310,8 +1310,8 @@ socket.on('room message', ({room,user}) => {
 });
 
 socket.on('system message', msg => {
-  const isClaim=msg.includes('TYPE "claim"')||msg.includes('claimed the reward');
-  if(isClaim){addMessage(`<span class="msg-claim-event">*** ${escHtml(msg)} ***</span>`);if(msg.includes('TYPE "claim"'))soundClaim();else if(msg.includes('claimed the reward')&&msg.includes(myUsername))soundWin();}
+  const isClaim=msg.includes('/claim')||msg.includes('claimed the reward')||msg.includes('Nobody claimed');
+  if(isClaim){addMessage(`<span class="msg-claim-event">${escHtml(msg)}</span>`);if(msg.includes('/claim'))soundClaim();else if(msg.includes('claimed the reward')&&msg.includes(myUsername))soundWin();}
   else{addMessage(`<span class="msg-system">*** ${escHtml(msg)} ***</span>`);if(/has joined/.test(msg))soundJoin();else if(/has left/.test(msg))soundLeave();}
 });
 
@@ -1702,7 +1702,7 @@ async function loadLeaderboard() {
       const rank=i<3
         ?`<img class="sprite" src="/sprites/${medals[i]}" width="20" height="20" alt="#${i+1}" onerror="this.onerror=null;this.src='/sprites/placeholder.png'">`
         :`#${i+1}`;
-      return `<div class="lb-row"><span class="lb-rank">${rank}</span><span class="lb-name">${escHtml(row.username)}</span><span class="lb-coins">${si('coinIcon.png',32,32,'coin')} ${fmtNum(row.coins)}</span></div>`;
+      return `<div class="lb-row"><span class="lb-rank">${rank}</span><span class="lb-name">${escHtml(row.username)}</span><span class="lb-coins" style="color:#ffd700;text-shadow:1px 1px 0 #7a6000,0 1px 3px rgba(0,0,0,0.4)">${si('coinIcon.png',16,16,'coin')} ${fmtNum(row.coins)}</span></div>`;
     }).join('');
   } catch { container.innerHTML='<div style="color:#cc0000;text-align:center;padding:12px;">Error loading.</div>'; }
 }
