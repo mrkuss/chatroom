@@ -190,10 +190,7 @@
     .roulette-num-btn.selected{outline:2px solid yellow;outline-offset:1px;box-shadow:inset 0 0 0 2px yellow;}
     #roulette-selected-info{text-align:center;font-size:14px;color:var(--text-system);margin:8px 0;min-height:20px;}
 
-    /* ════ WINDOW SYSTEM ════
-       Desktop (>=700px): draggable floating windows, no backdrop
-       Mobile (<700px):   centered overlay (original behaviour)
-    */
+    /* ════ WINDOW SYSTEM ════ */
     .win-titlebar-btns{display:flex;align-items:center;gap:0;}
     .modal-minimize{font-family:'VT323',monospace;font-size:18px;line-height:1;background:var(--btn-bg);color:var(--text-main);border:2px solid;border-color:var(--btn-border);width:22px;height:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;margin-right:3px;flex-shrink:0;}
     .modal-minimize:active{border-color:var(--border-inset) white white var(--border-inset);}
@@ -201,36 +198,69 @@
     .modal-titlebar{background:var(--bg-titlebar);color:var(--text-titlebar);padding:6px 10px;display:flex;justify-content:space-between;align-items:center;font-size:18px;letter-spacing:1px;}
     .modal-body{padding:16px;}
 
+    /* Mobile: centered overlay */
     @media(max-width:699px){
       .modal-minimize{display:none;}
       .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center;}
       .modal-overlay.open{display:flex;}
       .modal-box{background:var(--bg-window);border:3px solid;border-color:var(--border-main);width:90%;font-family:'VT323',monospace;color:var(--text-main);}
     }
+
+    /* Desktop: draggable floating windows */
     @media(min-width:700px){
       .modal-overlay{display:none;position:fixed;background:none;z-index:500;}
       .modal-overlay.open{display:block;}
-      .modal-box{background:var(--bg-window);border:3px solid;border-color:var(--border-main);font-family:'VT323',monospace;color:var(--text-main);box-shadow:4px 4px 0 rgba(0,0,0,0.45);}
+      .modal-box{
+        background:var(--bg-window);
+        border:3px solid;
+        border-color:var(--border-main);
+        font-family:'VT323',monospace;
+        color:var(--text-main);
+        box-shadow:4px 4px 0 rgba(0,0,0,0.45);
+      }
       .modal-titlebar{cursor:move;user-select:none;}
       .modal-overlay.win-focused{z-index:600;}
-      /* Minimised: collapse to titlebar only */
+
+      /* Minimised: collapse to titlebar only — hide ALL body content */
       .modal-overlay.minimized .modal-body{display:none!important;}
       .modal-overlay.minimized .win-body{display:none!important;}
-      /* for announcement/patchnotes which use a plain div wrapper */
-      .modal-overlay.minimized>div>.win-hideable{display:none!important;}
+
+      /* Fixed sizes per window to prevent resize on tab switching */
+      #settings-overlay .modal-box  {width:420px;}
+      #shop-overlay .modal-box      {width:520px;}
+      #games-overlay .modal-box     {width:500px;}
+      #profile-modal .modal-box     {width:340px;}
+      #daily-modal .modal-box       {width:320px;}
+      #keypad-modal .modal-box      {width:280px;}
+      #room-created-modal .modal-box{width:300px;}
+      #changepass-modal .modal-box  {width:320px;}
+      #announcement-modal .modal-box{width:500px;}
+      #patchnotes-modal .modal-box  {width:600px;}
+
+      /* Inner scroll containers get a fixed height so the box never resizes */
+      #shop-overlay .win-body       {height:460px;overflow:hidden;display:flex;flex-direction:column;}
+      #games-overlay .win-body      {height:500px;overflow:hidden;display:flex;flex-direction:column;}
+      #settings-overlay .win-body   {height:480px;overflow:hidden;display:flex;flex-direction:column;}
+
+      /* Scrollable inner areas */
+      #shop-overlay .win-scroll     {flex:1;overflow-y:auto;}
+      #games-overlay .win-scroll    {flex:1;overflow-y:auto;}
+      #settings-overlay .win-scroll {flex:1;overflow-y:auto;}
     }
 
-    /* window width caps */
-    #keypad-modal .modal-box{max-width:280px;}
-    #room-created-modal .modal-box{max-width:300px;}
-    #changepass-modal .modal-box{max-width:320px;}
-    #daily-modal .modal-box{max-width:320px;}
-    #profile-modal .modal-box{max-width:340px;}
-    #settings-overlay .modal-box{max-width:420px;}
-    #shop-overlay .modal-box{max-width:520px;}
-    #games-overlay .modal-box{max-width:500px;}
-    #announcement-modal .modal-box{max-width:500px;}
-    #patchnotes-modal .modal-box{max-width:600px;}
+    /* shared cap for mobile too */
+    @media(max-width:699px){
+      #keypad-modal .modal-box{max-width:280px;}
+      #room-created-modal .modal-box{max-width:300px;}
+      #changepass-modal .modal-box{max-width:320px;}
+      #daily-modal .modal-box{max-width:320px;}
+      #profile-modal .modal-box{max-width:340px;}
+      #settings-overlay .modal-box{max-width:420px;}
+      #shop-overlay .modal-box{max-width:520px;}
+      #games-overlay .modal-box{max-width:500px;}
+      #announcement-modal .modal-box{max-width:500px;}
+      #patchnotes-modal .modal-box{max-width:600px;}
+    }
 
     .keypad-room-name{text-align:center;font-size:17px;color:var(--text-system);margin-bottom:10px;}
     .keypad-dots{display:flex;justify-content:center;gap:8px;margin-bottom:12px;min-height:24px;}
@@ -266,7 +296,7 @@
     .theme-btn.theme-opt-rose{background:#7a2d52;color:#ffe0ee;border-color:#f0a0c0 #3d1428 #3d1428 #f0a0c0;}
     .theme-btn.theme-opt-forest{background:#2a3a1a;color:#c8d8b0;border-color:#5a8a3a #1a3010 #1a3010 #5a8a3a;}
     .theme-btn.selected{outline:2px solid white;outline-offset:1px;}
-    #settings-color-swatches{display:flex;flex-direction:column;gap:0;max-height:280px;overflow-y:auto;border:2px inset var(--border-inset);background:var(--bg-messages);padding:0;}
+    #settings-color-swatches{display:flex;flex-direction:column;gap:0;max-height:200px;overflow-y:auto;border:2px inset var(--border-inset);background:var(--bg-messages);padding:0;}
     .color-swatch{display:flex;align-items:center;gap:12px;padding:8px 12px;cursor:pointer;border:2px solid transparent;background:var(--bg-messages);min-height:32px;}
     .color-swatch:hover{background:var(--bg-window);}
     .color-swatch.selected{background:var(--bg-titlebar);border-color:var(--text-titlebar);box-shadow:inset 0 0 0 1px var(--text-titlebar);}
@@ -554,84 +584,87 @@
         <button class="modal-close" onclick="sfxClick();closeSettings()">&#x2715;</button>
       </div>
     </div>
-    <div class="modal-body">
-      <div class="stab-bar">
-        <button class="stab active" onclick="sfxClick();switchSettingsTab('appearance')">Look</button>
-        <button class="stab" onclick="sfxClick();switchSettingsTab('badges')">Badges</button>
-        <button class="stab" onclick="sfxClick();switchSettingsTab('stats')">Stats</button>
-        <button class="stab" onclick="sfxClick();switchSettingsTab('account')">Account</button>
-        <button class="stab" onclick="sfxClick();switchSettingsTab('help')">Help</button>
-      </div>
-      <div id="stab-appearance" class="stab-panel active">
-        <div class="settings-section">
-          <span class="settings-label">Sound Effects</span>
-          <button id="sound-toggle-btn" class="icon-btn on" onclick="sfxClick();toggleSound()" title="Toggle SFX">Sound On</button>
+    <!-- win-body wraps everything below titlebar so minimise can hide it -->
+    <div class="win-body">
+      <div class="win-scroll" style="padding:16px;">
+        <div class="stab-bar">
+          <button class="stab active" onclick="sfxClick();switchSettingsTab('appearance')">Look</button>
+          <button class="stab" onclick="sfxClick();switchSettingsTab('badges')">Badges</button>
+          <button class="stab" onclick="sfxClick();switchSettingsTab('stats')">Stats</button>
+          <button class="stab" onclick="sfxClick();switchSettingsTab('account')">Account</button>
+          <button class="stab" onclick="sfxClick();switchSettingsTab('help')">Help</button>
         </div>
-        <div class="settings-section">
-          <span class="settings-label">Theme</span>
-          <div class="settings-note">Only owned themes shown. Buy more in the Shop.</div>
-          <div class="theme-options" id="settings-theme-options"></div>
+        <div id="stab-appearance" class="stab-panel active">
+          <div class="settings-section">
+            <span class="settings-label">Sound Effects</span>
+            <button id="sound-toggle-btn" class="icon-btn on" onclick="sfxClick();toggleSound()" title="Toggle SFX">Sound On</button>
+          </div>
+          <div class="settings-section">
+            <span class="settings-label">Theme</span>
+            <div class="settings-note">Only owned themes shown. Buy more in the Shop.</div>
+            <div class="theme-options" id="settings-theme-options"></div>
+          </div>
+          <div class="settings-section">
+            <span class="settings-label">Username Colour</span>
+            <div class="settings-note">Only owned colours shown.</div>
+            <div id="settings-color-swatches"></div>
+          </div>
+          <div class="settings-save-row"><button class="settings-btn" onclick="sfxClick();saveSettings()">Save</button></div>
+          <div class="settings-status" id="settings-status"></div>
         </div>
-        <div class="settings-section">
-          <span class="settings-label">Username Colour</span>
-          <div class="settings-note">Only owned colours shown.</div>
-          <div id="settings-color-swatches"></div>
+        <div id="stab-badges" class="stab-panel">
+          <div class="badge-set-note">Click an earned badge to set it as your active showcase badge.</div>
+          <div class="badge-grid" id="badge-grid"></div>
+          <div class="settings-status" id="badge-status"></div>
         </div>
-        <div class="settings-save-row"><button class="settings-btn" onclick="sfxClick();saveSettings()">Save</button></div>
-        <div class="settings-status" id="settings-status"></div>
-      </div>
-      <div id="stab-badges" class="stab-panel">
-        <div class="badge-set-note">Click an earned badge to set it as your active showcase badge.</div>
-        <div class="badge-grid" id="badge-grid"></div>
-        <div class="settings-status" id="badge-status"></div>
-      </div>
-      <div id="stab-stats" class="stab-panel">
-        <div id="stats-content"><div style="text-align:center;padding:20px;color:var(--text-system);">Loading...</div></div>
-      </div>
-      <div id="stab-account" class="stab-panel" style="padding:6px 0 0;">
-        <div class="settings-section">
-          <span class="settings-label">Change Password</span>
-          <div class="settings-note">Provide your current password, then choose a new one.</div>
-          <input id="pw-old" type="password" placeholder="Current password" style="width:100%;margin:8px 0;padding:6px;font-family:'VT323',monospace;font-size:16px;border:2px inset var(--border-inset);background:var(--auth-input-bg);color:var(--text-main);" />
-          <input id="pw-new" type="password" placeholder="New password (min 6 chars)" style="width:100%;margin:8px 0;padding:6px;font-family:'VT323',monospace;font-size:16px;border:2px inset var(--border-inset);background:var(--auth-input-bg);color:var(--text-main);" />
-          <input id="pw-new2" type="password" placeholder="Confirm new password" style="width:100%;margin:8px 0;padding:6px;font-family:'VT323',monospace;font-size:16px;border:2px inset var(--border-inset);background:var(--auth-input-bg);color:var(--text-main);" />
-          <div class="settings-save-row"><button class="settings-btn" onclick="sfxClick();changePassword()">Change Password</button></div>
-          <div class="settings-status" id="pw-status"></div>
+        <div id="stab-stats" class="stab-panel">
+          <div id="stats-content"><div style="text-align:center;padding:20px;color:var(--text-system);">Loading...</div></div>
         </div>
-      </div>
-      <div id="stab-help" class="stab-panel">
-        <div style="max-height:340px;overflow-y:auto;">
-          <div class="help-section"><div class="help-section-title">Chat</div>
-            <div class="help-cmd"><code>/me action</code> &mdash; emote action</div>
-            <div class="help-cmd"><code>/msg username text</code> &mdash; private DM</div>
+        <div id="stab-account" class="stab-panel" style="padding:6px 0 0;">
+          <div class="settings-section">
+            <span class="settings-label">Change Password</span>
+            <div class="settings-note">Provide your current password, then choose a new one.</div>
+            <input id="pw-old" type="password" placeholder="Current password" style="width:100%;margin:8px 0;padding:6px;font-family:'VT323',monospace;font-size:16px;border:2px inset var(--border-inset);background:var(--auth-input-bg);color:var(--text-main);" />
+            <input id="pw-new" type="password" placeholder="New password (min 6 chars)" style="width:100%;margin:8px 0;padding:6px;font-family:'VT323',monospace;font-size:16px;border:2px inset var(--border-inset);background:var(--auth-input-bg);color:var(--text-main);" />
+            <input id="pw-new2" type="password" placeholder="Confirm new password" style="width:100%;margin:8px 0;padding:6px;font-family:'VT323',monospace;font-size:16px;border:2px inset var(--border-inset);background:var(--auth-input-bg);color:var(--text-main);" />
+            <div class="settings-save-row"><button class="settings-btn" onclick="sfxClick();changePassword()">Change Password</button></div>
+            <div class="settings-status" id="pw-status"></div>
           </div>
-          <div class="help-section"><div class="help-section-title">Polls</div>
-            <div class="help-cmd"><code>/poll "Question?" Yes No Maybe</code> &mdash; create a 5-min poll</div>
-          </div>
-          <div class="help-section"><div class="help-section-title">Duels</div>
-            <div class="help-cmd"><code>/duel username amount</code> &mdash; challenge to coinflip</div>
-            <div class="help-cmd"><code>/accept</code> / <code>/decline</code> &mdash; respond to a challenge</div>
-          </div>
-          <div class="help-section"><div class="help-section-title">Coins</div>
-            <div class="help-cmd"><code>/give username amount</code> &mdash; send coins</div>
-            <div class="help-cmd"><code>/claim</code> &mdash; grab free coins during events</div>
-          </div>
-          <div class="help-section"><div class="help-section-title">Private Rooms</div>
-            <div class="help-cmd"><code>/create roomname code</code></div>
-            <div class="help-cmd"><code>/joinroom roomname</code></div>
-            <div class="help-cmd"><code>/kick username</code> &mdash; (owner)</div>
-            <div class="help-cmd"><code>/ban username</code> / <code>/unban username</code> &mdash; (owner)</div>
-            <div class="help-cmd"><code>/changepass newcode</code> &mdash; (owner)</div>
-            <div class="help-cmd"><code>/deleteroom roomname</code> &mdash; (owner)</div>
-            <div class="help-cmd">Codes are 1&ndash;9 digits only</div>
-          </div>
-          <div class="help-section"><div class="help-section-title">Reactions</div>
-            <div class="help-cmd">Hover a message &rarr; click + &rarr; pick an emoji</div>
-          </div>
-          <div class="help-section"><div class="help-section-title">Games</div>
-            <div class="help-cmd">Slots &mdash; match 3 symbols, up to 20x bet</div>
-            <div class="help-cmd">Dice &mdash; beat the house, win 1.9x</div>
-            <div class="help-cmd">Roulette &mdash; red/black or even/odd, 1.8x payout</div>
+        </div>
+        <div id="stab-help" class="stab-panel">
+          <div style="max-height:340px;overflow-y:auto;">
+            <div class="help-section"><div class="help-section-title">Chat</div>
+              <div class="help-cmd"><code>/me action</code> &mdash; emote action</div>
+              <div class="help-cmd"><code>/msg username text</code> &mdash; private DM</div>
+            </div>
+            <div class="help-section"><div class="help-section-title">Polls</div>
+              <div class="help-cmd"><code>/poll "Question?" Yes No Maybe</code> &mdash; create a 5-min poll</div>
+            </div>
+            <div class="help-section"><div class="help-section-title">Duels</div>
+              <div class="help-cmd"><code>/duel username amount</code> &mdash; challenge to coinflip</div>
+              <div class="help-cmd"><code>/accept</code> / <code>/decline</code> &mdash; respond to a challenge</div>
+            </div>
+            <div class="help-section"><div class="help-section-title">Coins</div>
+              <div class="help-cmd"><code>/give username amount</code> &mdash; send coins</div>
+              <div class="help-cmd"><code>/claim</code> &mdash; grab free coins during events</div>
+            </div>
+            <div class="help-section"><div class="help-section-title">Private Rooms</div>
+              <div class="help-cmd"><code>/create roomname code</code></div>
+              <div class="help-cmd"><code>/joinroom roomname</code></div>
+              <div class="help-cmd"><code>/kick username</code> &mdash; (owner)</div>
+              <div class="help-cmd"><code>/ban username</code> / <code>/unban username</code> &mdash; (owner)</div>
+              <div class="help-cmd"><code>/changepass newcode</code> &mdash; (owner)</div>
+              <div class="help-cmd"><code>/deleteroom roomname</code> &mdash; (owner)</div>
+              <div class="help-cmd">Codes are 1&ndash;9 digits only</div>
+            </div>
+            <div class="help-section"><div class="help-section-title">Reactions</div>
+              <div class="help-cmd">Hover a message &rarr; click + &rarr; pick an emoji</div>
+            </div>
+            <div class="help-section"><div class="help-section-title">Games</div>
+              <div class="help-cmd">Slots &mdash; match 3 symbols, up to 20x bet</div>
+              <div class="help-cmd">Dice &mdash; beat the house, win 1.9x</div>
+              <div class="help-cmd">Roulette &mdash; red/black or even/odd, 1.8x payout</div>
+            </div>
           </div>
         </div>
       </div>
@@ -649,21 +682,24 @@
         <button class="modal-close" onclick="sfxClick();closeShop()">&#x2715;</button>
       </div>
     </div>
-    <div style="padding:0 16px;">
-      <div class="shop-balance" id="shop-balance">
-        <img class="sprite" src="/sprites/coinIcon.png" width="18" height="18" alt="coin" onerror="this.src='/sprites/placeholder.png'">
-        Balance: <span id="shop-balance-amt">0</span>
+    <!-- win-body wraps everything so minimise hides it -->
+    <div class="win-body">
+      <div style="padding:0 16px;">
+        <div class="shop-balance" id="shop-balance">
+          <img class="sprite" src="/sprites/coinIcon.png" width="18" height="18" alt="coin" onerror="this.src='/sprites/placeholder.png'">
+          Balance: <span id="shop-balance-amt">0</span>
+        </div>
+        <div class="shop-tabs">
+          <button class="shop-tab active" onclick="sfxClick();switchShopTab('themes')">Themes</button>
+          <button class="shop-tab" onclick="sfxClick();switchShopTab('colors')">Username Colours</button>
+        </div>
       </div>
-      <div class="shop-tabs">
-        <button class="shop-tab active" onclick="sfxClick();switchShopTab('themes')">Themes</button>
-        <button class="shop-tab" onclick="sfxClick();switchShopTab('colors')">Username Colours</button>
+      <div class="win-scroll" style="padding:0 16px 8px;">
+        <div id="shop-themes" class="shop-panel active"></div>
+        <div id="shop-colors" class="shop-panel"></div>
       </div>
+      <div style="padding:0 16px 12px;flex-shrink:0;"><div class="shop-status" id="shop-status"></div></div>
     </div>
-    <div style="padding:0 16px 16px;max-height:380px;overflow-y:auto;">
-      <div id="shop-themes" class="shop-panel active"></div>
-      <div id="shop-colors" class="shop-panel"></div>
-    </div>
-    <div style="padding:0 16px 12px;"><div class="shop-status" id="shop-status"></div></div>
   </div>
 </div>
 
@@ -677,58 +713,63 @@
         <button class="modal-close" onclick="sfxClick();closeGames()">&#x2715;</button>
       </div>
     </div>
-    <div style="padding:0 16px;">
-      <div class="games-tabs">
-        <button class="games-tab active" onclick="sfxClick();switchGame('slots')"><img class="sprite" src="/sprites/slotsIcon.png" width="13" height="13" alt="" onerror="this.src='/sprites/placeholder.png'"> Slots</button>
-        <button class="games-tab" onclick="sfxClick();switchGame('dice')"><img class="sprite" src="/sprites/diceIcon.png" width="13" height="13" alt="" onerror="this.src='/sprites/placeholder.png'"> Dice</button>
-        <button class="games-tab" onclick="sfxClick();switchGame('roulette')"><img class="sprite" src="/sprites/rouletteIcon.png" width="13" height="13" alt="" onerror="this.src='/sprites/placeholder.png'"> Roulette</button>
-        <button class="games-tab" onclick="sfxClick();switchGame('leaderboard')"><img class="sprite" src="/sprites/trophyIcon.png" width="13" height="13" alt="" onerror="this.src='/sprites/placeholder.png'"> Board</button>
+    <!-- win-body wraps everything so minimise hides it -->
+    <div class="win-body">
+      <div style="padding:0 16px;flex-shrink:0;">
+        <div class="games-tabs">
+          <button class="games-tab active" onclick="sfxClick();switchGame('slots')"><img class="sprite" src="/sprites/slotsIcon.png" width="13" height="13" alt="" onerror="this.src='/sprites/placeholder.png'"> Slots</button>
+          <button class="games-tab" onclick="sfxClick();switchGame('dice')"><img class="sprite" src="/sprites/diceIcon.png" width="13" height="13" alt="" onerror="this.src='/sprites/placeholder.png'"> Dice</button>
+          <button class="games-tab" onclick="sfxClick();switchGame('roulette')"><img class="sprite" src="/sprites/rouletteIcon.png" width="13" height="13" alt="" onerror="this.src='/sprites/placeholder.png'"> Roulette</button>
+          <button class="games-tab" onclick="sfxClick();switchGame('leaderboard')"><img class="sprite" src="/sprites/trophyIcon.png" width="13" height="13" alt="" onerror="this.src='/sprites/placeholder.png'"> Board</button>
+        </div>
       </div>
-    </div>
-    <div id="game-slots" class="game-panel active" style="padding:0 16px 16px;">
-      <div class="game-balance" id="slots-balance"><img class="sprite" src="/sprites/coinIcon.png" width="18" height="18" alt="coin" onerror="this.src='/sprites/placeholder.png'"> Balance: <span id="slots-balance-amt">0</span></div>
-      <div class="slots-reels">
-        <div class="slot-reel" id="reel-0"><img class="sprite" src="/sprites/slotsIcon.png" width="40" height="40" alt="?" onerror="this.src='/sprites/placeholder.png'"></div>
-        <div class="slot-reel" id="reel-1"><img class="sprite" src="/sprites/slotsIcon.png" width="40" height="40" alt="?" onerror="this.src='/sprites/placeholder.png'"></div>
-        <div class="slot-reel" id="reel-2"><img class="sprite" src="/sprites/slotsIcon.png" width="40" height="40" alt="?" onerror="this.src='/sprites/placeholder.png'"></div>
+      <div class="win-scroll" style="padding:0 16px 16px;">
+        <div id="game-slots" class="game-panel active">
+          <div class="game-balance" id="slots-balance"><img class="sprite" src="/sprites/coinIcon.png" width="18" height="18" alt="coin" onerror="this.src='/sprites/placeholder.png'"> Balance: <span id="slots-balance-amt">0</span></div>
+          <div class="slots-reels">
+            <div class="slot-reel" id="reel-0"><img class="sprite" src="/sprites/slotsIcon.png" width="40" height="40" alt="?" onerror="this.src='/sprites/placeholder.png'"></div>
+            <div class="slot-reel" id="reel-1"><img class="sprite" src="/sprites/slotsIcon.png" width="40" height="40" alt="?" onerror="this.src='/sprites/placeholder.png'"></div>
+            <div class="slot-reel" id="reel-2"><img class="sprite" src="/sprites/slotsIcon.png" width="40" height="40" alt="?" onerror="this.src='/sprites/placeholder.png'"></div>
+          </div>
+          <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="slots-bet" value="10" min="1" max="50000" /><div class="bet-presets"><button class="bet-preset" onclick="sfxClick();setBet('slots',10)">10</button><button class="bet-preset" onclick="sfxClick();setBet('slots',50)">50</button><button class="bet-preset" onclick="sfxClick();setBet('slots',100)">100</button></div></div>
+          <button class="game-btn" id="slots-spin-btn" onclick="sfxClick();playSlots()">SPIN</button>
+          <div class="game-result" id="slots-result"></div>
+          <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Cherry=2x &middot; Lemon=3x &middot; Orange=4x &middot; Star=6x &middot; Diamond=8x &middot; Seven=20x</div>
+        </div>
+        <div id="game-dice" class="game-panel">
+          <div class="game-balance" id="dice-balance"><img class="sprite" src="/sprites/coinIcon.png" width="18" height="18" alt="coin" onerror="this.src='/sprites/placeholder.png'"> Balance: <span id="dice-balance-amt">0</span></div>
+          <div class="dice-display">
+            <div class="dice-side"><label>You</label><div class="dice-value" id="dice-player">?</div></div>
+            <div class="dice-vs">VS</div>
+            <div class="dice-side"><label>House</label><div class="dice-value" id="dice-house">?</div></div>
+          </div>
+          <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="dice-bet" value="10" min="1" max="50000" /><div class="bet-presets"><button class="bet-preset" onclick="sfxClick();setBet('dice',10)">10</button><button class="bet-preset" onclick="sfxClick();setBet('dice',50)">50</button><button class="bet-preset" onclick="sfxClick();setBet('dice',100)">100</button></div></div>
+          <button class="game-btn" id="dice-roll-btn" onclick="sfxClick();playDice()">ROLL DICE</button>
+          <div class="game-result" id="dice-result"></div>
+          <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Roll 2 dice vs the house. Higher total wins 1.9x &middot; Tie returns bet</div>
+        </div>
+        <div id="game-roulette" class="game-panel">
+          <div class="game-balance" id="roulette-balance"><img class="sprite" src="/sprites/coinIcon.png" width="18" height="18" alt="coin" onerror="this.src='/sprites/placeholder.png'"> Balance: <span id="roulette-balance-amt">0</span></div>
+          <div style="display:flex;justify-content:center;margin:16px 0;"><div style="text-align:center;"><label style="font-size:12px;color:var(--text-system);">Spin</label><div style="font-size:28px;margin-top:4px;" id="roulette-spin"><img class="sprite" src="/sprites/rouletteIcon.png" width="40" height="40" alt="Roulette" onerror="this.src='/sprites/placeholder.png'"></div></div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;">
+            <button class="game-btn" id="roulette-red-btn" onclick="sfxClick();playRoulette('red')" style="background:#cc0000;">RED</button>
+            <button class="game-btn" id="roulette-black-btn" onclick="sfxClick();playRoulette('black')" style="background:#222;color:#fff;">BLACK</button>
+            <button class="game-btn" onclick="sfxClick();playRoulette('even')" style="background:#0056b3;">2,4,6... EVEN</button>
+            <button class="game-btn" onclick="sfxClick();playRoulette('odd')" style="background:#0056b3;">1,3,5... ODD</button>
+          </div>
+          <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="roulette-bet" value="10" min="1" max="50000" /><div class="bet-presets"><button class="bet-preset" onclick="sfxClick();setBet('roulette',10)">10</button><button class="bet-preset" onclick="sfxClick();setBet('roulette',50)">50</button><button class="bet-preset" onclick="sfxClick();setBet('roulette',100)">100</button></div></div>
+          <div id="roulette-selected-info"></div>
+          <div style="font-size:12px;color:var(--text-system);margin:8px 0;">Or pick a specific number (50x payout):</div>
+          <div id="roulette-number-grid"></div>
+          <div class="game-result" id="roulette-result"></div>
+          <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Red/Black/Even/Odd = 1.8x &middot; Number = 50x. Spin 0 is green (house win)</div>
+        </div>
+        <div id="game-leaderboard" class="game-panel">
+          <div class="lb-header"><span>Rank</span><span>Player</span><span>Coins</span></div>
+          <div id="leaderboard-rows"><div style="text-align:center;color:var(--text-system);padding:20px;">Loading...</div></div>
+          <button class="game-btn" style="margin-top:12px;" onclick="sfxClick();loadLeaderboard()">Refresh</button>
+        </div>
       </div>
-      <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="slots-bet" value="10" min="1" max="50000" /><div class="bet-presets"><button class="bet-preset" onclick="sfxClick();setBet('slots',10)">10</button><button class="bet-preset" onclick="sfxClick();setBet('slots',50)">50</button><button class="bet-preset" onclick="sfxClick();setBet('slots',100)">100</button></div></div>
-      <button class="game-btn" id="slots-spin-btn" onclick="sfxClick();playSlots()">SPIN</button>
-      <div class="game-result" id="slots-result"></div>
-      <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Cherry=2x &middot; Lemon=3x &middot; Orange=4x &middot; Star=6x &middot; Diamond=8x &middot; Seven=20x</div>
-    </div>
-    <div id="game-dice" class="game-panel" style="padding:0 16px 16px;">
-      <div class="game-balance" id="dice-balance"><img class="sprite" src="/sprites/coinIcon.png" width="18" height="18" alt="coin" onerror="this.src='/sprites/placeholder.png'"> Balance: <span id="dice-balance-amt">0</span></div>
-      <div class="dice-display">
-        <div class="dice-side"><label>You</label><div class="dice-value" id="dice-player">?</div></div>
-        <div class="dice-vs">VS</div>
-        <div class="dice-side"><label>House</label><div class="dice-value" id="dice-house">?</div></div>
-      </div>
-      <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="dice-bet" value="10" min="1" max="50000" /><div class="bet-presets"><button class="bet-preset" onclick="sfxClick();setBet('dice',10)">10</button><button class="bet-preset" onclick="sfxClick();setBet('dice',50)">50</button><button class="bet-preset" onclick="sfxClick();setBet('dice',100)">100</button></div></div>
-      <button class="game-btn" id="dice-roll-btn" onclick="sfxClick();playDice()">ROLL DICE</button>
-      <div class="game-result" id="dice-result"></div>
-      <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Roll 2 dice vs the house. Higher total wins 1.9x &middot; Tie returns bet</div>
-    </div>
-    <div id="game-roulette" class="game-panel" style="padding:0 16px 16px;">
-      <div class="game-balance" id="roulette-balance"><img class="sprite" src="/sprites/coinIcon.png" width="18" height="18" alt="coin" onerror="this.src='/sprites/placeholder.png'"> Balance: <span id="roulette-balance-amt">0</span></div>
-      <div style="display:flex;justify-content:center;margin:16px 0;"><div style="text-align:center;"><label style="font-size:12px;color:var(--text-system);">Spin</label><div style="font-size:28px;margin-top:4px;" id="roulette-spin"><img class="sprite" src="/sprites/rouletteIcon.png" width="40" height="40" alt="Roulette" onerror="this.src='/sprites/placeholder.png'"></div></div></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;">
-        <button class="game-btn" id="roulette-red-btn" onclick="sfxClick();playRoulette('red')" style="background:#cc0000;">RED</button>
-        <button class="game-btn" id="roulette-black-btn" onclick="sfxClick();playRoulette('black')" style="background:#222;color:#fff;">BLACK</button>
-        <button class="game-btn" onclick="sfxClick();playRoulette('even')" style="background:#0056b3;">2,4,6... EVEN</button>
-        <button class="game-btn" onclick="sfxClick();playRoulette('odd')" style="background:#0056b3;">1,3,5... ODD</button>
-      </div>
-      <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="roulette-bet" value="10" min="1" max="50000" /><div class="bet-presets"><button class="bet-preset" onclick="sfxClick();setBet('roulette',10)">10</button><button class="bet-preset" onclick="sfxClick();setBet('roulette',50)">50</button><button class="bet-preset" onclick="sfxClick();setBet('roulette',100)">100</button></div></div>
-      <div id="roulette-selected-info"></div>
-      <div style="font-size:12px;color:var(--text-system);margin:8px 0;">Or pick a specific number (50x payout):</div>
-      <div id="roulette-number-grid"></div>
-      <div class="game-result" id="roulette-result"></div>
-      <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Red/Black/Even/Odd = 1.8x &middot; Number = 50x. Spin 0 is green (house win)</div>
-    </div>
-    <div id="game-leaderboard" class="game-panel" style="padding:0 16px 16px;">
-      <div class="lb-header"><span>Rank</span><span>Player</span><span>Coins</span></div>
-      <div id="leaderboard-rows"><div style="text-align:center;color:var(--text-system);padding:20px;">Loading...</div></div>
-      <button class="game-btn" style="margin-top:12px;" onclick="sfxClick();loadLeaderboard()">Refresh</button>
     </div>
   </div>
 </div>
@@ -838,47 +879,49 @@ const IS_DESKTOP=()=>window.innerWidth>=700;
 let winZCounter=500;
 const WIN_OFFSETS={};
 
-// Default spawn positions (staggered so windows don't stack exactly)
-const WIN_DEFAULTS={
-  'settings-overlay':  {x:60, y:55},
-  'shop-overlay':      {x:80, y:45},
-  'games-overlay':     {x:100,y:65},
-  'profile-modal':     {x:120,y:75},
-  'daily-modal':       {x:200,y:110},
-  'keypad-modal':      {x:220,y:90},
-  'room-created-modal':{x:180,y:100},
-  'changepass-modal':  {x:160,y:80},
-  'announcement-modal':{x:140,y:95},
-  'patchnotes-modal':  {x:120,y:55},
-};
+function winCenterPos(id){
+  // Calculate center of viewport for initial spawn
+  const el=document.getElementById(id);
+  if(!el)return{x:80,y:80};
+  // Temporarily make visible to measure
+  const prevDisplay=el.style.display;
+  el.style.visibility='hidden';
+  el.style.display='block';
+  const w=el.querySelector('.modal-box')?.offsetWidth||400;
+  const h=el.querySelector('.modal-box')?.offsetHeight||300;
+  el.style.display=prevDisplay||'';
+  el.style.visibility='';
+  const x=Math.max(20,Math.floor((window.innerWidth-w)/2));
+  const y=Math.max(20,Math.floor((window.innerHeight-h)/2));
+  return{x,y};
+}
 
 function winOpen(id){
-  if(!IS_DESKTOP()) return;
+  if(!IS_DESKTOP())return;
   const el=document.getElementById(id);
-  if(!el) return;
-  // Position
-  const pos=WIN_OFFSETS[id]||WIN_DEFAULTS[id]||{x:80,y:80};
+  if(!el)return;
+  el.classList.remove('minimized');
+  // Use saved position or calculate center
+  const pos=WIN_OFFSETS[id]||winCenterPos(id);
   el.style.left=pos.x+'px';
   el.style.top=pos.y+'px';
-  // Restore from minimized
-  el.classList.remove('minimized');
   winFocus(id);
 }
 
 function winFocus(id){
-  if(!IS_DESKTOP()) return;
+  if(!IS_DESKTOP())return;
   document.querySelectorAll('.modal-overlay').forEach(w=>w.classList.remove('win-focused'));
   const el=document.getElementById(id);
-  if(!el) return;
+  if(!el)return;
   winZCounter++;
   el.style.zIndex=winZCounter;
   el.classList.add('win-focused');
 }
 
 function winMinimize(id){
-  if(!IS_DESKTOP()) return;
+  if(!IS_DESKTOP())return;
   const el=document.getElementById(id);
-  if(!el) return;
+  if(!el)return;
   el.classList.toggle('minimized');
 }
 
@@ -886,10 +929,10 @@ function winMinimize(id){
 let dragState=null;
 function initDrag(overlayEl){
   const titlebar=overlayEl.querySelector('.modal-titlebar');
-  if(!titlebar) return;
+  if(!titlebar)return;
   titlebar.addEventListener('mousedown',e=>{
-    if(e.target.closest('button')) return;
-    if(!IS_DESKTOP()) return;
+    if(e.target.closest('button'))return;
+    if(!IS_DESKTOP())return;
     winFocus(overlayEl.id);
     const rect=overlayEl.getBoundingClientRect();
     dragState={el:overlayEl,sx:e.clientX,sy:e.clientY,ex:rect.left,ey:rect.top};
@@ -897,7 +940,7 @@ function initDrag(overlayEl){
   });
 }
 document.addEventListener('mousemove',e=>{
-  if(!dragState) return;
+  if(!dragState)return;
   const dx=e.clientX-dragState.sx,dy=e.clientY-dragState.sy;
   let nx=dragState.ex+dx,ny=dragState.ey+dy;
   const w=dragState.el.offsetWidth,h=dragState.el.offsetHeight;
@@ -907,14 +950,14 @@ document.addEventListener('mousemove',e=>{
   dragState.el.style.top=ny+'px';
 });
 document.addEventListener('mouseup',()=>{
-  if(!dragState) return;
+  if(!dragState)return;
   WIN_OFFSETS[dragState.el.id]={x:parseInt(dragState.el.style.left),y:parseInt(dragState.el.style.top)};
   dragState=null;
 });
 // Click any window to focus it
 document.addEventListener('mousedown',e=>{
   const win=e.target.closest('.modal-overlay');
-  if(win&&IS_DESKTOP()) winFocus(win.id);
+  if(win&&IS_DESKTOP())winFocus(win.id);
 },true);
 
 function initAllWindows(){
@@ -924,7 +967,7 @@ function initAllWindows(){
 // Helper: open a window (adds .open + positions on desktop)
 function winShow(id){
   const el=document.getElementById(id);
-  if(!el) return;
+  if(!el)return;
   el.classList.add('open');
   winOpen(id);
 }
@@ -958,7 +1001,7 @@ function enterChat(username,color,theme,coins,token,dailyAvailable){
   document.getElementById('input').focus();
   socket.connect();
   initAllWindows();
-  if(dailyAvailable) setTimeout(showDailyModal,1500);
+  if(dailyAvailable)setTimeout(showDailyModal,1500);
 }
 function setLoggedInAs(username,color){const ci=SHOP_COLORS[color];const ec=ci?` user-${ci.effect}`:'';document.getElementById('logged-in-as').innerHTML=`<span class="${ec}" style="color:${color};text-shadow:0 0 2px rgba(255,255,255,0.5)">${escHtml(username)}</span>`;setCoinAmountShadow(color);}
 
@@ -1174,7 +1217,6 @@ async function openProfile(username){
   }catch{document.getElementById('profile-modal-body').textContent='Error loading profile.';}
 }
 function closeProfile(){document.getElementById('profile-modal').classList.remove('open');}
-// Mobile: click backdrop to close
 document.getElementById('profile-modal').addEventListener('click',e=>{if(e.target===document.getElementById('profile-modal')&&!IS_DESKTOP())closeProfile();});
 
 // ── SETTINGS ───────────────────────────────────────────────────
