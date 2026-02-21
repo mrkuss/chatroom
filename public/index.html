@@ -674,8 +674,8 @@
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;">
-        <button class="game-btn" onclick="playRoulette('red')" style="background:#cc0000;">🔴 RED</button>
-        <button class="game-btn" onclick="playRoulette('black')" style="background:#222222;color:#fff;">⚫ BLACK</button>
+        <button class="game-btn" id="roulette-red-btn" onclick="playRoulette('red')" style="background:#cc0000;">🔴 RED</button>
+        <button class="game-btn" id="roulette-black-btn" onclick="playRoulette('black')" style="background:#222222;color:#fff;">⚫ BLACK</button>
         <button class="game-btn" onclick="playRoulette('even')" style="background:#0056b3;">2,4,6... EVEN</button>
         <button class="game-btn" onclick="playRoulette('odd')" style="background:#0056b3;">1,3,5... ODD</button>
       </div>
@@ -841,7 +841,7 @@ function enterChat(username,color,theme,coins,token,dailyAvailable){
   applyTheme(theme||'classic');
   document.getElementById('auth-screen').style.display='none';
   document.getElementById('chat-screen').style.display='block';
-  document.getElementById('logged-in-as').innerHTML=`<span style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.5)">${username}</span>`;
+  const colorInfo=SHOP_COLORS[myColor];const effectClass=colorInfo?` user-${colorInfo.effect}`:'';document.getElementById('logged-in-as').innerHTML=`<span class="${effectClass}" style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.5)">${username}</span>`;
   updateCoinDisplay();
   document.getElementById('input').focus();
   socket.connect();
@@ -1322,7 +1322,7 @@ async function saveSettings(){
   const statusEl=document.getElementById('settings-status');statusEl.textContent='Saving...';statusEl.style.color='inherit';
   try{const res=await fetch('/settings',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({color:selectedSettingsColor,theme:selectedSettingsTheme})});
   const data=await res.json();if(!res.ok){statusEl.textContent=data.error;statusEl.style.color='#cc0000';return}
-  myColor=selectedSettingsColor;document.getElementById('logged-in-as').innerHTML=`<span style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.5)">${myUsername}</span>`;
+  myColor=selectedSettingsColor;const colorInfo=SHOP_COLORS[myColor];const effectClass=colorInfo?` user-${colorInfo.effect}`:'';document.getElementById('logged-in-as').innerHTML=`<span class="${effectClass}" style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.5)">${myUsername}</span>`;
   socket.emit('color update',myColor);
   statusEl.textContent='Saved!';statusEl.style.color='#007700';setTimeout(()=>{statusEl.textContent=''},2000)}catch{statusEl.textContent='Error saving.';statusEl.style.color='#cc0000'}
 }
@@ -1484,7 +1484,7 @@ function initRouletteNumbers(){
   const redNumbers=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
   const grid=document.getElementById('roulette-number-grid');grid.innerHTML='';
   for(let i=1;i<=36;i++){
-    const btn=document.createElement('button');btn.className='roulette-num-btn '+(redNumbers.includes(i)?'red':'black');btn.textContent=i;
+    const btn=document.createElement('button');btn.className='roulette-num-btn '+(redNumbers.includes(i)?'red':'black');btn.textContent=(redNumbers.includes(i)?'🔴':'⚫')+i;
     btn.onclick=()=>{selectedRouletteNumber=i;playRoulette('number')};
     grid.appendChild(btn);
   }
