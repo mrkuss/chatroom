@@ -411,10 +411,19 @@
     <div id="titlebar-right">
       <span id="logged-in-as"></span>
       <span id="coin-display">🪙 0</span>
-      <button class="icon-btn" onclick="openShop()" title="Shop"><img src="/sprites/shopButtonIcon.png" alt="Shop" class="pixel-icon"></button>
-      <button class="icon-btn" onclick="openGames()" title="Games"><img src="/sprites/gameButtonIcon.png" alt="Games" class="pixel-icon"></button>
-      <button id="user-count-btn" class="icon-btn" onclick="toggleUsers()" title="Online users"><img src="/sprites/onlineUsersButtonIcon.png" alt="Users" class="pixel-icon"> <span id="user-count-text">0</span></button>
-      <button class="icon-btn" onclick="openSettings()" title="Settings"><img src="/sprites/settingsButtonIcon.png" alt="Settings" class="pixel-icon"></button>
+      <button class="icon-btn" onclick="openShop()" title="Shop">
+        <img class="pixel-icon" src="/sprites/shopButtonIcon.png" alt="Shop" onerror="this.src='/sprites/placeholder.png'">
+      </button>
+      <button class="icon-btn" onclick="openGames()" title="Games">
+        <img class="pixel-icon" src="/sprites/gameButtonIcon.png" alt="Games" onerror="this.src='/sprites/placeholder.png'">
+      </button>
+      <button id="user-count-btn" class="icon-btn" onclick="toggleUsers()" title="Online users">
+        <img class="pixel-icon" src="/sprites/onlineUsersButtonIcon.png" alt="Users" onerror="this.src='/sprites/placeholder.png'">
+        <span id="user-count-text">0</span>
+      </button>
+      <button class="icon-btn" onclick="openSettings()" title="Settings">
+        <img class="pixel-icon" src="/sprites/settingsButtonIcon.png" alt="Settings" onerror="this.src='/sprites/placeholder.png'">
+      </button>
       <button class="icon-btn danger" onclick="doLogout()" title="Exit">✕</button>
     </div>
   </div>
@@ -436,7 +445,7 @@
   </div>
 </div>
 
-<!-- ── KEYPAD MODAL ──────────────────────────────────────────────────────── -->
+<!-- ── KEYPAD MODAL ── -->
 <div id="keypad-modal" class="modal-overlay">
   <div class="modal-box">
     <div class="modal-titlebar">
@@ -467,7 +476,7 @@
   </div>
 </div>
 
-<!-- ── ROOM CREATED MODAL ─────────────────────────────────────────────────── -->
+<!-- ── ROOM CREATED MODAL ── -->
 <div id="room-created-modal" class="modal-overlay">
   <div class="modal-box">
     <div class="modal-titlebar">
@@ -485,7 +494,7 @@
   </div>
 </div>
 
-<!-- ── CHANGEPASS CONFIRM MODAL ───────────────────────────────────────────── -->
+<!-- ── CHANGEPASS CONFIRM MODAL ── -->
 <div id="changepass-modal" class="modal-overlay">
   <div class="modal-box">
     <div class="modal-titlebar">
@@ -521,7 +530,10 @@
 <!-- Profile Popup -->
 <div id="profile-modal" class="modal-overlay">
   <div class="modal-box">
-    <div class="modal-titlebar"><span id="profile-modal-title">Profile</span><button class="modal-close" onclick="closeProfile()">✕</button></div>
+    <div class="modal-titlebar">
+      <span id="profile-modal-title">Profile</span>
+      <button class="modal-close" onclick="closeProfile()">✕</button>
+    </div>
     <div class="modal-body" id="profile-modal-body">Loading...</div>
   </div>
 </div>
@@ -529,7 +541,10 @@
 <!-- Settings -->
 <div id="settings-overlay" class="modal-overlay">
   <div class="modal-box" id="settings-modal">
-    <div class="modal-titlebar"><span>⚙ Settings</span><button class="modal-close" onclick="closeSettings()">✕</button></div>
+    <div class="modal-titlebar">
+      <span>⚙ Settings</span>
+      <button class="modal-close" onclick="closeSettings()">✕</button>
+    </div>
     <div class="modal-body">
       <div class="stab-bar">
         <button class="stab active" onclick="switchSettingsTab('appearance')">Look</button>
@@ -627,7 +642,10 @@
 <!-- Shop -->
 <div id="shop-overlay" class="modal-overlay">
   <div class="modal-box" id="shop-modal">
-    <div class="modal-titlebar"><span>🛒 Shop</span><button class="modal-close" onclick="closeShop()">✕</button></div>
+    <div class="modal-titlebar">
+      <span>🛒 Shop</span>
+      <button class="modal-close" onclick="closeShop()">✕</button>
+    </div>
     <div style="padding:0 16px;">
       <div class="shop-balance" id="shop-balance">Balance: 🪙 0</div>
       <div class="shop-tabs">
@@ -646,7 +664,10 @@
 <!-- Games -->
 <div id="games-overlay" class="modal-overlay">
   <div class="modal-box" id="games-modal">
-    <div class="modal-titlebar"><span>🎮 Games</span><button class="modal-close" onclick="closeGames()">✕</button></div>
+    <div class="modal-titlebar">
+      <span>🎮 Games</span>
+      <button class="modal-close" onclick="closeGames()">✕</button>
+    </div>
     <div style="padding:0 16px;">
       <div class="games-tabs">
         <button class="games-tab active" onclick="switchGame('slots')">🎰 Slots</button>
@@ -657,16 +678,40 @@
     </div>
     <div id="game-slots" class="game-panel active" style="padding:0 16px 16px;">
       <div class="game-balance" id="slots-balance">Balance: 🪙 0</div>
-      <div class="slots-reels"><div class="slot-reel" id="reel-0">🎰</div><div class="slot-reel" id="reel-1">🎰</div><div class="slot-reel" id="reel-2">🎰</div></div>
-      <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="slots-bet" value="10" min="1" max="50000" /><div class="bet-presets"><button class="bet-preset" onclick="setBet('slots',10)">10</button><button class="bet-preset" onclick="setBet('slots',50)">50</button><button class="bet-preset" onclick="setBet('slots',100)">100</button></div></div>
+      <div class="slots-reels">
+        <div class="slot-reel" id="reel-0">🎰</div>
+        <div class="slot-reel" id="reel-1">🎰</div>
+        <div class="slot-reel" id="reel-2">🎰</div>
+      </div>
+      <div class="bet-row">
+        <label>Bet:</label>
+        <input type="number" class="bet-input" id="slots-bet" value="10" min="1" max="50000" />
+        <div class="bet-presets">
+          <button class="bet-preset" onclick="setBet('slots',10)">10</button>
+          <button class="bet-preset" onclick="setBet('slots',50)">50</button>
+          <button class="bet-preset" onclick="setBet('slots',100)">100</button>
+        </div>
+      </div>
       <button class="game-btn" id="slots-spin-btn" onclick="playSlots()">SPIN</button>
       <div class="game-result" id="slots-result"></div>
       <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">More forgiving odds · 🍒=2x · 🍋=3x · 🍊=4x · ⭐=6x · 💎=8x · 7️⃣=20x</div>
     </div>
     <div id="game-dice" class="game-panel" style="padding:0 16px 16px;">
       <div class="game-balance" id="dice-balance">Balance: 🪙 0</div>
-      <div class="dice-display"><div class="dice-side"><label>You</label><div class="dice-value" id="dice-player">?</div></div><div class="dice-vs">VS</div><div class="dice-side"><label>House</label><div class="dice-value" id="dice-house">?</div></div></div>
-      <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="dice-bet" value="10" min="1" max="50000" /><div class="bet-presets"><button class="bet-preset" onclick="setBet('dice',10)">10</button><button class="bet-preset" onclick="setBet('dice',50)">50</button><button class="bet-preset" onclick="setBet('dice',100)">100</button></div></div>
+      <div class="dice-display">
+        <div class="dice-side"><label>You</label><div class="dice-value" id="dice-player">?</div></div>
+        <div class="dice-vs">VS</div>
+        <div class="dice-side"><label>House</label><div class="dice-value" id="dice-house">?</div></div>
+      </div>
+      <div class="bet-row">
+        <label>Bet:</label>
+        <input type="number" class="bet-input" id="dice-bet" value="10" min="1" max="50000" />
+        <div class="bet-presets">
+          <button class="bet-preset" onclick="setBet('dice',10)">10</button>
+          <button class="bet-preset" onclick="setBet('dice',50)">50</button>
+          <button class="bet-preset" onclick="setBet('dice',100)">100</button>
+        </div>
+      </div>
       <button class="game-btn" id="dice-roll-btn" onclick="playDice()">ROLL DICE</button>
       <div class="game-result" id="dice-result"></div>
       <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Roll 2 dice vs the house. Higher total wins 1.9x · Tie returns bet</div>
@@ -685,7 +730,15 @@
         <button class="game-btn" onclick="playRoulette('even')" style="background:#0056b3;">2,4,6... EVEN</button>
         <button class="game-btn" onclick="playRoulette('odd')" style="background:#0056b3;">1,3,5... ODD</button>
       </div>
-      <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="roulette-bet" value="10" min="1" max="50000" /><div class="bet-presets"><button class="bet-preset" onclick="setBet('roulette',10)">10</button><button class="bet-preset" onclick="setBet('roulette',50)">50</button><button class="bet-preset" onclick="setBet('roulette',100)">100</button></div></div>
+      <div class="bet-row">
+        <label>Bet:</label>
+        <input type="number" class="bet-input" id="roulette-bet" value="10" min="1" max="50000" />
+        <div class="bet-presets">
+          <button class="bet-preset" onclick="setBet('roulette',10)">10</button>
+          <button class="bet-preset" onclick="setBet('roulette',50)">50</button>
+          <button class="bet-preset" onclick="setBet('roulette',100)">100</button>
+        </div>
+      </div>
       <div id="roulette-selected-info"></div>
       <div style="font-size:12px;color:var(--text-system);margin:8px 0;">Or pick a specific number (50x payout):</div>
       <div id="roulette-number-grid"></div>
@@ -704,7 +757,7 @@
 <div id="announcement-modal" class="modal-overlay">
   <div style="background:var(--bg-input);padding:24px;border-radius:4px;max-width:500px;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
     <div style="font-weight:bold;font-size:18px;margin-bottom:12px;">Server Announcement</div>
-    <div id="announcement-content" style="color:var(--text-primary);margin-bottom:20px;line-height:1.5;"></div>
+    <div id="announcement-content" style="color:var(--text-main);margin-bottom:20px;line-height:1.5;"></div>
     <button class="game-btn" onclick="closeAnnouncement()" style="width:100%;">Close</button>
   </div>
 </div>
@@ -713,7 +766,7 @@
 <div id="patchnotes-modal" class="modal-overlay">
   <div style="background:var(--bg-input);padding:24px;border-radius:4px;max-width:600px;max-height:80vh;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
     <div style="font-weight:bold;font-size:18px;margin-bottom:16px;">Patch Notes</div>
-    <div id="patchnotes-content" style="color:var(--text-primary);line-height:1.6;font-size:14px;">
+    <div id="patchnotes-content" style="color:var(--text-main);line-height:1.6;font-size:14px;">
       <div style="margin-bottom:16px;">
         <div style="font-weight:bold;margin-bottom:8px;">Latest Updates</div>
         <ul style="margin:0;padding-left:20px;">
@@ -753,36 +806,63 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-// ── SHOP CATALOGUE (for color effects) ────────────────────────────────────────
-const SHOP_COLORS={
-  '#ffd700':{name:'Shimmering Gold / Infinity Gold',effect:'shimmer'},'#e5e4e2':{name:'Platinum Gleam',effect:'gleam'},
-  '#b9f2ff':{name:'Diamond Sparkle',effect:'sparkle'},'#ff6bcb':{name:'Aurora Borealis',effect:'rainbow'},
-  '#2a0845':{name:'Cosmic Nebula',effect:'nebula'},'#ff00ff':{name:'Prismatic Legend',effect:'prism'}
+
+// ── SPRITE HELPER ─────────────────────────────────────────────────────────────
+// Returns an <img> element that falls back to placeholder.png if the sprite 404s.
+function spriteImg(name, alt, extraClass) {
+  const img = document.createElement('img');
+  img.src = `/sprites/${name}`;
+  img.alt = alt || name;
+  if (extraClass) img.className = extraClass;
+  img.onerror = function() { this.onerror = null; this.src = '/sprites/placeholder.png'; };
+  return img;
+}
+
+// ── SHOP CATALOGUE (for color effects) ───────────────────────────────────────
+const SHOP_COLORS = {
+  '#ffd700': { name: 'Shimmering Gold / Infinity Gold', effect: 'shimmer' },
+  '#e5e4e2': { name: 'Platinum Gleam', effect: 'gleam' },
+  '#b9f2ff': { name: 'Diamond Sparkle', effect: 'sparkle' },
+  '#ff6bcb': { name: 'Aurora Borealis', effect: 'rainbow' },
+  '#2a0845': { name: 'Cosmic Nebula', effect: 'nebula' },
+  '#ff00ff': { name: 'Prismatic Legend', effect: 'prism' }
 };
 
 // ── SOUNDS ────────────────────────────────────────────────────────────────────
 let soundEnabled = true;
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-let actx = null;
-function getActx() { if (!actx) actx = new AudioContext(); return actx; }
-function playTone(freq,type,duration,vol=0.15,delay=0) {
+const _sounds = Object.fromEntries(
+  ['listclick','hover','message','join','leave','dm',
+   'pollEnd','win','lose','coin','claim','keypad',
+   'spin','roll','bet','notify']
+  .map(n => [n, Object.assign(new Audio(`/sounds/${n}.wav`), { preload: 'auto' })])
+);
+function playSound(name, vol = 1.0) {
   if (!soundEnabled) return;
-  try { const ctx=getActx(),osc=ctx.createOscillator(),gain=ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); osc.type=type; osc.frequency.setValueAtTime(freq,ctx.currentTime+delay); gain.gain.setValueAtTime(vol,ctx.currentTime+delay); gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+delay+duration); osc.start(ctx.currentTime+delay); osc.stop(ctx.currentTime+delay+duration+0.01); } catch {}
+  const a = _sounds[name]; if (!a) return;
+  try { a.volume = Math.min(1, Math.max(0, vol)); a.currentTime = 0; a.play().catch(() => {}); } catch {}
 }
-function soundMessage(){playTone(880,'square',0.06,0.1)}
-function soundJoin(){playTone(523,'sine',0.15,0.12);playTone(659,'sine',0.15,0.12,0.12);playTone(784,'sine',0.2,0.14,0.24)}
-function soundLeave(){playTone(784,'sine',0.12,0.1);playTone(523,'sine',0.2,0.1,0.14)}
-function soundDM(){playTone(1046,'square',0.08,0.1);playTone(1318,'square',0.12,0.12,0.1)}
-function soundPollEnd(){playTone(659,'sine',0.1,0.12);playTone(784,'sine',0.1,0.12,0.1);playTone(1046,'sine',0.3,0.15,0.2)}
-function soundWin(){playTone(523,'sine',0.1,0.15);playTone(659,'sine',0.1,0.15,0.1);playTone(784,'sine',0.1,0.15,0.2);playTone(1046,'sine',0.3,0.18,0.3)}
-function soundLose(){playTone(400,'sawtooth',0.1,0.12);playTone(300,'sawtooth',0.2,0.12,0.12)}
-function soundCoin(){playTone(1318,'sine',0.08,0.12);playTone(1568,'sine',0.12,0.14,0.08)}
-function soundClaim(){playTone(880,'sine',0.08,0.2);playTone(1046,'sine',0.08,0.2,0.1);playTone(1318,'sine',0.15,0.2,0.2);playTone(1568,'sine',0.3,0.25,0.35)}
-function soundKeypad(){playTone(1000,'square',0.04,0.08)}
-function toggleSound(){ soundEnabled=!soundEnabled; const btn=document.getElementById('sound-toggle-btn'); btn.textContent=soundEnabled?'🔊 Enabled':'🔇 Disabled'; btn.classList.toggle('on',soundEnabled); }
+function soundMessage()  { playSound('message',  0.8); }
+function soundJoin()     { playSound('join',      0.9); }
+function soundLeave()    { playSound('leave',     0.8); }
+function soundDM()       { playSound('dm',        1.0); }
+function soundPollEnd()  { playSound('pollEnd',   0.9); }
+function soundWin()      { playSound('win',       1.0); }
+function soundLose()     { playSound('lose',      0.9); }
+function soundCoin()     { playSound('coin',      0.8); }
+function soundClaim()    { playSound('claim',     1.0); }
+function soundKeypad()   { playSound('keypad',    0.6); }
+function soundNotify()   { playSound('notify',    1.0); }
+function soundSpin()     { playSound('spin',      0.9); }
+function soundRoll()     { playSound('roll',      0.9); }
+function soundBet()      { playSound('bet',       0.8); }
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  const btn = document.getElementById('sound-toggle-btn');
+  btn.textContent = soundEnabled ? '🔊 Enabled' : '🔇 Disabled';
+  btn.classList.toggle('on', soundEnabled);
+}
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
-// Socket configured with aggressive reconnection so silent drops are recovered
 const socket = io({
   autoConnect: false,
   reconnection: true,
@@ -791,258 +871,225 @@ const socket = io({
   reconnectionDelayMax: 10000,
   timeout: 20000,
 });
-let myUsername=null, myColor='#000080', myCoins=0, selectedTheme='classic';
-let currentRoom='general', pendingRoom=null, usersVisible=false, isTyping=false, typingTimer;
-let myToken=null; // stored so we can re-auth after reconnect
-const unreadCounts={}, polls={};
-let shopItems=[], selectedSettingsColor='#000080', selectedSettingsTheme='classic';
-
-// Keypad state
-let keypadRoom=null, keypadCode='';
-// Changepass pending
-let pendingChangepass=null;
-// Owner room codes: roomName -> code (populated from server on rooms list + room created events)
-const ownerRoomCodes={};
+let myUsername = null, myColor = '#000080', myCoins = 0, selectedTheme = 'classic';
+let currentRoom = 'general', pendingRoom = null, usersVisible = false, isTyping = false, typingTimer;
+let myToken = null;
+const unreadCounts = {}, polls = {};
+let shopItems = [], selectedSettingsColor = '#000080', selectedSettingsTheme = 'classic';
+let keypadRoom = null, keypadCode = '';
+let pendingChangepass = null;
+const ownerRoomCodes = {};
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
-function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function formatNumber(n){if(n===null||n===undefined)return'0';const num=Number(n);if(Number.isNaN(num))return String(n);return num.toLocaleString()}
-function updateCoinDisplay(){document.getElementById('coin-display').textContent=`🪙 ${formatNumber(myCoins)}`}
-function formatDuration(ms){const t=Math.floor(ms/1000),d=Math.floor(t/86400),h=Math.floor((t%86400)/3600),m=Math.floor((t%3600)/60),s=t%60;if(d>0)return d+"D "+h+"HR "+m+"M";if(h>0)return h+"HR "+m+"M";if(m>0)return m+"M "+s+"S";return s+"S"}
-function formatSeconds(s){if(s<60)return s+'s';if(s<3600)return Math.floor(s/60)+'m';if(s<86400)return Math.floor(s/3600)+'h '+Math.floor((s%3600)/60)+'m';return Math.floor(s/86400)+'d '+Math.floor((s%86400)/3600)+'h'}
-function formatTime(ts){return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
-function formatDate(d){return new Date(d).toLocaleDateString([],{year:'numeric',month:'short',day:'numeric'})}
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function formatNumber(n) { if(n===null||n===undefined)return'0'; const num=Number(n); if(Number.isNaN(num))return String(n); return num.toLocaleString(); }
+function updateCoinDisplay() { document.getElementById('coin-display').textContent = `🪙 ${formatNumber(myCoins)}`; }
+function formatDuration(ms) { const t=Math.floor(ms/1000),d=Math.floor(t/86400),h=Math.floor((t%86400)/3600),m=Math.floor((t%3600)/60),s=t%60; if(d>0)return d+"D "+h+"HR "+m+"M"; if(h>0)return h+"HR "+m+"M"; if(m>0)return m+"M "+s+"S"; return s+"S"; }
+function formatSeconds(s) { if(s<60)return s+'s'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h '+Math.floor((s%3600)/60)+'m'; return Math.floor(s/86400)+'d '+Math.floor((s%86400)/3600)+'h'; }
+function formatTime(ts) { return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
+function formatDate(d) { return new Date(d).toLocaleDateString([],{year:'numeric',month:'short',day:'numeric'}); }
 
 // ── THEME ─────────────────────────────────────────────────────────────────────
-function applyTheme(theme){document.body.className=document.body.className.replace(/theme-\w+/g,'').trim();if(theme!=='classic')document.body.classList.add('theme-'+theme);selectedTheme=theme}
+function applyTheme(theme) {
+  document.body.className = document.body.className.replace(/theme-\w+/g,'').trim();
+  if (theme !== 'classic') document.body.classList.add('theme-'+theme);
+  selectedTheme = theme;
+}
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
-function switchTab(tab){
-  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(i===0)===(tab==='login')));
-  document.getElementById('login-panel').classList.toggle('active',tab==='login');
-  document.getElementById('register-panel').classList.toggle('active',tab==='register');
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active',(i===0)===(tab==='login')));
+  document.getElementById('login-panel').classList.toggle('active', tab==='login');
+  document.getElementById('register-panel').classList.toggle('active', tab==='register');
 }
 fetch('/user-count').then(r=>r.json()).then(d=>{
-  if(d.count) document.getElementById('auth-user-count').textContent=`👥 ${d.count} registered user${d.count===1?'':'s'}`;
+  if(d.count) document.getElementById('auth-user-count').textContent = `👥 ${d.count} registered user${d.count===1?'':'s'}`;
 }).catch(()=>{});
 
-async function doLogin(){
-  const u=document.getElementById('login-username').value.trim(),p=document.getElementById('login-password').value,e=document.getElementById('login-error');
-  e.textContent='';if(!u||!p){e.textContent='Please fill in all fields.';return;}
+async function doLogin() {
+  const u=document.getElementById('login-username').value.trim(), p=document.getElementById('login-password').value, e=document.getElementById('login-error');
+  e.textContent=''; if(!u||!p){e.textContent='Please fill in all fields.';return;}
   const res=await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
-  const data=await res.json();if(!res.ok){e.textContent=data.error;return;}
+  const data=await res.json(); if(!res.ok){e.textContent=data.error;return;}
   enterChat(data.username,data.color||'#000080',data.theme||'classic',data.coins||0,data.token,data.dailyAvailable);
 }
-async function doRegister(){
-  const u=document.getElementById('reg-username').value.trim(),p=document.getElementById('reg-password').value,p2=document.getElementById('reg-password2').value,e=document.getElementById('register-error');
-  e.textContent='';if(!u||!p||!p2){e.textContent='Please fill in all fields.';return;}if(p!==p2){e.textContent='Passwords do not match.';return;}
+async function doRegister() {
+  const u=document.getElementById('reg-username').value.trim(), p=document.getElementById('reg-password').value, p2=document.getElementById('reg-password2').value, e=document.getElementById('register-error');
+  e.textContent=''; if(!u||!p||!p2){e.textContent='Please fill in all fields.';return;} if(p!==p2){e.textContent='Passwords do not match.';return;}
   const res=await fetch('/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
-  const data=await res.json();if(!res.ok){e.textContent=data.error;return;}
+  const data=await res.json(); if(!res.ok){e.textContent=data.error;return;}
   enterChat(data.username,data.color||'#000080',data.theme||'classic',data.coins||100,data.token,false);
 }
-async function doLogout(){await fetch('/logout',{method:'POST'});socket.disconnect();location.reload()}
+async function doLogout() { await fetch('/logout',{method:'POST'}); socket.disconnect(); location.reload(); }
 
-function enterChat(username,color,theme,coins,token,dailyAvailable){
-  myUsername=username;myColor=color||'#000080';myCoins=coins||0;myToken=token;
+function enterChat(username, color, theme, coins, token, dailyAvailable) {
+  myUsername=username; myColor=color||'#000080'; myCoins=coins||0; myToken=token;
   applyTheme(theme||'classic');
   document.getElementById('auth-screen').style.display='none';
   document.getElementById('chat-screen').style.display='block';
-  const colorInfo=SHOP_COLORS[myColor];const effectClass=colorInfo?` user-${colorInfo.effect}`:'';document.getElementById('logged-in-as').innerHTML=`<span class="${effectClass}" style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.5)">${username}</span>`;
+  const colorInfo=SHOP_COLORS[myColor]; const effectClass=colorInfo?` user-${colorInfo.effect}`:'';
+  document.getElementById('logged-in-as').innerHTML=`<span class="${effectClass}" style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.5)">${username}</span>`;
   updateCoinDisplay();
   document.getElementById('input').focus();
   socket.connect();
-  if(dailyAvailable)setTimeout(()=>showDailyModal(),1500);
+  if (dailyAvailable) setTimeout(()=>showDailyModal(), 1500);
 }
 
 // ── RECONNECTION ──────────────────────────────────────────────────────────────
-socket.on('disconnect', (reason) => {
-  // If the server explicitly kicked us (e.g. logged in elsewhere), don't reconnect
-  if (reason === 'io server disconnect') return;
+socket.on('disconnect', reason => {
+  if (reason==='io server disconnect') return;
   document.getElementById('reconnect-banner').classList.add('visible');
-  document.getElementById('input').disabled = true;
-  document.getElementById('send-btn').disabled = true;
+  document.getElementById('input').disabled=true;
+  document.getElementById('send-btn').disabled=true;
 });
-
 socket.on('connect', () => {
   document.getElementById('reconnect-banner').classList.remove('visible');
-  document.getElementById('input').disabled = false;
-  document.getElementById('send-btn').disabled = false;
-  // Re-authenticate on every (re)connect so the server has our session
+  document.getElementById('input').disabled=false;
+  document.getElementById('send-btn').disabled=false;
   if (myToken) socket.emit('join', myToken);
 });
-
 socket.on('reconnect', () => {
-  // After reconnect, switch back to the room we were in
-  if (currentRoom && currentRoom !== 'general') {
-    socket.emit('switch room', { room: currentRoom });
-  }
+  if (currentRoom && currentRoom!=='general') socket.emit('switch room',{room:currentRoom});
 });
 
 // ── ROOMS ─────────────────────────────────────────────────────────────────────
-function renderRooms(rooms){
-  const list=document.getElementById('rooms-list');list.innerHTML='';
-  rooms.forEach(r=>{
+function renderRooms(rooms) {
+  const list=document.getElementById('rooms-list'); list.innerHTML='';
+  rooms.forEach(r => {
     const name=typeof r==='string'?r:r.name;
     const isPrivate=typeof r==='object'&&r.isPrivate;
-    const isOwner=typeof r==='object'&&r.isOwner;
-    // Server sends ownerCode for rooms the user owns
     const serverCode=typeof r==='object'&&r.ownerCode?r.ownerCode:null;
     if(serverCode) ownerRoomCodes[name]=serverCode;
-
     const btn=document.createElement('button');
     btn.className='room-btn'+(name===currentRoom?' active':'');
     btn.dataset.room=name;
     btn.innerHTML=(isPrivate?'<span class="room-private-icon">🔒</span>':'')+`#${name}`;
-    if(unreadCounts[name])btn.innerHTML+=`<span class="room-unread">${unreadCounts[name]}</span>`;
+    if(unreadCounts[name]) btn.innerHTML+=`<span class="room-unread">${unreadCounts[name]}</span>`;
     btn.onclick=()=>switchRoom(name);
     list.appendChild(btn);
   });
 }
-
-function switchRoom(room){
-  if(room===currentRoom||room===pendingRoom)return;
+function switchRoom(room) {
+  if(room===currentRoom||room===pendingRoom) return;
   pendingRoom=room;
   socket.emit('switch room',{room});
 }
 
 // ── KEYPAD ────────────────────────────────────────────────────────────────────
-function openKeypad(room){
-  keypadRoom=room;keypadCode='';
+function openKeypad(room) {
+  keypadRoom=room; keypadCode='';
   document.getElementById('keypad-room-label').textContent=`#${room}`;
   document.getElementById('keypad-error').textContent='';
   renderKeypadDots();
   document.getElementById('keypad-modal').classList.add('open');
 }
-function closeKeypad(){
+function closeKeypad() {
   document.getElementById('keypad-modal').classList.remove('open');
-  keypadRoom=null;keypadCode='';
-  pendingRoom=null;
+  keypadRoom=null; keypadCode=''; pendingRoom=null;
 }
-function renderKeypadDots(){
-  const wrap=document.getElementById('keypad-dots');
-  wrap.innerHTML='';
+function renderKeypadDots() {
+  const wrap=document.getElementById('keypad-dots'); wrap.innerHTML='';
   const len=Math.max(keypadCode.length,1);
-  for(let i=0;i<Math.min(len,9);i++){
+  for(let i=0;i<Math.min(len,9);i++) {
     const d=document.createElement('div');
     d.className='keypad-dot'+(i<keypadCode.length?' filled':'');
     wrap.appendChild(d);
   }
 }
-function keypadPress(digit){
-  if(keypadCode.length>=9)return;
-  soundKeypad();
-  keypadCode+=digit;
+function keypadPress(digit) {
+  if(keypadCode.length>=9) return;
+  soundKeypad(); keypadCode+=digit;
   document.getElementById('keypad-error').textContent='';
   renderKeypadDots();
 }
-function keypadClear(){
-  if(!keypadCode.length)return;
+function keypadClear() {
+  if(!keypadCode.length) return;
   keypadCode=keypadCode.slice(0,-1);
   renderKeypadDots();
 }
-function keypadSubmit(){
+function keypadSubmit() {
   if(!keypadCode){document.getElementById('keypad-error').textContent='Enter a code first.';return;}
   pendingRoom=keypadRoom;
   socket.emit('switch room',{room:keypadRoom,code:keypadCode});
 }
-document.addEventListener('keydown',e=>{
-  if(!document.getElementById('keypad-modal').classList.contains('open'))return;
-  if(e.key>='0'&&e.key<='9')keypadPress(e.key);
-  else if(e.key==='Backspace')keypadClear();
-  else if(e.key==='Enter')keypadSubmit();
+document.addEventListener('keydown', e => {
+  if(!document.getElementById('keypad-modal').classList.contains('open')) return;
+  if(e.key>='0'&&e.key<='9') keypadPress(e.key);
+  else if(e.key==='Backspace') keypadClear();
+  else if(e.key==='Enter') keypadSubmit();
 });
 
 // ── ROOM CREATED MODAL ────────────────────────────────────────────────────────
-function openRoomCreated(room,code){
+function openRoomCreated(room,code) {
   document.getElementById('rc-room-name').textContent=`#${room}`;
   document.getElementById('rc-room-code').textContent=code;
   document.getElementById('room-created-modal').classList.add('open');
 }
-function closeRoomCreated(){document.getElementById('room-created-modal').classList.remove('open');}
+function closeRoomCreated() { document.getElementById('room-created-modal').classList.remove('open'); }
 
 // ── CHANGEPASS CONFIRM MODAL ──────────────────────────────────────────────────
-function openChangepassConfirm(room,newCode){
+function openChangepassConfirm(room,newCode) {
   pendingChangepass={room,newCode};
   document.getElementById('cp-room-name').textContent=`#${room}`;
   document.getElementById('cp-new-code').textContent=newCode;
   document.getElementById('changepass-modal').classList.add('open');
 }
-function closeChangepass(){document.getElementById('changepass-modal').classList.remove('open');pendingChangepass=null;}
-function confirmChangepass(){
-  if(!pendingChangepass)return;
-  socket.emit('confirm changepass',pendingChangepass);
-  closeChangepass();
-}
+function closeChangepass() { document.getElementById('changepass-modal').classList.remove('open'); pendingChangepass=null; }
+function confirmChangepass() { if(!pendingChangepass)return; socket.emit('confirm changepass',pendingChangepass); closeChangepass(); }
 
 // ── SEND ──────────────────────────────────────────────────────────────────────
-function send(){const input=document.getElementById('input'),text=input.value.trim();if(!text)return;socket.emit('chat message',text);input.value='';stopTyping()}
+function send() { const input=document.getElementById('input'), text=input.value.trim(); if(!text)return; socket.emit('chat message',text); input.value=''; stopTyping(); }
 
 // ── TYPING ────────────────────────────────────────────────────────────────────
-document.getElementById('input').addEventListener('input',()=>{socket.emit('activity');if(!isTyping){isTyping=true;socket.emit('typing start')}clearTimeout(typingTimer);typingTimer=setTimeout(stopTyping,2000)});
-function stopTyping(){if(!isTyping)return;isTyping=false;clearTimeout(typingTimer);socket.emit('typing stop')}
-function toggleUsers(){usersVisible=!usersVisible;document.getElementById('users-panel').classList.toggle('visible',usersVisible)}
+document.getElementById('input').addEventListener('input', () => {
+  socket.emit('activity');
+  if(!isTyping){isTyping=true;socket.emit('typing start');}
+  clearTimeout(typingTimer); typingTimer=setTimeout(stopTyping,2000);
+});
+function stopTyping() { if(!isTyping)return; isTyping=false; clearTimeout(typingTimer); socket.emit('typing stop'); }
+function toggleUsers() { usersVisible=!usersVisible; document.getElementById('users-panel').classList.toggle('visible',usersVisible); }
 
 // ── MESSAGES ──────────────────────────────────────────────────────────────────
-function addMessage(html, extraClass='', timestamp=null, msgId=null){
+function addMessage(html, extraClass='', timestamp=null, msgId=null) {
   const messages=document.getElementById('messages');
   const atBottom=messages.scrollHeight-messages.scrollTop-messages.clientHeight<40;
-  const li=document.createElement('li');li.style.listStyle='none';
+  const li=document.createElement('li'); li.style.listStyle='none';
   li.className='msg-row'+(extraClass?' '+extraClass:'');
   if(msgId) li.dataset.msgId=msgId;
   const ts=timestamp?`<span class="msg-ts">${formatTime(timestamp)}</span>`:'';
   const reactBtn=msgId?`<button class="msg-react-btn" title="React">+<div class="react-picker"><span class="react-emoji" data-emoji="👍">👍</span><span class="react-emoji" data-emoji="❤️">❤️</span><span class="react-emoji" data-emoji="😂">😂</span><span class="react-emoji" data-emoji="😮">😮</span></div></button>`:'';
+  // Highlight mentions
+  const mentionRegex=myUsername?new RegExp(`@${myUsername.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}\\b`,'i'):null;
+  const temp=document.createElement('div'); temp.innerHTML=html;
+  const msgText=temp.textContent||'';
+  const willMention=mentionRegex&&mentionRegex.test(msgText);
+  if(willMention) li.classList.add('msg-mention');
   li.innerHTML=html+ts+reactBtn;
   messages.appendChild(li);
-  if(atBottom)messages.scrollTop=messages.scrollHeight;
+  if(atBottom) messages.scrollTop=messages.scrollHeight;
   return li;
 }
 
-// Room unread badge updater
-function updateRoomBadge(room){
-  const btn = document.querySelector(`.room-btn[data-room="${room}"]`);
-  if (!btn) return;
-  // remove existing badge
-  const existing = btn.querySelector('.room-unread');
-  if (existing) existing.remove();
-  const count = unreadCounts[room] || 0;
-  if (count > 0) {
-    const span = document.createElement('span');
-    span.className = 'room-unread';
-    span.textContent = count>99? '99+' : count;
-    btn.appendChild(span);
-  }
+function updateRoomBadge(room) {
+  const btn=document.querySelector(`.room-btn[data-room="${room}"]`); if(!btn)return;
+  const existing=btn.querySelector('.room-unread'); if(existing)existing.remove();
+  const count=unreadCounts[room]||0;
+  if(count>0){const span=document.createElement('span');span.className='room-unread';span.textContent=count>99?'99+':count;btn.appendChild(span);}
 }
 
-function addDmMessage(data){
+function addDmMessage(data) {
   const messages=document.getElementById('messages');
   const atBottom=messages.scrollHeight-messages.scrollTop-messages.clientHeight<40;
-  const li=document.createElement('li');li.style.listStyle='none';
+  const li=document.createElement('li'); li.style.listStyle='none';
   li.className='msg-row msg-dm-row'+(!data.noFlash&&!data.self?' dm-flash':'');
   const label=data.self?`<span class="msg-dm-label">→ DM to ${data.to}:</span>`:`<span class="msg-dm-label">DM from ${data.from}:</span>`;
   li.innerHTML=label+`<span class="msg-text">${data.text}</span>`;
   messages.appendChild(li);
-  if(atBottom)messages.scrollTop=messages.scrollHeight;
-  if(!data.noFlash&&!data.self)soundDM();
+  if(atBottom) messages.scrollTop=messages.scrollHeight;
+  if(!data.noFlash&&!data.self) soundDM();
 }
 
-// Highlight mentions in general chat messages when added
-const origAddMessage = addMessage;
-addMessage = function(html, extraClass='', timestamp=null, msgId=null){
-  // detect mention of current user
-  const temp = document.createElement('div'); temp.innerHTML = html;
-  const msgTextEl = temp.querySelector('.msg-text');
-  const msgText = msgTextEl ? msgTextEl.textContent : temp.textContent || '';
-  const mentionRegex = myUsername ? new RegExp(`@${myUsername.replace(/[.*+?^${}()|[\\]\\]/g,'\\\\$&')}\\b`, 'i') : null;
-  const willMention = mentionRegex && mentionRegex.test(msgText);
-  const li = origAddMessage(html, extraClass, timestamp, msgId);
-  if (willMention) {
-    li.classList.add('msg-mention');
-    playTone(880,'square',0.06,0.18);
-  }
-  return li;
-}
-
-document.getElementById('messages').addEventListener('click',e=>{
+document.getElementById('messages').addEventListener('click', e => {
   const emojiBtn=e.target.closest('.react-emoji');
   if(emojiBtn){const li=emojiBtn.closest('.msg-row');if(li&&li.dataset.msgId)socket.emit('react',{messageId:parseInt(li.dataset.msgId),emoji:emojiBtn.dataset.emoji});return;}
   const pill=e.target.closest('.reaction-pill');
@@ -1050,61 +1097,60 @@ document.getElementById('messages').addEventListener('click',e=>{
   const opt=e.target.closest('.poll-option');
   if(opt&&!opt.classList.contains('concluded')){const pollId=parseInt(opt.dataset.poll),option=opt.dataset.opt;if(pollId&&option)socket.emit('poll vote',{pollId,option});return;}
   const userEl=e.target.closest('.msg-user');
-  if(userEl&&userEl.dataset.username)openProfile(userEl.dataset.username);
+  if(userEl&&userEl.dataset.username) openProfile(userEl.dataset.username);
 });
 
-function updateReactions(li,reactions,myReaction){
+function updateReactions(li, reactions, myReaction) {
   let wrap=li.querySelector('.msg-reactions');
-  if(!wrap){wrap=document.createElement('div');wrap.className='msg-reactions';li.appendChild(wrap)}
-  wrap.innerHTML='';li.dataset.myReaction=myReaction||'';
+  if(!wrap){wrap=document.createElement('div');wrap.className='msg-reactions';li.appendChild(wrap);}
+  wrap.innerHTML=''; li.dataset.myReaction=myReaction||'';
   Object.entries(reactions).forEach(([emoji,count])=>{
     if(count<=0)return;
-    const pill=document.createElement('span');pill.className='reaction-pill'+(myReaction===emoji?' selected':'');pill.dataset.emoji=emoji;
-    pill.innerHTML=`${emoji}<span class="r-count">${count}</span>`;wrap.appendChild(pill);
+    const pill=document.createElement('span'); pill.className='reaction-pill'+(myReaction===emoji?' selected':'');
+    pill.dataset.emoji=emoji; pill.innerHTML=`${emoji}<span class="r-count">${count}</span>`; wrap.appendChild(pill);
   });
 }
 
 // ── POLLS ─────────────────────────────────────────────────────────────────────
-function renderPoll(poll){
-  polls[poll.id]=poll;const existing=document.getElementById(`poll-${poll.id}`);
-  if(existing){existing.innerHTML=buildPollHtml(poll);return}
-  const messages=document.getElementById('messages');const atBottom=messages.scrollHeight-messages.scrollTop-messages.clientHeight<40;
-  const li=document.createElement('li');li.style.listStyle='none';li.id=`poll-${poll.id}`;li.className='msg-row';li.innerHTML=buildPollHtml(poll);
-  messages.appendChild(li);if(atBottom)messages.scrollTop=messages.scrollHeight;
+function renderPoll(poll) {
+  polls[poll.id]=poll; const existing=document.getElementById(`poll-${poll.id}`);
+  if(existing){existing.innerHTML=buildPollHtml(poll);return;}
+  const messages=document.getElementById('messages'); const atBottom=messages.scrollHeight-messages.scrollTop-messages.clientHeight<40;
+  const li=document.createElement('li'); li.style.listStyle='none'; li.id=`poll-${poll.id}`; li.className='msg-row'; li.innerHTML=buildPollHtml(poll);
+  messages.appendChild(li); if(atBottom)messages.scrollTop=messages.scrollHeight;
 }
-function buildPollHtml(poll){
-  const totalVotes=Object.keys(poll.votes||{}).length,myVote=(poll.votes||{})[myUsername],concluded=poll.concluded;
+function buildPollHtml(poll) {
+  const totalVotes=Object.keys(poll.votes||{}).length, myVote=(poll.votes||{})[myUsername], concluded=poll.concluded;
   let topCount=0;
-  if(concluded&&totalVotes>0){const tally={};poll.options.forEach(o=>tally[o]=0);Object.values(poll.votes||{}).forEach(v=>{if(tally[v]!==undefined)tally[v]++});topCount=Math.max(...Object.values(tally))}
+  if(concluded&&totalVotes>0){const tally={};poll.options.forEach(o=>tally[o]=0);Object.values(poll.votes||{}).forEach(v=>{if(tally[v]!==undefined)tally[v]++;});topCount=Math.max(...Object.values(tally));}
   const optionsHtml=poll.options.map(opt=>{
-    const count=Object.values(poll.votes||{}).filter(v=>v===opt).length,pct=totalVotes>0?Math.round((count/totalVotes)*100):0;
-    const isVoted=myVote===opt,isWinner=concluded&&totalVotes>0&&count===topCount;
+    const count=Object.values(poll.votes||{}).filter(v=>v===opt).length, pct=totalVotes>0?Math.round((count/totalVotes)*100):0;
+    const isVoted=myVote===opt, isWinner=concluded&&totalVotes>0&&count===topCount;
     const classes=['poll-option',isVoted?'voted':'',concluded?'concluded':'',isWinner?'winner':''].filter(Boolean).join(' ');
     return `<div class="${classes}" data-poll="${poll.id}" data-opt="${escHtml(opt)}"><span class="poll-opt-label">${isWinner?'🏆 ':''}${escHtml(opt)}</span><div class="poll-bar-wrap"><div class="poll-bar" style="width:${pct}%"></div></div><span class="poll-pct">${pct}%</span><span style="font-size:13px;color:var(--text-system)">${count}</span></div>`;
   }).join('');
   let timerHtml='';
-  if(!concluded&&poll.endsAt)timerHtml=`<span class="poll-timer" data-ends="${new Date(poll.endsAt).getTime()}">...</span>`;
-  else if(concluded)timerHtml=`<span style="color:var(--text-system)">concluded</span>`;
+  if(!concluded&&poll.endsAt) timerHtml=`<span class="poll-timer" data-ends="${new Date(poll.endsAt).getTime()}">...</span>`;
+  else if(concluded) timerHtml=`<span style="color:var(--text-system)">concluded</span>`;
   return `<div class="poll-card${concluded?' poll-concluded':''}"><div class="poll-question">📊 ${escHtml(poll.question)}</div>${optionsHtml}<div class="poll-meta">by ${escHtml(poll.creator)} · ${totalVotes} vote${totalVotes!==1?'s':''} · ${timerHtml}</div></div>`;
 }
 
 // ── HISTORY ───────────────────────────────────────────────────────────────────
-function renderHistory(history){
-  const messages=document.getElementById('messages');messages.innerHTML='';
+function renderHistory(history) {
+  const messages=document.getElementById('messages'); messages.innerHTML='';
   if(!history.length)return;
   addMessage(`<span class="msg-system">── message history ──</span>`);
-  history.forEach(row=>{
+  history.forEach(row => {
     const ts=new Date(row.created_at).getTime();
-    const colorInfo=SHOP_COLORS[row.color];const effectClass=colorInfo?` user-${colorInfo.effect}`:'';
+    const colorInfo=SHOP_COLORS[row.color]; const effectClass=colorInfo?` user-${colorInfo.effect}`:'';
     if(row.type==='poll'){
-      const poll=row.poll_data;
-      if(!poll)return;
+      const poll=row.poll_data; if(!poll)return;
       polls[poll.id]=poll;
       const msgEl=document.getElementById('messages');
       const atBottom=msgEl.scrollHeight-msgEl.scrollTop-msgEl.clientHeight<40;
-      const li=document.createElement('li');li.style.listStyle='none';
-      li.id=`poll-${poll.id}`;li.className='msg-row';li.innerHTML=buildPollHtml(poll);
-      msgEl.appendChild(li);if(atBottom)msgEl.scrollTop=msgEl.scrollHeight;
+      const li=document.createElement('li'); li.style.listStyle='none';
+      li.id=`poll-${poll.id}`; li.className='msg-row'; li.innerHTML=buildPollHtml(poll);
+      msgEl.appendChild(li); if(atBottom)msgEl.scrollTop=msgEl.scrollHeight;
     } else if(row.type==='system'){
       addMessage(`<span class="msg-system">*** ${row.text} ***</span>`,'',ts);
     } else if(row.type==='action'){
@@ -1113,7 +1159,7 @@ function renderHistory(history){
       addDmMessage({from:row.sender,to:row.recipient,text:row.text,self:row.sender===myUsername,noFlash:true});
     } else {
       const li=addMessage(`<span class="msg-user${effectClass}" data-username="${escHtml(row.sender)}" style="color:${row.color}">${row.sender}:</span> <span class="msg-text">${row.text}</span>`,row.sender===myUsername?'msg-own':'',ts,row.id);
-      if(row.reactions&&Object.keys(row.reactions).length)updateReactions(li,row.reactions,null);
+      if(row.reactions&&Object.keys(row.reactions).length) updateReactions(li,row.reactions,null);
     }
   });
   addMessage(`<span class="msg-system">── live ──</span>`);
@@ -1121,233 +1167,247 @@ function renderHistory(history){
 }
 
 // ── SOCKET EVENTS ─────────────────────────────────────────────────────────────
-socket.on('rooms list',rooms=>renderRooms(rooms));
+socket.on('rooms list', rooms => renderRooms(rooms));
 
-socket.on('room changed',room=>{
-  currentRoom=room;
-  pendingRoom=null;
-  unreadCounts[room]=0;
-  updateRoomBadge(room);
+socket.on('room changed', room => {
+  currentRoom=room; pendingRoom=null;
+  unreadCounts[room]=0; updateRoomBadge(room);
   document.getElementById('messages').innerHTML='';
-  if(document.getElementById('keypad-modal').classList.contains('open'))closeKeypad();
+  if(document.getElementById('keypad-modal').classList.contains('open')) closeKeypad();
   document.querySelectorAll('.room-btn').forEach(b=>b.classList.toggle('active',b.dataset.room===room));
 });
 
 socket.on('history', history => {
-  // Ensure previous room messages are cleared before rendering new history
-  document.getElementById('messages').innerHTML = '';
+  document.getElementById('messages').innerHTML='';
   renderHistory(history);
 });
 
-socket.on('room requires code',room=>{
-  pendingRoom=room;
-  openKeypad(room);
-});
+socket.on('room requires code', room => { pendingRoom=room; openKeypad(room); });
 
-socket.on('keypad error',msg=>{
+socket.on('keypad error', msg => {
   document.getElementById('keypad-error').textContent=msg||'Wrong code.';
-  keypadCode='';renderKeypadDots();
-  playTone(200,'sawtooth',0.15,0.15);
+  keypadCode=''; renderKeypadDots();
 });
 
-socket.on('confirm changepass',({room,newCode})=>{openChangepassConfirm(room,newCode)});
+socket.on('confirm changepass', ({room,newCode}) => { openChangepassConfirm(room,newCode); });
 
-socket.on('room code changed',({room,newCode})=>{
+socket.on('room code changed', ({room,newCode}) => {
   ownerRoomCodes[room]=String(newCode);
-  // Update badge in sidebar if present
-  document.querySelectorAll(`[data-room-code-for="${room}"]`).forEach(el=>{
-    el.textContent=`code: ${newCode}`;
-  });
   addMessage(`<span class="msg-system">✅ Room code changed to: ${newCode}</span>`);
 });
 
-socket.on('room created',({room,code})=>{
+socket.on('room created', ({room,code}) => {
   ownerRoomCodes[room]=String(code);
   openRoomCreated(room,code);
 });
 
-socket.on('chat message',({id,user,color,text,type,timestamp})=>{
-  const isOwn=user===myUsername;const colorInfo=SHOP_COLORS[color];const effectClass=colorInfo?` user-${colorInfo.effect}`:'';
-  if(type==='action')addMessage(`<span class="msg-action">*** <span class="msg-user${effectClass}" data-username="${escHtml(user)}" style="color:${color}">${user}</span> ${text} ***</span>`,'',timestamp);
-  else {
-    addMessage(`<span class="msg-user${effectClass}" data-username="${escHtml(user)}" style="color:${color}">${user}:</span> <span class="msg-text">${text}</span>`,isOwn?'msg-own':'',timestamp||Date.now(),id);
-    // If message from someone else in another room will be notified by 'room message'.
-  }
-  if(!isOwn)soundMessage();
+socket.on('chat message', ({id,user,color,text,type,timestamp}) => {
+  const isOwn=user===myUsername; const colorInfo=SHOP_COLORS[color]; const effectClass=colorInfo?` user-${colorInfo.effect}`:'';
+  if(type==='action') addMessage(`<span class="msg-action">*** <span class="msg-user${effectClass}" data-username="${escHtml(user)}" style="color:${color}">${user}</span> ${text} ***</span>`,'',timestamp);
+  else addMessage(`<span class="msg-user${effectClass}" data-username="${escHtml(user)}" style="color:${color}">${user}:</span> <span class="msg-text">${text}</span>`,isOwn?'msg-own':'',timestamp||Date.now(),id);
+  if(!isOwn) soundMessage();
 });
 
-socket.on('room message', ({room, user}) => {
-  try{
-    if (!myUsername) return;
-    if (room === currentRoom) return; // visible already
-    if (user && user.toLowerCase() === myUsername.toLowerCase()) return; // ignore own messages
-    unreadCounts[room] = (unreadCounts[room] || 0) + 1;
+socket.on('room message', ({room,user}) => {
+  try {
+    if(!myUsername||room===currentRoom) return;
+    if(user&&user.toLowerCase()===myUsername.toLowerCase()) return;
+    unreadCounts[room]=(unreadCounts[room]||0)+1;
     updateRoomBadge(room);
-  }catch(e){}
+  } catch(e) {}
 });
 
-socket.on('system message',msg=>{
+socket.on('system message', msg => {
   const isClaim=msg.includes('TYPE "claim"')||msg.includes('claimed the reward');
-  if(isClaim){addMessage(`<span class="msg-claim-event">*** ${msg} ***</span>`);if(msg.includes('TYPE "claim"'))soundClaim();else if(msg.includes('claimed the reward')&&msg.includes(myUsername))soundWin();}
-  else{addMessage(`<span class="msg-system">*** ${msg} ***</span>`);if(/has joined/.test(msg))soundJoin();else if(/has left/.test(msg))soundLeave();}
+  if(isClaim){
+    addMessage(`<span class="msg-claim-event">*** ${msg} ***</span>`);
+    if(msg.includes('TYPE "claim"')) soundClaim();
+    else if(msg.includes('claimed the reward')&&msg.includes(myUsername)) soundWin();
+  } else {
+    addMessage(`<span class="msg-system">*** ${msg} ***</span>`);
+    if(/has joined/.test(msg)) soundJoin(); else if(/has left/.test(msg)) soundLeave();
+  }
 });
 
-socket.on('announcement',({from,message})=>{
-  document.getElementById('announcement-content').textContent=message;
-  if(from&&from.toLowerCase()==='mce')document.getElementById('announcement-content').textContent=`Admin: ${message}`;
+socket.on('announcement', ({from,message}) => {
+  const content=document.getElementById('announcement-content');
+  content.textContent=from&&from.toLowerCase()==='mce'?`Admin: ${message}`:message;
   document.getElementById('announcement-modal').classList.add('open');
   soundClaim();
 });
 
-socket.on('dm',data=>addDmMessage(data));
-socket.on('coins update',({coins})=>{myCoins=coins;updateCoinDisplay();updateGameBalances()});
+socket.on('dm', data => addDmMessage(data));
+socket.on('coins update', ({coins}) => { myCoins=coins; updateCoinDisplay(); updateGameBalances(); });
 
-socket.on('reaction update',({messageId,reactions})=>{
-  const li=document.querySelector(`[data-msg-id="${messageId}"]`);
-  if(!li)return;updateReactions(li,reactions,li.dataset.myReaction||null);
+socket.on('reaction update', ({messageId,reactions}) => {
+  const li=document.querySelector(`[data-msg-id="${messageId}"]`); if(!li)return;
+  updateReactions(li,reactions,li.dataset.myReaction||null);
 });
 
-socket.on('link preview',({url,title,image,description})=>{
+socket.on('link preview', ({url,title,image,description}) => {
   const messages=document.getElementById('messages');
-  const rows=messages.querySelectorAll('.msg-row');let target=null;
-  for(let i=rows.length-1;i>=0;i--){if(rows[i].textContent.includes(url.slice(8,40))){target=rows[i];break}}
-  const previewEl=document.createElement('div');previewEl.className='link-preview';
-  let html='';if(image)html+=`<img src="${image}" alt="" onerror="this.style.display='none'">`;if(title)html+=`<div class="lp-title">${title}</div>`;if(description)html+=`<div class="lp-desc">${description}</div>`;
+  const rows=messages.querySelectorAll('.msg-row'); let target=null;
+  for(let i=rows.length-1;i>=0;i--){if(rows[i].textContent.includes(url.slice(8,40))){target=rows[i];break;}}
+  const previewEl=document.createElement('div'); previewEl.className='link-preview';
+  let html=''; if(image)html+=`<img src="${image}" alt="" onerror="this.style.display='none'">`;if(title)html+=`<div class="lp-title">${title}</div>`;if(description)html+=`<div class="lp-desc">${description}</div>`;
   previewEl.innerHTML=html;
   const atBottom=messages.scrollHeight-messages.scrollTop-messages.clientHeight<40;
-  if(target)target.appendChild(previewEl);else{const li=document.createElement('li');li.style.listStyle='none';li.appendChild(previewEl);messages.appendChild(li)}
+  if(target)target.appendChild(previewEl);else{const li=document.createElement('li');li.style.listStyle='none';li.appendChild(previewEl);messages.appendChild(li);}
   if(atBottom)messages.scrollTop=messages.scrollHeight;
 });
 
-socket.on('poll update',poll=>renderPoll(poll));
-socket.on('poll concluded',({pollId})=>{if(polls[pollId]){polls[pollId].concluded=true;const el=document.getElementById(`poll-${pollId}`);if(el)el.innerHTML=buildPollHtml(polls[pollId]);soundPollEnd()}});
+socket.on('poll update', poll => renderPoll(poll));
+socket.on('poll concluded', ({pollId}) => {
+  if(polls[pollId]){polls[pollId].concluded=true;const el=document.getElementById(`poll-${pollId}`);if(el)el.innerHTML=buildPollHtml(polls[pollId]);soundPollEnd();}
+});
 
-socket.on('user list',list=>{
+socket.on('user list', list => {
   document.getElementById('user-count-text').textContent=list.length;
-  const panel=document.getElementById('users-panel');panel.innerHTML='';
-  list.forEach(({username,color,joinedAt,idle})=>{
-    const entry=document.createElement('span');entry.className='user-entry';entry.dataset.joinedAt=joinedAt;
-    const colorInfo=SHOP_COLORS[color];const effectClass=colorInfo?` user-${colorInfo.effect}`:'';
+  const panel=document.getElementById('users-panel'); panel.innerHTML='';
+  list.forEach(({username,color,joinedAt,idle}) => {
+    const entry=document.createElement('span'); entry.className='user-entry'; entry.dataset.joinedAt=joinedAt;
+    const colorInfo=SHOP_COLORS[color]; const effectClass=colorInfo?` user-${colorInfo.effect}`:'';
     entry.innerHTML=`<span class="uname${effectClass}" style="color:${color}" data-username="${escHtml(username)}" onclick="openProfile('${escHtml(username)}')">${username}</span>${idle?'<span class="uidle">⏸</span>':''}<span class="utime">${formatDuration(Date.now()-joinedAt)}</span>`;
     panel.appendChild(entry);
-    if(username===myUsername){myColor=color;const colorInfo=SHOP_COLORS[color];const effectClass=colorInfo?` user-${colorInfo.effect}`:'';document.getElementById('logged-in-as').innerHTML=`<span class="${effectClass}" style="color:${color};text-shadow:0 0 2px rgba(255,255,255,0.5)">${myUsername}</span>`;}
+    if(username===myUsername){
+      myColor=color; const ci=SHOP_COLORS[color]; const ec=ci?` user-${ci.effect}`:'';
+      document.getElementById('logged-in-as').innerHTML=`<span class="${ec}" style="color:${color};text-shadow:0 0 2px rgba(255,255,255,0.5)">${myUsername}</span>`;
+    }
   });
 });
 
-socket.on('typing',({text})=>{const bar=document.getElementById('typing-bar');bar.innerHTML=text?text+' <span class="dots"><span></span><span></span><span></span></span>':''});
-socket.on('kicked',reason=>{
+socket.on('typing', ({text}) => {
+  const bar=document.getElementById('typing-bar');
+  bar.innerHTML=text?text+' <span class="dots"><span></span><span></span><span></span></span>':'';
+});
+
+socket.on('kicked', reason => {
   addMessage(`<span class="msg-kicked">⚠ ${reason||'You were signed in from another device.'}</span>`);
   document.getElementById('input').disabled=true;
   document.getElementById('send-btn').disabled=true;
-  // Prevent auto-reconnect when explicitly kicked
   socket.disconnect();
 });
 
 // ── DAILY ─────────────────────────────────────────────────────────────────────
-function showDailyModal(){document.getElementById('daily-modal').classList.add('open')}
-function closeDailyModal(){document.getElementById('daily-modal').classList.remove('open')}
-async function claimDaily(){
-  try{const res=await fetch('/daily',{method:'POST',credentials:'include'});const data=await res.json();if(!res.ok){closeDailyModal();return}
-  myCoins=data.coins;updateCoinDisplay();soundCoin();soundWin();closeDailyModal();addMessage(`<span class="msg-system">Daily reward claimed! +${formatNumber(data.reward)} coins. Balance: ${formatNumber(data.coins)} 🪙</span>`)}catch{closeDailyModal()}
+function showDailyModal() { document.getElementById('daily-modal').classList.add('open'); }
+function closeDailyModal() { document.getElementById('daily-modal').classList.remove('open'); }
+async function claimDaily() {
+  try {
+    const res=await fetch('/daily',{method:'POST',credentials:'include'}); const data=await res.json();
+    if(!res.ok){closeDailyModal();return;}
+    myCoins=data.coins; updateCoinDisplay(); soundCoin(); soundWin(); closeDailyModal();
+    addMessage(`<span class="msg-system">Daily reward claimed! +${formatNumber(data.reward)} coins. Balance: ${formatNumber(data.coins)} 🪙</span>`);
+  } catch { closeDailyModal(); }
 }
 
 // ── PROFILE ───────────────────────────────────────────────────────────────────
-async function openProfile(username){
+async function openProfile(username) {
   document.getElementById('profile-modal-title').textContent=username+"'s Profile";
   document.getElementById('profile-modal-body').innerHTML='<div style="text-align:center;padding:20px;color:var(--text-system);">Loading...</div>';
   document.getElementById('profile-modal').classList.add('open');
-  try{
+  try {
     const res=await fetch(`/profile/${encodeURIComponent(username)}`,{credentials:'include'});
-    const d=await res.json();if(!res.ok){document.getElementById('profile-modal-body').textContent=d.error;return}
+    const d=await res.json(); if(!res.ok){document.getElementById('profile-modal-body').textContent=d.error;return;}
     const badge=d.activeBadge?`<span title="${d.activeBadge.name}">${d.activeBadge.emoji} ${d.activeBadge.name}</span>`:'<span style="color:var(--text-system)">No badge</span>';
     const badgesHtml=d.earnedBadges.length?d.earnedBadges.map(b=>`<span title="${b.description}" style="font-size:20px;cursor:help">${b.emoji}</span>`).join(' '):'<span style="color:var(--text-system);font-size:14px">No badges yet</span>';
-    const colorInfo=SHOP_COLORS[d.color];const effectClass=colorInfo?` user-${colorInfo.effect}`:'';
+    const colorInfo=SHOP_COLORS[d.color]; const effectClass=colorInfo?` user-${colorInfo.effect}`:'';
     document.getElementById('profile-modal-body').innerHTML=`
-      <div class="profile-header"><div class="profile-avatar">👤</div><div><div class="profile-name${effectClass}" style="color:${d.color||'var(--text-main)'}">${escHtml(d.username)}</div><div class="profile-badge-display">${badge}</div></div></div>
-      <div class="profile-stats">
-          <div class="stat-row"><span class="stat-label">Joined</span><span class="stat-value">${formatDate(d.createdAt)}</span></div>
-          <div class="stat-row"><span class="stat-label">Coins</span><span class="stat-value">🪙 ${formatNumber(d.coins)}</span></div>
-          <div class="stat-row"><span class="stat-label">Messages sent</span><span class="stat-value">${d.messagesSent}</span></div>
-          <div class="stat-row"><span class="stat-label">Time online</span><span class="stat-value">${formatSeconds(d.timeOnlineSeconds)}</span></div>
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <img src="/sprites/profileAvatar.png" alt="Avatar" style="width:40px;height:40px;image-rendering:pixelated;" onerror="this.src='/sprites/placeholder.png'">
         </div>
+        <div>
+          <div class="profile-name${effectClass}" style="color:${d.color||'var(--text-main)'}">${escHtml(d.username)}</div>
+          <div class="profile-badge-display">${badge}</div>
+        </div>
+      </div>
+      <div class="profile-stats">
+        <div class="stat-row"><span class="stat-label">Joined</span><span class="stat-value">${formatDate(d.createdAt)}</span></div>
+        <div class="stat-row"><span class="stat-label">Coins</span><span class="stat-value">🪙 ${formatNumber(d.coins)}</span></div>
+        <div class="stat-row"><span class="stat-label">Messages sent</span><span class="stat-value">${d.messagesSent}</span></div>
+        <div class="stat-row"><span class="stat-label">Time online</span><span class="stat-value">${formatSeconds(d.timeOnlineSeconds)}</span></div>
+      </div>
       <div style="font-size:15px;margin-bottom:4px;">Badges earned:</div>
       <div style="padding:4px 0">${badgesHtml}</div>`;
-  }catch{document.getElementById('profile-modal-body').textContent='Error loading profile.'}
+  } catch { document.getElementById('profile-modal-body').textContent='Error loading profile.'; }
 }
-function closeProfile(){document.getElementById('profile-modal').classList.remove('open')}
-document.getElementById('profile-modal').addEventListener('click',e=>{if(e.target===document.getElementById('profile-modal'))closeProfile()});
+function closeProfile() { document.getElementById('profile-modal').classList.remove('open'); }
+document.getElementById('profile-modal').addEventListener('click', e => { if(e.target===document.getElementById('profile-modal'))closeProfile(); });
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────────
-function switchSettingsTab(tab){
-  document.querySelectorAll('.stab').forEach((t,i)=>{const tabs=['appearance','badges','stats','account','help'];t.classList.toggle('active',tabs[i]===tab)});
+function switchSettingsTab(tab) {
+  document.querySelectorAll('.stab').forEach((t,i) => { const tabs=['appearance','badges','stats','account','help']; t.classList.toggle('active',tabs[i]===tab); });
   document.querySelectorAll('.stab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('stab-'+tab).classList.add('active');
-  if(tab==='stats')loadStats();if(tab==='badges')loadBadges();
+  if(tab==='stats') loadStats();
+  if(tab==='badges') loadBadges();
 }
-async function openSettings(){
+async function openSettings() {
   document.getElementById('settings-overlay').classList.add('open');
   document.getElementById('settings-status').textContent='';
-  selectedSettingsColor=myColor;selectedSettingsTheme=selectedTheme;
-  if(shopItems.length===0)await loadShopItems();
-  renderSettingsThemes();renderSettingsColors();
+  selectedSettingsColor=myColor; selectedSettingsTheme=selectedTheme;
+  if(shopItems.length===0) await loadShopItems();
+  renderSettingsThemes(); renderSettingsColors();
 }
-function closeSettings(){document.getElementById('settings-overlay').classList.remove('open')}
-document.getElementById('settings-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('settings-overlay'))closeSettings()});
+function closeSettings() { document.getElementById('settings-overlay').classList.remove('open'); }
+document.getElementById('settings-overlay').addEventListener('click', e => { if(e.target===document.getElementById('settings-overlay'))closeSettings(); });
 
-function renderSettingsThemes(){
+function renderSettingsThemes() {
   const ownedThemes=shopItems.filter(i=>i.type==='theme'&&i.owned);
-  const wrap=document.getElementById('settings-theme-options');wrap.innerHTML='';
-  ownedThemes.forEach(item=>{
-    const btn=document.createElement('button');btn.className=`theme-btn theme-opt-${item.value}${item.value===selectedSettingsTheme?' selected':''}`;btn.textContent=item.name;
-    btn.onclick=()=>{selectedSettingsTheme=item.value;wrap.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');applyTheme(item.value)};
+  const wrap=document.getElementById('settings-theme-options'); wrap.innerHTML='';
+  ownedThemes.forEach(item => {
+    const btn=document.createElement('button');
+    btn.className=`theme-btn theme-opt-${item.value}${item.value===selectedSettingsTheme?' selected':''}`;
+    btn.textContent=item.name;
+    btn.onclick=()=>{ selectedSettingsTheme=item.value; wrap.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); applyTheme(item.value); };
     wrap.appendChild(btn);
   });
-  if(!ownedThemes.length)wrap.innerHTML='<span style="font-size:14px;color:var(--text-system)">No themes owned. Visit 🛒 Shop!</span>';
+  if(!ownedThemes.length) wrap.innerHTML='<span style="font-size:14px;color:var(--text-system)">No themes owned. Visit 🛒 Shop!</span>';
 }
-function renderSettingsColors(){
+function renderSettingsColors() {
   const ownedColors=shopItems.filter(i=>i.type==='color'&&i.owned);
-  const wrap=document.getElementById('settings-color-swatches');wrap.innerHTML='';
-  ownedColors.forEach(item=>{
-    const div=document.createElement('div');div.className='color-swatch'+(item.value===selectedSettingsColor?' selected':'');
-    const preview=document.createElement('div');preview.className='color-preview';preview.style.background=item.value;
-    const name=document.createElement('div');name.className='color-name';name.textContent=item.name;
-    const check=document.createElement('div');check.className='color-checkmark';check.textContent=item.value===selectedSettingsColor?'✓':'';
-    div.appendChild(preview);div.appendChild(name);div.appendChild(check);
-    div.onclick=()=>{selectedSettingsColor=item.value;wrap.querySelectorAll('.color-swatch').forEach(s=>{s.classList.remove('selected');s.querySelector('.color-checkmark').textContent=''});div.classList.add('selected');div.querySelector('.color-checkmark').textContent='✓'};
+  const wrap=document.getElementById('settings-color-swatches'); wrap.innerHTML='';
+  ownedColors.forEach(item => {
+    const div=document.createElement('div'); div.className='color-swatch'+(item.value===selectedSettingsColor?' selected':'');
+    const preview=document.createElement('div'); preview.className='color-preview'; preview.style.background=item.value;
+    const name=document.createElement('div'); name.className='color-name'; name.textContent=item.name;
+    const check=document.createElement('div'); check.className='color-checkmark'; check.textContent=item.value===selectedSettingsColor?'✓':'';
+    div.appendChild(preview); div.appendChild(name); div.appendChild(check);
+    div.onclick=()=>{ selectedSettingsColor=item.value; wrap.querySelectorAll('.color-swatch').forEach(s=>{s.classList.remove('selected');s.querySelector('.color-checkmark').textContent='';}); div.classList.add('selected'); div.querySelector('.color-checkmark').textContent='✓'; };
     wrap.appendChild(div);
   });
 }
-async function saveSettings(){
-  const statusEl=document.getElementById('settings-status');statusEl.textContent='Saving...';statusEl.style.color='inherit';
-  try{const res=await fetch('/settings',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({color:selectedSettingsColor,theme:selectedSettingsTheme})});
-  const data=await res.json();if(!res.ok){statusEl.textContent=data.error;statusEl.style.color='#cc0000';return}
-  myColor=selectedSettingsColor;const colorInfo=SHOP_COLORS[myColor];const effectClass=colorInfo?` user-${colorInfo.effect}`:'';document.getElementById('logged-in-as').innerHTML=`<span class="${effectClass}" style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.5)">${myUsername}</span>`;
-  socket.emit('color update',myColor);
-  statusEl.textContent='Saved!';statusEl.style.color='#007700';setTimeout(()=>{statusEl.textContent=''},2000)}catch{statusEl.textContent='Error saving.';statusEl.style.color='#cc0000'}
+async function saveSettings() {
+  const statusEl=document.getElementById('settings-status'); statusEl.textContent='Saving...'; statusEl.style.color='inherit';
+  try {
+    const res=await fetch('/settings',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({color:selectedSettingsColor,theme:selectedSettingsTheme})});
+    const data=await res.json(); if(!res.ok){statusEl.textContent=data.error;statusEl.style.color='#cc0000';return;}
+    myColor=selectedSettingsColor; const colorInfo=SHOP_COLORS[myColor]; const effectClass=colorInfo?` user-${colorInfo.effect}`:'';
+    document.getElementById('logged-in-as').innerHTML=`<span class="${effectClass}" style="color:${myColor};text-shadow:0 0 2px rgba(255,255,255,0.5)">${myUsername}</span>`;
+    socket.emit('color update',myColor);
+    statusEl.textContent='Saved!'; statusEl.style.color='#007700'; setTimeout(()=>{statusEl.textContent='';},2000);
+  } catch { statusEl.textContent='Error saving.'; statusEl.style.color='#cc0000'; }
 }
-
-async function changePassword(){
-  const statusEl = document.getElementById('pw-status');
-  const oldP = document.getElementById('pw-old').value;
-  const newP = document.getElementById('pw-new').value;
-  const newP2 = document.getElementById('pw-new2').value;
-  statusEl.textContent = 'Changing...'; statusEl.style.color = 'inherit';
-  try{
-    const res = await fetch('/settings/password', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ oldPassword: oldP, newPassword: newP, newPassword2: newP2 }) });
-    const data = await res.json();
-    if (!res.ok) { statusEl.textContent = data.error || 'Error'; statusEl.style.color = '#cc0000'; return; }
-    statusEl.textContent = 'Password changed!'; statusEl.style.color = '#007700';
-    document.getElementById('pw-old').value='';document.getElementById('pw-new').value='';document.getElementById('pw-new2').value='';
-    setTimeout(()=>{ statusEl.textContent=''; }, 2500);
-  } catch (err) { statusEl.textContent='Server error'; statusEl.style.color='#cc0000'; }
+async function changePassword() {
+  const statusEl=document.getElementById('pw-status');
+  const oldP=document.getElementById('pw-old').value, newP=document.getElementById('pw-new').value, newP2=document.getElementById('pw-new2').value;
+  statusEl.textContent='Changing...'; statusEl.style.color='inherit';
+  try {
+    const res=await fetch('/settings/password',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({oldPassword:oldP,newPassword:newP,newPassword2:newP2})});
+    const data=await res.json();
+    if(!res.ok){statusEl.textContent=data.error||'Error';statusEl.style.color='#cc0000';return;}
+    statusEl.textContent='Password changed!'; statusEl.style.color='#007700';
+    document.getElementById('pw-old').value=''; document.getElementById('pw-new').value=''; document.getElementById('pw-new2').value='';
+    setTimeout(()=>{statusEl.textContent='';},2500);
+  } catch { statusEl.textContent='Server error'; statusEl.style.color='#cc0000'; }
 }
 
 // ── BADGES ────────────────────────────────────────────────────────────────────
-async function loadBadges(){
-  const grid=document.getElementById('badge-grid');grid.innerHTML='<div style="color:var(--text-system);font-size:14px">Loading...</div>';
-  try{
-    const res=await fetch('/stats',{credentials:'include'});const data=await res.json();if(!res.ok)return;
-    const earnedIds=new Set(data.earnedBadges.map(b=>b.id));const activeBadgeId=data.activeBadge?.id||null;
+async function loadBadges() {
+  const grid=document.getElementById('badge-grid'); grid.innerHTML='<div style="color:var(--text-system);font-size:14px">Loading...</div>';
+  try {
+    const res=await fetch('/stats',{credentials:'include'}); const data=await res.json(); if(!res.ok)return;
+    const earnedIds=new Set(data.earnedBadges.map(b=>b.id)); const activeBadgeId=data.activeBadge?.id||null;
     const allBadges=[
       {id:'lurker_no_more',emoji:'💬',name:'Lurker No More',description:'Send 10 messages'},
       {id:'regular',emoji:'🗣️',name:'Regular',description:'Send 50 messages'},
@@ -1362,31 +1422,32 @@ async function loadBadges(){
       {id:'mogul',emoji:'🏆',name:'Mogul',description:'Earn 100,000 coins total'},
     ];
     grid.innerHTML='';
-    allBadges.forEach(b=>{
-      const earned=earnedIds.has(b.id),isActive=b.id===activeBadgeId;
-      const div=document.createElement('div');div.className='badge-item'+(earned?' earned':'  locked')+(isActive?' active-badge':'');
+    allBadges.forEach(b => {
+      const earned=earnedIds.has(b.id), isActive=b.id===activeBadgeId;
+      const div=document.createElement('div');
+      div.className='badge-item'+(earned?' earned':'  locked')+(isActive?' active-badge':'');
       div.innerHTML=`<span class="badge-emoji">${b.emoji}</span><div class="badge-name">${b.name}</div><div class="badge-desc">${b.description}</div>${isActive?'<div class="badge-active-label">★ Active showcase</div>':''}`;
-      if(earned){div.onclick=()=>setActiveBadge(b.id,data.activeBadge?.id)}
+      if(earned) div.onclick=()=>setActiveBadge(b.id,data.activeBadge?.id);
       grid.appendChild(div);
     });
-  }catch{document.getElementById('badge-grid').innerHTML='<div style="color:#cc0000">Error loading badges.</div>'}
+  } catch { document.getElementById('badge-grid').innerHTML='<div style="color:#cc0000">Error loading badges.</div>'; }
 }
-async function setActiveBadge(badgeId,currentActiveId){
+async function setActiveBadge(badgeId,currentActiveId) {
   const newId=badgeId===currentActiveId?null:badgeId;
-  try{
+  try {
     const res=await fetch('/badge/set',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({badgeId:newId})});
-    const data=await res.json();const statusEl=document.getElementById('badge-status');
-    if(!res.ok){statusEl.textContent=data.error;statusEl.style.color='#cc0000';return}
-    statusEl.textContent=newId?'Badge set as showcase!':'Badge removed.';statusEl.style.color='#007700';
-    setTimeout(()=>{statusEl.textContent=''},2000);loadBadges();
-  }catch{}
+    const data=await res.json(); const statusEl=document.getElementById('badge-status');
+    if(!res.ok){statusEl.textContent=data.error;statusEl.style.color='#cc0000';return;}
+    statusEl.textContent=newId?'Badge set as showcase!':'Badge removed.'; statusEl.style.color='#007700';
+    setTimeout(()=>{statusEl.textContent='';},2000); loadBadges();
+  } catch {}
 }
 
 // ── STATS ─────────────────────────────────────────────────────────────────────
-async function loadStats(){
-  const el=document.getElementById('stats-content');el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-system);">Loading...</div>';
-  try{
-    const res=await fetch('/stats',{credentials:'include'});const d=await res.json();if(!res.ok){el.textContent=d.error;return}
+async function loadStats() {
+  const el=document.getElementById('stats-content'); el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-system);">Loading...</div>';
+  try {
+    const res=await fetch('/stats',{credentials:'include'}); const d=await res.json(); if(!res.ok){el.textContent=d.error;return;}
     el.innerHTML=`
       <div class="stat-row"><span class="stat-label">Username</span><span class="stat-value" style="color:${myColor}">${escHtml(d.username)}</span></div>
       <div class="stat-row"><span class="stat-label">Member since</span><span class="stat-value">${formatDate(d.createdAt)}</span></div>
@@ -1397,122 +1458,169 @@ async function loadStats(){
       <div class="stat-row"><span class="stat-label">Time online</span><span class="stat-value">${formatSeconds(d.timeOnlineSeconds)}</span></div>
       <div class="stat-row"><span class="stat-label">Badges earned</span><span class="stat-value">${d.earnedBadges.length}</span></div>
       <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Stats tracked from Feb 2026</div>`;
-  }catch{el.textContent='Error loading stats.'}
+  } catch { el.textContent='Error loading stats.'; }
 }
 
 // ── SHOP ──────────────────────────────────────────────────────────────────────
-async function openShop(){document.getElementById('shop-overlay').classList.add('open');document.getElementById('shop-balance').textContent=`Balance: 🪙 ${formatNumber(myCoins)}`;document.getElementById('shop-status').textContent='';await loadShopItems()}
-function closeShop(){document.getElementById('shop-overlay').classList.remove('open')}
-function switchShopTab(tab){document.querySelectorAll('.shop-tab').forEach(t=>t.classList.toggle('active',t.textContent.toLowerCase().includes(tab==='themes'?'theme':'colour')));document.getElementById('shop-themes').classList.toggle('active',tab==='themes');document.getElementById('shop-colors').classList.toggle('active',tab==='colors')}
-async function loadShopItems(){try{const res=await fetch('/shop',{credentials:'include'});shopItems=await res.json();renderShopThemes();renderShopColors()}catch{document.getElementById('shop-status').textContent='Error loading shop.';document.getElementById('shop-status').className='shop-status err'}}
-function renderShopThemes(){document.getElementById('shop-themes').innerHTML=`<div class="shop-grid">${shopItems.filter(i=>i.type==='theme').map(shopItemHtml).join('')}</div>`}
-function renderShopColors(){document.getElementById('shop-colors').innerHTML=`<div class="shop-grid">${shopItems.filter(i=>i.type==='color').map(shopItemHtml).join('')}</div>`}
-function shopItemHtml(item){
+async function openShop() {
+  document.getElementById('shop-overlay').classList.add('open');
+  document.getElementById('shop-balance').textContent=`Balance: 🪙 ${formatNumber(myCoins)}`;
+  document.getElementById('shop-status').textContent='';
+  await loadShopItems();
+}
+function closeShop() { document.getElementById('shop-overlay').classList.remove('open'); }
+function switchShopTab(tab) {
+  document.querySelectorAll('.shop-tab').forEach(t=>t.classList.toggle('active',t.textContent.toLowerCase().includes(tab==='themes'?'theme':'colour')));
+  document.getElementById('shop-themes').classList.toggle('active',tab==='themes');
+  document.getElementById('shop-colors').classList.toggle('active',tab==='colors');
+}
+async function loadShopItems() {
+  try { const res=await fetch('/shop',{credentials:'include'}); shopItems=await res.json(); renderShopThemes(); renderShopColors(); }
+  catch { document.getElementById('shop-status').textContent='Error loading shop.'; document.getElementById('shop-status').className='shop-status err'; }
+}
+function renderShopThemes() { document.getElementById('shop-themes').innerHTML=`<div class="shop-grid">${shopItems.filter(i=>i.type==='theme').map(shopItemHtml).join('')}</div>`; }
+function renderShopColors() { document.getElementById('shop-colors').innerHTML=`<div class="shop-grid">${shopItems.filter(i=>i.type==='color').map(shopItemHtml).join('')}</div>`; }
+function shopItemHtml(item) {
   const priceLabel=item.price===0?`<span class="shop-item-price free">FREE</span>`:`<span class="shop-item-price">🪙 ${formatNumber(item.price)}</span>`;
   const badge=item.owned?`<span class="shop-item-owned-badge">✓ OWNED</span>`:'';
   const btn=item.owned?`<button class="shop-buy-btn" disabled>Owned</button>`:`<button class="shop-buy-btn" onclick="buyItem('${item.id}')">Buy ${item.price===0?'(Free)':`🪙 ${formatNumber(item.price)}`}</button>`;
   return `<div class="shop-item${item.owned?' owned':''}" id="shop-item-${item.id}">${badge}<div class="shop-item-swatch" style="background:${item.preview}"></div><div class="shop-item-name">${escHtml(item.name)}</div><div class="shop-item-desc">${escHtml(item.description||'')}</div>${priceLabel}${btn}</div>`;
 }
-async function buyItem(itemId){
-  const statusEl=document.getElementById('shop-status');statusEl.textContent='Purchasing...';statusEl.className='shop-status';
-  try{const res=await fetch('/shop/buy',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({itemId})});
-  const data=await res.json();if(!res.ok){statusEl.textContent=data.error;statusEl.className='shop-status err';return}
-  myCoins=data.coins;updateCoinDisplay();document.getElementById('shop-balance').textContent=`Balance: 🪙 ${formatNumber(myCoins)}`;
-  const idx=shopItems.findIndex(i=>i.id===itemId);if(idx>=0)shopItems[idx].owned=true;
-  renderShopThemes();renderShopColors();statusEl.textContent=`✓ Purchased ${data.item.name}!`;statusEl.className='shop-status';soundCoin()}catch{statusEl.textContent='Purchase failed.';statusEl.className='shop-status err'}
+async function buyItem(itemId) {
+  const statusEl=document.getElementById('shop-status'); statusEl.textContent='Purchasing...'; statusEl.className='shop-status';
+  try {
+    const res=await fetch('/shop/buy',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({itemId})});
+    const data=await res.json(); if(!res.ok){statusEl.textContent=data.error;statusEl.className='shop-status err';return;}
+    myCoins=data.coins; updateCoinDisplay(); document.getElementById('shop-balance').textContent=`Balance: 🪙 ${formatNumber(myCoins)}`;
+    const idx=shopItems.findIndex(i=>i.id===itemId); if(idx>=0)shopItems[idx].owned=true;
+    renderShopThemes(); renderShopColors(); statusEl.textContent=`✓ Purchased ${data.item.name}!`; statusEl.className='shop-status'; soundCoin();
+  } catch { statusEl.textContent='Purchase failed.'; statusEl.className='shop-status err'; }
 }
-document.getElementById('shop-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('shop-overlay'))closeShop()});
+document.getElementById('shop-overlay').addEventListener('click', e => { if(e.target===document.getElementById('shop-overlay'))closeShop(); });
 
 // ── GAMES ─────────────────────────────────────────────────────────────────────
-function openGames(){updateGameBalances();document.getElementById('games-overlay').classList.add('open');loadLeaderboard()}
-function closeGames(){document.getElementById('games-overlay').classList.remove('open')}
-function openPatchNotes(){document.getElementById('patchnotes-modal').classList.add('open')}
-function closePatchNotes(){document.getElementById('patchnotes-modal').classList.remove('open')}
-function closeAnnouncement(){document.getElementById('announcement-modal').classList.remove('open')}
-function switchGame(name){document.querySelectorAll('.game-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.games-tab').forEach(t=>t.classList.remove('active'));document.getElementById('game-'+name).classList.add('active');document.querySelectorAll('.games-tab').forEach(t=>{if(t.textContent.toLowerCase().includes(name==='leaderboard'?'board':name))t.classList.add('active')});if(name==='leaderboard')loadLeaderboard();if(name==='roulette')initRouletteNumbers();updateGameBalances()}
-function updateGameBalances(){['slots','dice','roulette'].forEach(g=>{const el=document.getElementById(g+'-balance');if(el)el.textContent=`Balance: 🪙 ${formatNumber(myCoins)}`})}
-function setBet(game,amount){document.getElementById(game+'-bet').value=amount}
+function openGames() { updateGameBalances(); document.getElementById('games-overlay').classList.add('open'); loadLeaderboard(); }
+function closeGames() { document.getElementById('games-overlay').classList.remove('open'); }
+function openPatchNotes() { document.getElementById('patchnotes-modal').classList.add('open'); }
+function closePatchNotes() { document.getElementById('patchnotes-modal').classList.remove('open'); }
+function closeAnnouncement() { document.getElementById('announcement-modal').classList.remove('open'); }
+function switchGame(name) {
+  document.querySelectorAll('.game-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.games-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('game-'+name).classList.add('active');
+  document.querySelectorAll('.games-tab').forEach(t=>{ if(t.textContent.toLowerCase().includes(name==='leaderboard'?'board':name))t.classList.add('active'); });
+  if(name==='leaderboard') loadLeaderboard();
+  if(name==='roulette') initRouletteNumbers();
+  updateGameBalances();
+}
+function updateGameBalances() { ['slots','dice','roulette'].forEach(g=>{ const el=document.getElementById(g+'-balance'); if(el)el.textContent=`Balance: 🪙 ${formatNumber(myCoins)}`; }); }
+function setBet(game,amount) { document.getElementById(game+'-bet').value=amount; }
 
 let slotsSpinning=false;
-async function playSlots(){
-  if(slotsSpinning)return;const bet=parseInt(document.getElementById('slots-bet').value,10);
-  if(!bet||bet<1||bet>50000){document.getElementById('slots-result').innerHTML='<span class="result-lose">Bet must be 1-50000</span>';return}
-  slotsSpinning=true;const btn=document.getElementById('slots-spin-btn');btn.disabled=true;document.getElementById('slots-result').textContent='';
-  [0,1,2].forEach(i=>document.getElementById('reel-'+i).classList.add('spinning'));await new Promise(r=>setTimeout(r,600));
-  try{const res=await fetch('/game/slots',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({bet})});const data=await res.json();
-  [0,1,2].forEach(i=>{const el=document.getElementById('reel-'+i);el.classList.remove('spinning');el.textContent=data.reels?data.reels[i]:'?'});
-  if(!res.ok)document.getElementById('slots-result').innerHTML=`<span class="result-lose">${data.error}</span>`;
-  else{myCoins=data.coins;updateCoinDisplay();updateGameBalances();if(data.winAmount>0){document.getElementById('slots-result').innerHTML=`<span class="result-win">🎉 WIN! ${data.multiplier}x = +${formatNumber(data.winAmount)} coins!</span>`;soundWin()}else{document.getElementById('slots-result').innerHTML=`<span class="result-lose">No match. Better luck next time!</span>`;soundLose()}}}
-  catch{document.getElementById('slots-result').innerHTML='<span class="result-lose">Error. Try again.</span>';[0,1,2].forEach(i=>document.getElementById('reel-'+i).classList.remove('spinning'))}
-  slotsSpinning=false;btn.disabled=false;
+async function playSlots() {
+  if(slotsSpinning)return; const bet=parseInt(document.getElementById('slots-bet').value,10);
+  if(!bet||bet<1||bet>50000){document.getElementById('slots-result').innerHTML='<span class="result-lose">Bet must be 1-50000</span>';return;}
+  slotsSpinning=true; const btn=document.getElementById('slots-spin-btn'); btn.disabled=true; document.getElementById('slots-result').textContent='';
+  [0,1,2].forEach(i=>document.getElementById('reel-'+i).classList.add('spinning')); await new Promise(r=>setTimeout(r,600));
+  try {
+    const res=await fetch('/game/slots',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({bet})}); const data=await res.json();
+    [0,1,2].forEach(i=>{const el=document.getElementById('reel-'+i);el.classList.remove('spinning');el.textContent=data.reels?data.reels[i]:'?';});
+    if(!res.ok) document.getElementById('slots-result').innerHTML=`<span class="result-lose">${data.error}</span>`;
+    else { myCoins=data.coins; updateCoinDisplay(); updateGameBalances(); if(data.winAmount>0){document.getElementById('slots-result').innerHTML=`<span class="result-win">🎉 WIN! ${data.multiplier}x = +${formatNumber(data.winAmount)} coins!</span>`;soundWin();}else{document.getElementById('slots-result').innerHTML=`<span class="result-lose">No match. Better luck next time!</span>`;soundLose();} }
+  } catch { document.getElementById('slots-result').innerHTML='<span class="result-lose">Error. Try again.</span>'; [0,1,2].forEach(i=>document.getElementById('reel-'+i).classList.remove('spinning')); }
+  slotsSpinning=false; btn.disabled=false;
 }
+
 let diceRolling=false;
-async function playDice(){
-  if(diceRolling)return;const bet=parseInt(document.getElementById('dice-bet').value,10);
-  if(!bet||bet<1||bet>50000){document.getElementById('dice-result').innerHTML='<span class="result-lose">Bet must be 1-50000</span>';return}
-  diceRolling=true;const btn=document.getElementById('dice-roll-btn');btn.disabled=true;
-  document.getElementById('dice-player').textContent='🎲';document.getElementById('dice-house').textContent='🎲';document.getElementById('dice-result').textContent='';
+async function playDice() {
+  if(diceRolling)return; const bet=parseInt(document.getElementById('dice-bet').value,10);
+  if(!bet||bet<1||bet>50000){document.getElementById('dice-result').innerHTML='<span class="result-lose">Bet must be 1-50000</span>';return;}
+  diceRolling=true; const btn=document.getElementById('dice-roll-btn'); btn.disabled=true;
+  document.getElementById('dice-player').textContent='🎲'; document.getElementById('dice-house').textContent='🎲'; document.getElementById('dice-result').textContent='';
   await new Promise(r=>setTimeout(r,500));
-  try{const res=await fetch('/game/dice',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({bet})});const data=await res.json();
-  if(!res.ok)document.getElementById('dice-result').innerHTML=`<span class="result-lose">${data.error}</span>`;
-  else{document.getElementById('dice-player').textContent=data.playerRoll;document.getElementById('dice-house').textContent=data.houseRoll;myCoins=data.coins;updateCoinDisplay();updateGameBalances();
-  if(data.result==='win'){document.getElementById('dice-result').innerHTML=`<span class="result-win">🎉 You win! +${formatNumber(data.winAmount)} coins!</span>`;soundWin()}
-  else if(data.result==='tie')document.getElementById('dice-result').innerHTML=`<span class="result-tie">🤝 Tie! Bet returned.</span>`;
-  else{document.getElementById('dice-result').innerHTML=`<span class="result-lose">House wins. Better luck next time!</span>`;soundLose()}}}
-  catch{document.getElementById('dice-result').innerHTML='<span class="result-lose">Error. Try again.</span>'}
-  diceRolling=false;btn.disabled=false;
+  try {
+    const res=await fetch('/game/dice',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({bet})}); const data=await res.json();
+    if(!res.ok) document.getElementById('dice-result').innerHTML=`<span class="result-lose">${data.error}</span>`;
+    else {
+      document.getElementById('dice-player').textContent=data.playerRoll; document.getElementById('dice-house').textContent=data.houseRoll;
+      myCoins=data.coins; updateCoinDisplay(); updateGameBalances();
+      if(data.result==='win'){document.getElementById('dice-result').innerHTML=`<span class="result-win">🎉 You win! +${formatNumber(data.winAmount)} coins!</span>`;soundWin();}
+      else if(data.result==='tie') document.getElementById('dice-result').innerHTML=`<span class="result-tie">🤝 Tie! Bet returned.</span>`;
+      else{document.getElementById('dice-result').innerHTML=`<span class="result-lose">House wins. Better luck next time!</span>`;soundLose();}
+    }
+  } catch { document.getElementById('dice-result').innerHTML='<span class="result-lose">Error. Try again.</span>'; }
+  diceRolling=false; btn.disabled=false;
 }
-let rouletteSpinning=false;let selectedRouletteNumber=null;
-async function playRoulette(betType){
-  if(rouletteSpinning)return;const bet=parseInt(document.getElementById('roulette-bet').value,10);
-  if(!bet||bet<1||bet>50000){document.getElementById('roulette-result').innerHTML='<span class="result-lose">Bet must be 1-50000</span>';return}
-  if(betType==='number'&&selectedRouletteNumber===null){document.getElementById('roulette-result').innerHTML='<span class="result-lose">Select a number first!</span>';return}
-  
-  rouletteSpinning=true;const spinEl=document.getElementById('roulette-spin');spinEl.style.animation='none';document.getElementById('roulette-result').textContent='';
-  await new Promise(r=>setTimeout(r,50));spinEl.style.animation='spin 2s linear 1';
+
+let rouletteSpinning=false; let selectedRouletteNumber=null;
+async function playRoulette(betType) {
+  if(rouletteSpinning)return; const bet=parseInt(document.getElementById('roulette-bet').value,10);
+  if(!bet||bet<1||bet>50000){document.getElementById('roulette-result').innerHTML='<span class="result-lose">Bet must be 1-50000</span>';return;}
+  if(betType==='number'&&selectedRouletteNumber===null){document.getElementById('roulette-result').innerHTML='<span class="result-lose">Select a number first!</span>';return;}
+  rouletteSpinning=true; const spinEl=document.getElementById('roulette-spin'); spinEl.style.animation='none'; document.getElementById('roulette-result').textContent='';
+  await new Promise(r=>setTimeout(r,50)); spinEl.style.animation='spin 2s linear 1';
   await new Promise(r=>setTimeout(r,2000));
-  try{const res=await fetch('/game/roulette',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({bet,betType:betType==='number'?selectedRouletteNumber:betType})});const data=await res.json();
-  if(!res.ok)document.getElementById('roulette-result').innerHTML=`<span class="result-lose">${data.error}</span>`;
-  else{spinEl.innerHTML=`<div style="font-size:28px;">${data.spinColor}</div><div>${data.spin}</div>`;myCoins=data.coins;updateCoinDisplay();updateGameBalances();
-  if(data.result==='win'){const label=betType==='number'?`#${selectedRouletteNumber}`:betType;document.getElementById('roulette-result').innerHTML=`<span class="result-win">🎉 ${label} hits! +${formatNumber(data.winAmount)} coins!</span>`;soundWin()}
-  else{document.getElementById('roulette-result').innerHTML=`<span class="result-lose">House wins. Better luck next time!</span>`;soundLose()}}}
-  catch{document.getElementById('roulette-result').innerHTML='<span class="result-lose">Error. Try again.</span>'}
+  try {
+    const res=await fetch('/game/roulette',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({bet,betType:betType==='number'?selectedRouletteNumber:betType})}); const data=await res.json();
+    if(!res.ok) document.getElementById('roulette-result').innerHTML=`<span class="result-lose">${data.error}</span>`;
+    else {
+      spinEl.innerHTML=`<div style="font-size:28px;">${data.spinColor}</div><div>${data.spin}</div>`;
+      myCoins=data.coins; updateCoinDisplay(); updateGameBalances();
+      if(data.result==='win'){const label=betType==='number'?`#${selectedRouletteNumber}`:betType;document.getElementById('roulette-result').innerHTML=`<span class="result-win">🎉 ${label} hits! +${formatNumber(data.winAmount)} coins!</span>`;soundWin();}
+      else{document.getElementById('roulette-result').innerHTML=`<span class="result-lose">House wins. Better luck next time!</span>`;soundLose();}
+    }
+  } catch { document.getElementById('roulette-result').innerHTML='<span class="result-lose">Error. Try again.</span>'; }
   rouletteSpinning=false;
 }
-function initRouletteNumbers(){
+function initRouletteNumbers() {
   const redNumbers=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
-  const grid=document.getElementById('roulette-number-grid');grid.innerHTML='';
+  const grid=document.getElementById('roulette-number-grid'); grid.innerHTML='';
   for(let i=1;i<=36;i++){
-    const btn=document.createElement('button');btn.className='roulette-num-btn '+(redNumbers.includes(i)?'red':'black');btn.innerHTML=`<div style="font-size:20px;">${redNumbers.includes(i)?'🔴':'⚫'}</div><div>${i}</div>`;
-    btn.onclick=()=>{selectedRouletteNumber=i;playRoulette('number')};
+    const btn=document.createElement('button'); btn.className='roulette-num-btn '+(redNumbers.includes(i)?'red':'black');
+    btn.innerHTML=`<div style="font-size:20px;">${redNumbers.includes(i)?'🔴':'⚫'}</div><div>${i}</div>`;
+    btn.onclick=()=>{ selectedRouletteNumber=i; playRoulette('number'); };
     grid.appendChild(btn);
   }
 }
-function playNumber(num){selectedRouletteNumber=num;playRoulette('number');}
-async function loadLeaderboard(){
-  const container=document.getElementById('leaderboard-rows');container.innerHTML='<div style="text-align:center;color:var(--text-system);padding:20px;">Loading...</div>';
-  try{const res=await fetch('/leaderboard',{credentials:'include'});const data=await res.json();
-  if(!res.ok){container.innerHTML='<div style="color:#cc0000;text-align:center;padding:12px;">Error loading.</div>';return}
-  container.innerHTML=data.map((row,i)=>`<div class="lb-row"><span class="lb-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`}</span><span class="lb-name">${escHtml(row.username)}</span><span class="lb-coins">🪙 ${formatNumber(row.coins)}</span></div>`).join('')}
-  catch{container.innerHTML='<div style="color:#cc0000;text-align:center;padding:12px;">Error loading.</div>'}
+async function loadLeaderboard() {
+  const container=document.getElementById('leaderboard-rows'); container.innerHTML='<div style="text-align:center;color:var(--text-system);padding:20px;">Loading...</div>';
+  try {
+    const res=await fetch('/leaderboard',{credentials:'include'}); const data=await res.json();
+    if(!res.ok){container.innerHTML='<div style="color:#cc0000;text-align:center;padding:12px;">Error loading.</div>';return;}
+    // Medal sprites with fallback
+    const medals=['goldMedal.png','silverMedal.png','bronzeMedal.png'];
+    container.innerHTML=data.map((row,i)=>{
+      const rank=i<3?`<img src="/sprites/${medals[i]}" alt="${['🥇','🥈','🥉'][i]}" style="width:18px;height:18px;image-rendering:pixelated;vertical-align:middle;" onerror="this.onerror=null;this.src='/sprites/placeholder.png'">`:`#${i+1}`;
+      return `<div class="lb-row"><span class="lb-rank">${rank}</span><span class="lb-name">${escHtml(row.username)}</span><span class="lb-coins">🪙 ${formatNumber(row.coins)}</span></div>`;
+    }).join('');
+  } catch { container.innerHTML='<div style="color:#cc0000;text-align:center;padding:12px;">Error loading.</div>'; }
 }
 
-
 // ── TICKERS ───────────────────────────────────────────────────────────────────
-setInterval(()=>{document.querySelectorAll('.user-entry').forEach(entry=>{const span=entry.querySelector('.utime');if(span)span.textContent=formatDuration(Date.now()-parseInt(entry.dataset.joinedAt,10))})},1000);
-setInterval(()=>{document.querySelectorAll('.poll-timer').forEach(el=>{const left=Math.max(0,Math.ceil((parseInt(el.dataset.ends,10)-Date.now())/1000));if(left===0){el.textContent='ending...';el.classList.add('urgent')}else{const m=Math.floor(left/60),s=left%60;el.textContent=m>0?`${m}m ${s}s left`:`${s}s left`;el.classList.toggle('urgent',left<=30)}})},1000);
+setInterval(()=>{
+  document.querySelectorAll('.user-entry').forEach(entry=>{const span=entry.querySelector('.utime');if(span)span.textContent=formatDuration(Date.now()-parseInt(entry.dataset.joinedAt,10));});
+},1000);
+setInterval(()=>{
+  document.querySelectorAll('.poll-timer').forEach(el=>{
+    const left=Math.max(0,Math.ceil((parseInt(el.dataset.ends,10)-Date.now())/1000));
+    if(left===0){el.textContent='ending...';el.classList.add('urgent');}
+    else{const m=Math.floor(left/60),s=left%60;el.textContent=m>0?`${m}m ${s}s left`:`${s}s left`;el.classList.toggle('urgent',left<=30);}
+  });
+},1000);
 
 let activityThrottle=0;
-document.addEventListener('keydown',e=>{
-  const now=Date.now();if(now-activityThrottle>30000){activityThrottle=now;socket.emit('activity')}
+document.addEventListener('keydown', e => {
+  const now=Date.now(); if(now-activityThrottle>30000){activityThrottle=now;socket.emit('activity');}
   if(e.key==='Escape'){closeSettings();closeGames();closeShop();closeProfile();closeKeypad();closeRoomCreated();closeChangepass();}
 });
-document.getElementById('input').addEventListener('keydown',e=>{if(e.key==='Enter')send()});
-['login-username','login-password'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()}));
-['reg-username','reg-password','reg-password2'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doRegister()}));
+document.getElementById('input').addEventListener('keydown', e => { if(e.key==='Enter')send(); });
+['login-username','login-password'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();}));
+['reg-username','reg-password','reg-password2'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doRegister();}));
 
 // ── AUTO-LOGIN ────────────────────────────────────────────────────────────────
-fetch('/me').then(async res=>{if(res.ok){const data=await res.json();enterChat(data.username,data.color,data.theme||'classic',data.coins||0,data.token,data.dailyAvailable)}});
+fetch('/me').then(async res => {
+  if(res.ok){const data=await res.json();enterChat(data.username,data.color,data.theme||'classic',data.coins||0,data.token,data.dailyAvailable);}
+});
 </script>
 </body>
 </html>
