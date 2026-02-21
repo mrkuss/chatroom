@@ -207,7 +207,7 @@
 
     /* ── ROULETTE NUMBER GRID ── */
     #roulette-number-grid { display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin:8px 0;max-height:180px;overflow-y:auto;padding:4px; }
-    .roulette-num-btn { padding:6px;font-family:'VT323',monospace;font-size:14px;border:2px solid;cursor:pointer;font-weight:bold;color:#fff;border-color:var(--border-main); }
+    .roulette-num-btn { padding:4px;font-family:'VT323',monospace;font-size:14px;border:2px solid;cursor:pointer;font-weight:bold;color:#fff;border-color:var(--border-main);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50px;line-height:1.2; }
     .roulette-num-btn.red { background:#cc0000; }
     .roulette-num-btn.black { background:#222222; }
     .roulette-num-btn.selected { outline:2px solid yellow;outline-offset:1px;box-shadow:inset 0 0 0 2px yellow; }
@@ -670,7 +670,7 @@
       <div style="display:flex;justify-content:center;align-items:center;gap:16px;margin:16px 0;">
         <div style="text-align:center;">
           <label style="font-size:12px;color:var(--text-system);">Spin</label>
-          <div style="font-size:32px;margin-top:4px;" id="roulette-spin">🎡</div>
+          <div style="font-size:28px;margin-top:4px;text-align:center;line-height:1.2;" id="roulette-spin">🎡</div>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;">
@@ -1098,6 +1098,7 @@ function renderHistory(history){
   addMessage(`<span class="msg-system">── message history ──</span>`);
   history.forEach(row=>{
     const ts=new Date(row.created_at).getTime();
+    const colorInfo=SHOP_COLORS[row.color];const effectClass=colorInfo?` user-${colorInfo.effect}`:'';
     if(row.type==='poll'){
       const poll=row.poll_data;
       if(!poll)return;
@@ -1110,11 +1111,11 @@ function renderHistory(history){
     } else if(row.type==='system'){
       addMessage(`<span class="msg-system">*** ${row.text} ***</span>`,'',ts);
     } else if(row.type==='action'){
-      addMessage(`<span class="msg-action">*** <span class="msg-user" data-username="${escHtml(row.sender)}" style="color:${row.color}">${row.sender}</span> ${row.text} ***</span>`,'',ts);
+      addMessage(`<span class="msg-action">*** <span class="msg-user${effectClass}" data-username="${escHtml(row.sender)}" style="color:${row.color}">${row.sender}</span> ${row.text} ***</span>`,'',ts);
     } else if(row.type==='dm'){
       addDmMessage({from:row.sender,to:row.recipient,text:row.text,self:row.sender===myUsername,noFlash:true});
     } else {
-      const li=addMessage(`<span class="msg-user" data-username="${escHtml(row.sender)}" style="color:${row.color}">${row.sender}:</span> <span class="msg-text">${row.text}</span>`,row.sender===myUsername?'msg-own':'',ts,row.id);
+      const li=addMessage(`<span class="msg-user${effectClass}" data-username="${escHtml(row.sender)}" style="color:${row.color}">${row.sender}:</span> <span class="msg-text">${row.text}</span>`,row.sender===myUsername?'msg-own':'',ts,row.id);
       if(row.reactions&&Object.keys(row.reactions).length)updateReactions(li,row.reactions,null);
     }
   });
@@ -1475,7 +1476,7 @@ async function playRoulette(betType){
   await new Promise(r=>setTimeout(r,2000));
   try{const res=await fetch('/game/roulette',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({bet,betType:betType==='number'?selectedRouletteNumber:betType})});const data=await res.json();
   if(!res.ok)document.getElementById('roulette-result').innerHTML=`<span class="result-lose">${data.error}</span>`;
-  else{spinEl.textContent=data.spinColor+data.spin;myCoins=data.coins;updateCoinDisplay();updateGameBalances();
+  else{spinEl.innerHTML=`<div style="font-size:28px;">${data.spinColor}</div><div>${data.spin}</div>`;myCoins=data.coins;updateCoinDisplay();updateGameBalances();
   if(data.result==='win'){const label=betType==='number'?`#${selectedRouletteNumber}`:betType;document.getElementById('roulette-result').innerHTML=`<span class="result-win">🎉 ${label} hits! +${formatNumber(data.winAmount)} coins!</span>`;soundWin()}
   else{document.getElementById('roulette-result').innerHTML=`<span class="result-lose">House wins. Better luck next time!</span>`;soundLose()}}}
   catch{document.getElementById('roulette-result').innerHTML='<span class="result-lose">Error. Try again.</span>'}
@@ -1485,7 +1486,7 @@ function initRouletteNumbers(){
   const redNumbers=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
   const grid=document.getElementById('roulette-number-grid');grid.innerHTML='';
   for(let i=1;i<=36;i++){
-    const btn=document.createElement('button');btn.className='roulette-num-btn '+(redNumbers.includes(i)?'red':'black');btn.textContent=(redNumbers.includes(i)?'🔴':'⚫')+i;
+    const btn=document.createElement('button');btn.className='roulette-num-btn '+(redNumbers.includes(i)?'red':'black');btn.innerHTML=`<div style="font-size:20px;">${redNumbers.includes(i)?'🔴':'⚫'}</div><div>${i}</div>`;
     btn.onclick=()=>{selectedRouletteNumber=i;playRoulette('number')};
     grid.appendChild(btn);
   }
