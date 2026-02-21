@@ -394,6 +394,7 @@ function initChat(io) {
           '/decline — decline a duel',
           '/create roomname code — create private room (digits only)',
           '/joinroom roomname — open keypad to join a private room',
+          '/showcode roomname — show room code (room owner only)',
           '/leaveroom — return to #general',
           '/kick username, /ban username, /unban username — room owner only',
           '/changepass newcode — room owner only (numeric code)',
@@ -673,6 +674,26 @@ function initChat(io) {
           socket.emit('system message', `You already have access to #${roomName}. Click it in the sidebar.`); return;
         }
         socket.emit('room requires code', roomName);
+        return;
+      }
+
+      // ── /showcode (room owner only — show code to them) ────────────────────
+      if (raw.startsWith('/showcode ')) {
+        const roomName = raw.slice(10).trim().split(' ')[0].toLowerCase();
+        const roomRes = await db.query(
+          `SELECT creator, owner_code FROM rooms WHERE name = $1 AND is_private = true`,
+          [roomName]
+        );
+        if (!roomRes.rows.length) {
+          socket.emit('system message', `Private room "${escapeHtml(roomName)}" not found.`);
+          return;
+        }
+        if (roomRes.rows[0].creator.toLowerCase() !== user.username.toLowerCase()) {
+          socket.emit('system message', 'Only the room owner can view the code.');
+          return;
+        }
+        const code = roomRes.rows[0].owner_code;
+        socket.emit('system message', `Code for #${roomName}: ${code}`);
         return;
       }
 
