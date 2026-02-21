@@ -1401,7 +1401,7 @@ async function openProfile(username) {
       </div>
       <div class="profile-stats">
         <div class="stat-row"><span class="stat-label">Joined</span><span class="stat-value">${formatDate(d.createdAt)}</span></div>
-        <div class="stat-row"><span class="stat-label">Coins</span><span class="stat-value">${si('coinIcon.png',14,14,'coin')} ${fmtNum(d.coins)}</span></div>
+        <div class="stat-row"><span class="stat-label">Coins</span><span class="stat-value" style="color:#ffd700;text-shadow:1px 1px 0 #7a6000,0 1px 3px rgba(0,0,0,0.4)">${si('coinIcon.png',14,14,'coin')} ${fmtNum(d.coins)}</span></div>
         <div class="stat-row"><span class="stat-label">Messages sent</span><span class="stat-value">${d.messagesSent}</span></div>
         <div class="stat-row"><span class="stat-label">Time online</span><span class="stat-value">${formatSeconds(d.timeOnlineSeconds)}</span></div>
       </div>
