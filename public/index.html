@@ -365,8 +365,7 @@
     .dice-vs { font-size:20px;color:var(--text-system); }
     
     /* ── COIN CLICKER ── */
-    /* ── COIN CLICKER ── */
-    #coin-clicker-container { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;margin:20px 0;position:relative;min-height:300px; }
+    #coin-clicker-container { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;margin:20px 0;position:relative;min-height:150px; }
     #coin-clicker-coin { font-size:100px;cursor:pointer;user-select:none;filter:drop-shadow(0 0 20px rgba(255,215,0,0.4));transition:filter 0.1s; }
     #coin-clicker-coin:hover { filter:drop-shadow(0 0 30px rgba(255,215,0,0.8)); }
     #coin-clicker-coin.clicking { animation:coinClick 0.15s ease-out; }
@@ -376,7 +375,7 @@
     .coin-float { position:absolute;font-weight:bold;font-size:28px;color:#00ff00;pointer-events:none;font-family:'VT323',monospace;text-shadow:0 0 8px rgba(0,255,0,0.6); }
     @keyframes floatUp { 0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-80px) scale(0.8);opacity:0} }
     .coin-float.animate { animation:floatUp 1s ease-out forwards; }
-    #coin-clicker-info { font-size:14px;color:var(--text-system);text-align:center;min-height:20px; }
+    #coin-clicker-info { font-size:14px;color:var(--text-system);text-align:center;min-height:0; }
     
     .lb-row { display:flex;justify-content:space-between;padding:4px 8px;border-bottom:1px solid var(--border-inset);font-size:16px; }
     .lb-row:nth-child(odd) { background:var(--poll-bg); }
@@ -1532,7 +1531,7 @@ async function breakCoin(){
   catch{document.getElementById('coin-clicker-result').innerHTML='<span class="result-lose">Error. Try again.</span>'}}
 function floatCoinText(text){const container=document.getElementById('coin-clicker-container');const float=document.createElement('div');float.className='coin-float';float.textContent=text;float.style.left='50%';float.style.top='50%';container.style.position='relative';container.appendChild(float);float.offsetHeight;float.classList.add('animate');setTimeout(()=>float.remove(),1000)}
 function soundClick(){const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=800;osc.type='sine';gain.gain.setValueAtTime(0.3,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.1);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.1)}
-function soundBreak(){const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=1200;osc.type='square';gain.gain.setValueAtTime(0.4,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.2);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.2)}
+function soundBreak(){const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=600;osc.type='square';gain.gain.setValueAtTime(0.4,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.2);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.2)}
 
 // ── TICKERS ───────────────────────────────────────────────────────────────────
 setInterval(()=>{document.querySelectorAll('.user-entry').forEach(entry=>{const span=entry.querySelector('.utime');if(span)span.textContent=formatDuration(Date.now()-parseInt(entry.dataset.joinedAt,10))})},1000);
