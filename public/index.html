@@ -652,7 +652,7 @@
     <div id="game-slots" class="game-panel active" style="padding:0 16px 16px;">
       <div class="game-balance" id="slots-balance">Balance: 🪙 0</div>
       <div class="slots-reels"><div class="slot-reel" id="reel-0">🎰</div><div class="slot-reel" id="reel-1">🎰</div><div class="slot-reel" id="reel-2">🎰</div></div>
-      <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="slots-bet" value="10" min="1" max="500" /><div class="bet-presets"><button class="bet-preset" onclick="setBet('slots',10)">10</button><button class="bet-preset" onclick="setBet('slots',50)">50</button><button class="bet-preset" onclick="setBet('slots',100)">100</button></div></div>
+      <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="slots-bet" value="10" min="1" max="50000" /><div class="bet-presets"><button class="bet-preset" onclick="setBet('slots',10)">10</button><button class="bet-preset" onclick="setBet('slots',50)">50</button><button class="bet-preset" onclick="setBet('slots',100)">100</button></div></div>
       <button class="game-btn" id="slots-spin-btn" onclick="playSlots()">SPIN</button>
       <div class="game-result" id="slots-result"></div>
       <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">More forgiving odds · 🍒=2x · 🍋=3x · 🍊=4x · ⭐=6x · 💎=8x · 7️⃣=20x</div>
@@ -660,7 +660,7 @@
     <div id="game-dice" class="game-panel" style="padding:0 16px 16px;">
       <div class="game-balance" id="dice-balance">Balance: 🪙 0</div>
       <div class="dice-display"><div class="dice-side"><label>You</label><div class="dice-value" id="dice-player">?</div></div><div class="dice-vs">VS</div><div class="dice-side"><label>House</label><div class="dice-value" id="dice-house">?</div></div></div>
-      <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="dice-bet" value="10" min="1" max="500" /><div class="bet-presets"><button class="bet-preset" onclick="setBet('dice',10)">10</button><button class="bet-preset" onclick="setBet('dice',50)">50</button><button class="bet-preset" onclick="setBet('dice',100)">100</button></div></div>
+      <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="dice-bet" value="10" min="1" max="50000" /><div class="bet-presets"><button class="bet-preset" onclick="setBet('dice',10)">10</button><button class="bet-preset" onclick="setBet('dice',50)">50</button><button class="bet-preset" onclick="setBet('dice',100)">100</button></div></div>
       <button class="game-btn" id="dice-roll-btn" onclick="playDice()">ROLL DICE</button>
       <div class="game-result" id="dice-result"></div>
       <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Roll 2 dice vs the house. Higher total wins 1.9x · Tie returns bet</div>
@@ -679,7 +679,7 @@
         <button class="game-btn" onclick="playRoulette('even')" style="background:#0056b3;">2,4,6... EVEN</button>
         <button class="game-btn" onclick="playRoulette('odd')" style="background:#0056b3;">1,3,5... ODD</button>
       </div>
-      <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="roulette-bet" value="10" min="1" max="500" /><div class="bet-presets"><button class="bet-preset" onclick="setBet('roulette',10)">10</button><button class="bet-preset" onclick="setBet('roulette',50)">50</button><button class="bet-preset" onclick="setBet('roulette',100)">100</button></div></div>
+      <div class="bet-row"><label>Bet:</label><input type="number" class="bet-input" id="roulette-bet" value="10" min="1" max="50000" /><div class="bet-presets"><button class="bet-preset" onclick="setBet('roulette',10)">10</button><button class="bet-preset" onclick="setBet('roulette',50)">50</button><button class="bet-preset" onclick="setBet('roulette',100)">100</button></div></div>
       <div id="roulette-selected-info"></div>
       <div style="font-size:12px;color:var(--text-system);margin:8px 0;">Or pick a specific number (50x payout):</div>
       <div id="roulette-number-grid"></div>
@@ -1437,7 +1437,7 @@ function setBet(game,amount){document.getElementById(game+'-bet').value=amount}
 let slotsSpinning=false;
 async function playSlots(){
   if(slotsSpinning)return;const bet=parseInt(document.getElementById('slots-bet').value,10);
-  if(!bet||bet<1||bet>500){document.getElementById('slots-result').innerHTML='<span class="result-lose">Bet must be 1-500</span>';return}
+  if(!bet||bet<1||bet>50000){document.getElementById('slots-result').innerHTML='<span class="result-lose">Bet must be 1-50000</span>';return}
   slotsSpinning=true;const btn=document.getElementById('slots-spin-btn');btn.disabled=true;document.getElementById('slots-result').textContent='';
   [0,1,2].forEach(i=>document.getElementById('reel-'+i).classList.add('spinning'));await new Promise(r=>setTimeout(r,600));
   try{const res=await fetch('/game/slots',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({bet})});const data=await res.json();
@@ -1450,7 +1450,7 @@ async function playSlots(){
 let diceRolling=false;
 async function playDice(){
   if(diceRolling)return;const bet=parseInt(document.getElementById('dice-bet').value,10);
-  if(!bet||bet<1||bet>500){document.getElementById('dice-result').innerHTML='<span class="result-lose">Bet must be 1-500</span>';return}
+  if(!bet||bet<1||bet>50000){document.getElementById('dice-result').innerHTML='<span class="result-lose">Bet must be 1-50000</span>';return}
   diceRolling=true;const btn=document.getElementById('dice-roll-btn');btn.disabled=true;
   document.getElementById('dice-player').textContent='🎲';document.getElementById('dice-house').textContent='🎲';document.getElementById('dice-result').textContent='';
   await new Promise(r=>setTimeout(r,500));
@@ -1466,7 +1466,7 @@ async function playDice(){
 let rouletteSpinning=false;let selectedRouletteNumber=null;
 async function playRoulette(betType){
   if(rouletteSpinning)return;const bet=parseInt(document.getElementById('roulette-bet').value,10);
-  if(!bet||bet<1||bet>500){document.getElementById('roulette-result').innerHTML='<span class="result-lose">Bet must be 1-500</span>';return}
+  if(!bet||bet<1||bet>50000){document.getElementById('roulette-result').innerHTML='<span class="result-lose">Bet must be 1-50000</span>';return}
   if(betType==='number'&&selectedRouletteNumber===null){document.getElementById('roulette-result').innerHTML='<span class="result-lose">Select a number first!</span>';return}
   
   rouletteSpinning=true;const spinEl=document.getElementById('roulette-spin');spinEl.style.animation='none';document.getElementById('roulette-result').textContent='';

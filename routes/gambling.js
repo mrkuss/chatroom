@@ -81,7 +81,7 @@ router.get('/leaderboard', async (req, res) => {
 router.post('/game/slots', async (req, res) => {
   if (!req.session.username) return res.status(401).json({ error: 'Not logged in' });
   const betAmount = parseInt(req.body.bet, 10);
-  if (!betAmount || betAmount < 1 || betAmount > 500) return res.status(400).json({ error: 'Bet must be 1-500' });
+  if (!betAmount || betAmount < 1 || betAmount > 50000) return res.status(400).json({ error: 'Bet must be 1-50000' });
 
   const newBal = await deductCoins(req.session.username, betAmount);
   if (newBal === false) return res.status(400).json({ error: 'Not enough coins' });
@@ -123,7 +123,7 @@ router.post('/game/slots', async (req, res) => {
 router.post('/game/dice', async (req, res) => {
   if (!req.session.username) return res.status(401).json({ error: 'Not logged in' });
   const betAmount = parseInt(req.body.bet, 10);
-  if (!betAmount || betAmount < 1 || betAmount > 500) return res.status(400).json({ error: 'Bet must be 1-500' });
+  if (!betAmount || betAmount < 1 || betAmount > 50000) return res.status(400).json({ error: 'Bet must be 1-50000' });
 
   const newBal = await deductCoins(req.session.username, betAmount);
   if (newBal === false) return res.status(400).json({ error: 'Not enough coins' });
@@ -161,7 +161,7 @@ router.post('/game/roulette', async (req, res) => {
   const betAmount = parseInt(req.body.bet, 10);
   let betType = req.body.betType;
   
-  if (!betAmount || betAmount < 1 || betAmount > 500) return res.status(400).json({ error: 'Bet must be 1-500' });
+  if (!betAmount || betAmount < 1 || betAmount > 50000) return res.status(400).json({ error: 'Bet must be 1-50000' });
   
   // Validate bet type: can be 'red', 'black', 'even', 'odd', or a number 1-36
   let isNumberBet = false;
