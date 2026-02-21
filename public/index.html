@@ -1232,6 +1232,7 @@ socket.on('user list',list=>{
     const colorInfo=SHOP_COLORS[color];const effectClass=colorInfo?` user-${colorInfo.effect}`:'';
     entry.innerHTML=`<span class="uname${effectClass}" style="color:${color}" data-username="${escHtml(username)}" onclick="openProfile('${escHtml(username)}')">${username}</span>${idle?'<span class="uidle">⏸</span>':''}<span class="utime">${formatDuration(Date.now()-joinedAt)}</span>`;
     panel.appendChild(entry);
+    if(username===myUsername){myColor=color;const colorInfo=SHOP_COLORS[color];const effectClass=colorInfo?` user-${colorInfo.effect}`:'';document.getElementById('logged-in-as').innerHTML=`<span class="${effectClass}" style="color:${color};text-shadow:0 0 2px rgba(255,255,255,0.5)">${myUsername}</span>`;}
   });
 });
 
