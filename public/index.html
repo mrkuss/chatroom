@@ -369,7 +369,7 @@
     #coin-clicker-coin { font-size:100px;cursor:pointer;user-select:none;filter:drop-shadow(0 0 20px rgba(255,215,0,0.4));transition:filter 0.1s; }
     #coin-clicker-coin:hover { filter:drop-shadow(0 0 30px rgba(255,215,0,0.8)); }
     #coin-clicker-coin.clicking { animation:coinClick 0.15s ease-out; }
-    #coin-clicker-coin.breaking { animation:coinBreak 0.6s ease-out; }
+    #coin-clicker-coin.breaking { animation:coinBreak 0.3s ease-out; }
     @keyframes coinClick { 0%{transform:scale(1)}30%{transform:scale(0.95) rotate(-5deg)}60%{transform:scale(1.05) rotate(5deg)}100%{transform:scale(1) rotate(0deg)} }
     @keyframes coinBreak { 0%{transform:scale(1) rotate(0deg);opacity:1}50%{transform:scale(1.1);opacity:1}100%{transform:scale(0) rotate(360deg);opacity:0} }
     .coin-float { position:absolute;font-weight:bold;font-size:28px;color:#00ff00;pointer-events:none;font-family:'VT323',monospace;text-shadow:0 0 8px rgba(0,255,0,0.6); }
@@ -707,7 +707,6 @@
         <div id="coin-clicker-coin" onclick="clickCoin()">🪙</div>
         <div id="coin-clicker-info"></div>
       </div>
-      <div class="game-result" id="coin-clicker-result"></div>
       <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Tap the coin repeatedly to break it and earn 1-3 coins! Limit: 1000 breaks per day</div>
     </div>
     <div id="game-leaderboard" class="game-panel" style="padding:0 16px 16px;">
@@ -1527,11 +1526,11 @@ async function breakCoin(){
   const coin=document.getElementById('coin-clicker-coin');coin.classList.remove('clicking');coin.classList.add('breaking');soundBreak();
   try{const res=await fetch('/game/coin-clicker',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});const data=await res.json();
   if(!res.ok){document.getElementById('coin-clicker-result').innerHTML=`<span class="result-lose">${data.error}</span>`;return}
-  myCoins=data.coins;updateCoinDisplay();updateGameBalances();const earned=data.coinsEarned;floatCoinText('+'+earned);setTimeout(()=>{coin.classList.remove('breaking');clickerState={nextClickTime:0,tapCount:0,requiredTaps:Math.floor(Math.random()*4)+2,isBreaking:false}},600)}
+  myCoins=data.coins;updateCoinDisplay();updateGameBalances();const earned=data.coinsEarned;floatCoinText('+'+earned);setTimeout(()=>{coin.classList.remove('breaking');clickerState={nextClickTime:0,tapCount:0,requiredTaps:Math.floor(Math.random()*4)+2,isBreaking:false}},300)}}
   catch{document.getElementById('coin-clicker-result').innerHTML='<span class="result-lose">Error. Try again.</span>'}}
 function floatCoinText(text){const container=document.getElementById('coin-clicker-container');const float=document.createElement('div');float.className='coin-float';float.textContent=text;float.style.left='50%';float.style.top='50%';container.style.position='relative';container.appendChild(float);float.offsetHeight;float.classList.add('animate');setTimeout(()=>float.remove(),1000)}
 function soundClick(){const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=800;osc.type='sine';gain.gain.setValueAtTime(0.3,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.1);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.1)}
-function soundBreak(){const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=600;osc.type='square';gain.gain.setValueAtTime(0.4,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.2);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.2)}
+function soundBreak(){const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=400;osc.type='sine';gain.gain.setValueAtTime(0.15,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.15);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.15)}
 
 // ── TICKERS ───────────────────────────────────────────────────────────────────
 setInterval(()=>{document.querySelectorAll('.user-entry').forEach(entry=>{const span=entry.querySelector('.utime');if(span)span.textContent=formatDuration(Date.now()-parseInt(entry.dataset.joinedAt,10))})},1000);
