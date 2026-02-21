@@ -94,11 +94,8 @@
     #logged-in-as { font-size:22px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:8px; }
     #logged-in-as span { color:white !important;text-shadow:0 1px 2px rgba(0,0,0,0.12); }
     #coin-display { font-size:14px;color:#ffd700;white-space:nowrap;margin-right:4px;text-shadow:0 0 4px rgba(255,215,0,0.5);display:flex;align-items:center;gap:3px; }
-    #coin-display #coin-amount { font-weight:bold;font-size:16px;text-shadow:1px 1px 0 rgba(160,100,0,0.7),0 0 6px rgba(255,215,0,0.4); }
     body.theme-amber #coin-display,body.theme-dark #coin-display { color:#ffcc00; }
     body.theme-rose #coin-display { color:#ffaa44; }
-    .shop-balance #shop-balance-amt,
-    .game-balance span { font-weight:bold;text-shadow:1px 1px 0 rgba(140,80,0,0.65),0 0 5px rgba(255,215,0,0.3); }
 
     .icon-btn { font-family:'VT323',monospace;font-size:16px;background:var(--btn-bg);color:var(--text-main);border:2px solid;border-color:var(--btn-border);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;padding:0;line-height:1;position:relative; }
     .icon-btn:active { border-color:var(--border-inset) white white var(--border-inset); }
@@ -276,7 +273,7 @@
     .badge-item.earned { border-color:#007700;background:var(--poll-bg); }
     .badge-item.active-badge { border-color:#ffd700;outline:1px solid #ffd700; }
     .badge-item.locked { opacity:0.4;cursor:default; }
-    .badge-icon { width:32px;height:32px;display:block;margin-bottom:3px; }
+    .badge-icon { width:28px;height:28px;display:block;margin-bottom:3px; }
     .badge-name { font-size:15px;font-weight:bold;color:var(--text-main); }
     .badge-desc { font-size:12px;color:var(--text-system);margin-top:2px; }
     .badge-active-label { font-size:11px;color:#ffd700;margin-top:2px; }
@@ -287,14 +284,14 @@
     .help-cmd code { color:var(--link-title-color);font-family:'VT323',monospace;font-size:15px; }
 
     #daily-modal .modal-box { max-width:320px;text-align:center; }
-    .daily-icon { width:32px;height:32px;display:block;margin:0 auto 8px; }
+    .daily-icon { width:48px;height:48px;display:block;margin:0 auto 8px; }
     .daily-title { font-size:24px;color:var(--poll-question);margin-bottom:8px; }
     .daily-amount { font-size:32px;color:#ffd700;margin:8px 0;display:flex;align-items:center;justify-content:center;gap:6px; }
     .daily-claim-btn { width:100%;padding:10px;font-family:'VT323',monospace;font-size:22px;background:#007700;color:white;border:2px solid;border-color:#0a0 #030 #030 #0a0;cursor:pointer;margin-top:12px;letter-spacing:1px; }
 
     #profile-modal .modal-box { max-width:340px; }
     .profile-header { display:flex;align-items:center;gap:10px;margin-bottom:12px; }
-    .profile-avatar-img { }
+    .profile-avatar-img { width:48px;height:48px; }
     .profile-name { font-size:24px;font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,0.12); }
     .profile-badge-display { font-size:16px;margin-top:2px;color:var(--text-system);display:flex;align-items:center;gap:4px; }
     .profile-stats { margin-bottom:12px; }
@@ -394,7 +391,7 @@
     <div id="titlebar-right">
       <span id="logged-in-as"></span>
       <span id="coin-display">
-        <img class="sprite" data-scale="titlebar_coin" src="/sprites/coinIcon.png" width="32" height="32" alt="coins" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/coinIcon.png" width="32" height="32" alt="coins" onerror="this.src='/sprites/placeholder.png'">
         <span id="coin-amount">0</span>
       </span>
       <button class="icon-btn" onclick="sfxClick();openShop()" title="Shop">
@@ -416,7 +413,7 @@
     </div>
   </div>
   <div id="reconnect-banner">
-    <img class="sprite" data-scale="reconnect_warning" src="/sprites/warningIcon.png" width="32" height="32" alt="!" onerror="this.src='/sprites/placeholder.png'">
+    <img class="sprite" src="/sprites/warningIcon.png" width="14" height="14" alt="!" onerror="this.src='/sprites/placeholder.png'">
     Connection lost — reconnecting...
   </div>
   <div id="chat-layout">
@@ -441,7 +438,7 @@
   <div class="modal-box">
     <div class="modal-titlebar">
       <span>
-        <img class="sprite" data-scale="modal_titlebar_icon" src="/sprites/lockIcon.png" width="32" height="32" alt="Lock" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/lockIcon.png" width="16" height="16" alt="Lock" onerror="this.src='/sprites/placeholder.png'">
         Enter Room Code
       </span>
       <button class="modal-close" onclick="sfxClick();closeKeypad()">✕</button>
@@ -475,7 +472,7 @@
   <div class="modal-box">
     <div class="modal-titlebar">
       <span>
-        <img class="sprite" data-scale="modal_titlebar_icon" src="/sprites/lockIcon.png" width="32" height="32" alt="Lock" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/lockIcon.png" width="16" height="16" alt="Lock" onerror="this.src='/sprites/placeholder.png'">
         Room Created
       </span>
       <button class="modal-close" onclick="sfxClick();closeRoomCreated()">✕</button>
@@ -495,7 +492,7 @@
   <div class="modal-box">
     <div class="modal-titlebar">
       <span>
-        <img class="sprite" data-scale="modal_titlebar_icon" src="/sprites/warningIcon.png" width="32" height="32" alt="Warning" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/warningIcon.png" width="16" height="16" alt="Warning" onerror="this.src='/sprites/placeholder.png'">
         Confirm Code Change
       </span>
       <button class="modal-close" onclick="sfxClick();closeChangepass()">✕</button>
@@ -517,11 +514,11 @@
   <div class="modal-box" style="max-width:320px;text-align:center;">
     <div class="modal-titlebar"><span>Daily Reward</span></div>
     <div class="modal-body">
-      <img class="daily-icon" data-scale="daily_icon" src="/sprites/coinIcon.png" alt="Coin" onerror="this.src='/sprites/placeholder.png'">
+      <img class="daily-icon" src="/sprites/coinIcon.png" alt="Coin" onerror="this.src='/sprites/placeholder.png'">
       <div class="daily-title">Daily Bonus Available!</div>
       <div style="font-size:15px;color:var(--text-system);margin-bottom:4px;">Claim your free coins for today</div>
       <div class="daily-amount">
-        <img class="sprite" data-scale="daily_amount_coin" src="/sprites/coinIcon.png" width="32" height="32" alt="coin" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/coinIcon.png" width="32" height="32" alt="coin" onerror="this.src='/sprites/placeholder.png'">
         +50 coins
       </div>
       <button class="daily-claim-btn" onclick="sfxClick();claimDaily()">Claim Reward</button>
@@ -645,14 +642,14 @@
   <div class="modal-box" id="shop-modal">
     <div class="modal-titlebar">
       <span>
-        <img class="sprite" data-scale="shop_titlebar_icon" src="/sprites/shopButtonIcon.png" width="32" height="32" alt="Shop" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/shopButtonIcon.png" width="32" height="32" alt="Shop" onerror="this.src='/sprites/placeholder.png'">
         Shop
       </span>
       <button class="modal-close" onclick="sfxClick();closeShop()">✕</button>
     </div>
     <div style="padding:0 16px;">
       <div class="shop-balance" id="shop-balance">
-        <img class="sprite" data-scale="shop_balance_coin" src="/sprites/coinIcon.png" width="32" height="32" alt="coin" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/coinIcon.png" width="32" height="32" alt="coin" onerror="this.src='/sprites/placeholder.png'">
         Balance: <span id="shop-balance-amt">0</span>
       </div>
       <div class="shop-tabs">
@@ -673,7 +670,7 @@
   <div class="modal-box" id="games-modal">
     <div class="modal-titlebar">
       <span>
-        <img class="sprite" data-scale="games_titlebar_icon" src="/sprites/gameButtonIcon.png" width="32" height="32" alt="Games" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/gameButtonIcon.png" width="16" height="16" alt="Games" onerror="this.src='/sprites/placeholder.png'">
         Games
       </span>
       <button class="modal-close" onclick="sfxClick();closeGames()">✕</button>
@@ -681,34 +678,34 @@
     <div style="padding:0 16px;">
       <div class="games-tabs">
         <button class="games-tab active" onclick="sfxClick();switchGame('slots')">
-          <img class="sprite" data-scale="games_tab_icon" src="/sprites/slotsIcon.png" width="32" height="32" alt=""> Slots
+          <img class="sprite" src="/sprites/slotsIcon.png" width="14" height="14" alt="" onerror="this.src='/sprites/placeholder.png'"> Slots
         </button>
         <button class="games-tab" onclick="sfxClick();switchGame('dice')">
-          <img class="sprite" data-scale="games_tab_icon" src="/sprites/diceIcon.png" width="32" height="32" alt=""> Dice
+          <img class="sprite" src="/sprites/diceIcon.png" width="14" height="14" alt="" onerror="this.src='/sprites/placeholder.png'"> Dice
         </button>
         <button class="games-tab" onclick="sfxClick();switchGame('roulette')">
-          <img class="sprite" data-scale="games_tab_icon" src="/sprites/rouletteIcon.png" width="32" height="32" alt=""> Roulette
+          <img class="sprite" src="/sprites/rouletteIcon.png" width="14" height="14" alt="" onerror="this.src='/sprites/placeholder.png'"> Roulette
         </button>
         <button class="games-tab" onclick="sfxClick();switchGame('leaderboard')">
-          <img class="sprite" data-scale="games_tab_icon" src="/sprites/trophyIcon.png" width="32" height="32" alt=""> Board
+          <img class="sprite" src="/sprites/trophyIcon.png" width="14" height="14" alt="" onerror="this.src='/sprites/placeholder.png'"> Board
         </button>
       </div>
     </div>
     <!-- SLOTS -->
     <div id="game-slots" class="game-panel active" style="padding:0 16px 16px;">
       <div class="game-balance" id="slots-balance">
-        <img class="sprite" data-scale="games_balance_coin" src="/sprites/coinIcon.png" width="32" height="32" alt="coin" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/coinIcon.png" width="32" height="32" alt="coin" onerror="this.src='/sprites/placeholder.png'">
         Balance: <span id="slots-balance-amt">0</span>
       </div>
       <div class="slots-reels">
         <div class="slot-reel" id="reel-0">
-          <img class="sprite" data-scale="games_slot_reel" src="/sprites/slotsIcon.png" width="32" height="32" alt="?" onerror="this.src='/sprites/placeholder.png'">
+          <img class="sprite" src="/sprites/slotsIcon.png" width="40" height="40" alt="?" onerror="this.src='/sprites/placeholder.png'">
         </div>
         <div class="slot-reel" id="reel-1">
-          <img class="sprite" data-scale="games_slot_reel" src="/sprites/slotsIcon.png" width="32" height="32" alt="?" onerror="this.src='/sprites/placeholder.png'">
+          <img class="sprite" src="/sprites/slotsIcon.png" width="40" height="40" alt="?" onerror="this.src='/sprites/placeholder.png'">
         </div>
         <div class="slot-reel" id="reel-2">
-          <img class="sprite" data-scale="games_slot_reel" src="/sprites/slotsIcon.png" width="32" height="32" alt="?" onerror="this.src='/sprites/placeholder.png'">
+          <img class="sprite" src="/sprites/slotsIcon.png" width="40" height="40" alt="?" onerror="this.src='/sprites/placeholder.png'">
         </div>
       </div>
       <div class="bet-row">
@@ -727,7 +724,7 @@
     <!-- DICE -->
     <div id="game-dice" class="game-panel" style="padding:0 16px 16px;">
       <div class="game-balance" id="dice-balance">
-        <img class="sprite" data-scale="games_balance_coin" src="/sprites/coinIcon.png" width="32" height="32" alt="coin" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/coinIcon.png" width="32" height="32" alt="coin" onerror="this.src='/sprites/placeholder.png'">
         Balance: <span id="dice-balance-amt">0</span>
       </div>
       <div class="dice-display">
@@ -751,14 +748,14 @@
     <!-- ROULETTE -->
     <div id="game-roulette" class="game-panel" style="padding:0 16px 16px;">
       <div class="game-balance" id="roulette-balance">
-        <img class="sprite" data-scale="games_balance_coin" src="/sprites/coinIcon.png" width="32" height="32" alt="coin" onerror="this.src='/sprites/placeholder.png'">
+        <img class="sprite" src="/sprites/coinIcon.png" width="32" height="32" alt="coin" onerror="this.src='/sprites/placeholder.png'">
         Balance: <span id="roulette-balance-amt">0</span>
       </div>
       <div style="display:flex;justify-content:center;margin:16px 0;">
         <div style="text-align:center;">
           <label style="font-size:12px;color:var(--text-system);">Spin</label>
           <div style="font-size:28px;margin-top:4px;" id="roulette-spin">
-            <img class="sprite" data-scale="games_roulette_spin" src="/sprites/rouletteIcon.png" width="32" height="32" alt="Roulette" onerror="this.src='/sprites/placeholder.png'">
+            <img class="sprite" src="/sprites/rouletteIcon.png" width="40" height="40" alt="Roulette" onerror="this.src='/sprites/placeholder.png'">
           </div>
         </div>
       </div>
@@ -796,7 +793,7 @@
 <div id="announcement-modal" class="modal-overlay">
   <div style="background:var(--bg-window);padding:24px;border:3px solid;border-color:var(--border-main);max-width:500px;font-family:'VT323',monospace;">
     <div style="font-weight:bold;font-size:18px;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
-      <img class="sprite" data-scale="announcement_icon" src="/sprites/warningIcon.png" width="32" height="32" alt="!" onerror="this.src='/sprites/placeholder.png'">
+      <img class="sprite" src="/sprites/warningIcon.png" width="18" height="18" alt="!" onerror="this.src='/sprites/placeholder.png'">
       Server Announcement
     </div>
     <div id="announcement-content" style="color:var(--text-main);margin-bottom:20px;line-height:1.5;"></div>
@@ -849,113 +846,9 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// ── SPRITE SCALE CONFIG ───────────────────────────────────────────────────────
-// Base size is 32px. Each value is a multiplier applied to that base.
-// e.g. 0.5 → 16px,  1.0 → 32px,  1.5 → 48px,  2.0 → 64px
-// Location keys match the `data-scale` attributes on static HTML <img> tags,
-// and are also passed as the first argument to the si() helper for dynamic imgs.
-// ═══════════════════════════════════════════════════════════════════════════════
-const SPRITE_SCALE = {
-  // ── Titlebar / top bar ────────────────────────────────────────────────────
-  titlebar_coin:          0.75,  // coin icon next to coin balance in top bar
-  titlebar_buttons:       1.0,   // shop / games / users / settings / exit buttons
-
-  // ── Reconnect banner ──────────────────────────────────────────────────────
-  reconnect_warning:      0.5,   // warning icon in the reconnect banner
-
-  // ── Rooms sidebar ─────────────────────────────────────────────────────────
-  room_lock_icon:         0.5,   // lock icon next to private room names
-
-  // ── Modal titlebars ───────────────────────────────────────────────────────
-  modal_titlebar_icon:    0.75,  // lock/warning icons inside modal title bars
-
-  // ── Shop modal ────────────────────────────────────────────────────────────
-  shop_titlebar_icon:     1.0,   // shop icon in the shop modal titlebar
-  shop_balance_coin:      0.5,   // coin next to balance in shop header
-
-  // ── Games modal ───────────────────────────────────────────────────────────
-  games_titlebar_icon:    0.75,  // gamepad icon in games modal titlebar
-  games_tab_icon:         0.75,  // icons inside the Slots/Dice/Roulette/Board tabs
-  games_balance_coin:     0.75,  // coin next to balance inside each game panel
-  games_slot_reel:        1.5,   // slot reel symbols (bigger = more dramatic)
-  games_dice_loading:     1.0,   // dice icon shown while rolling
-  games_roulette_spin:    1.5,   // roulette icon in the spin area
-  games_leaderboard_coin: 0.5,   // coin next to each leaderboard score
-  games_leaderboard_medal:1.0,   // gold/silver/bronze medals
-
-  // ── Daily reward modal ────────────────────────────────────────────────────
-  daily_icon:             1.5,   // large coin at top of daily modal
-  daily_amount_coin:      1.0,   // coin next to "+50 coins" text
-
-  // ── Announcement modal ────────────────────────────────────────────────────
-  announcement_icon:      1.0,   // warning icon in announcement modal
-
-  // ── Stats panel (inside settings) ────────────────────────────────────────
-  stats_coin:             0.5,   // coin icons in stats rows
-  stats_trophy:           0.5,   // trophy icon on badges earned row
-
-  // ── Profile modal ─────────────────────────────────────────────────────────
-  profile_avatar:         1.5,   // avatar image in profile header
-  profile_badge_icon:     0.75,  // active badge icon in profile header
-  profile_earned_badge:   0.75,  // earned badge icons in the badge strip
-  profile_stat_coin:      0.5,   // coin icon in stats rows inside profile
-
-  // ── Poll messages ─────────────────────────────────────────────────────────
-  poll_star:              0.5,   // star icon before poll question
-  poll_trophy:            0.5,   // trophy icon on winning poll option
-
-  // ── Inline chat / leaderboard coins ──────────────────────────────────────
-  inline_coin:            0.5,   // coin in shop price tags, lb coins, etc.
-};
-
-// ─── Helper: resolve px size from a scale key (falls back to 1.0 = 32px) ────
-const BASE_PX = 32;
-function scaleOf(key) {
-  const s = SPRITE_SCALE[key];
-  return Math.round(BASE_PX * (typeof s === 'number' ? s : 1.0));
-}
-
-// ─── Apply data-scale to existing elements, and watch for new ones ────────────
-function applyStaticScales() {
-  document.querySelectorAll('img[data-scale]').forEach(img => {
-    const px = scaleOf(img.dataset.scale);
-    img.width  = px;
-    img.height = px;
-    img.style.width  = px + 'px';
-    img.style.height = px + 'px';
-  });
-}
-// Script is at bottom of page so DOM is ready — run immediately AND on DOMContentLoaded as safety net
-applyStaticScales();
-document.addEventListener('DOMContentLoaded', applyStaticScales);
-
-// Watch for dynamically inserted imgs with data-scale (e.g. slot reels, dice icons, profile modal)
-const _scaleObserver = new MutationObserver(mutations => {
-  mutations.forEach(m => {
-    m.addedNodes.forEach(node => {
-      if (node.nodeType !== 1) return;
-      const imgs = node.matches?.('img[data-scale]')
-        ? [node]
-        : [...(node.querySelectorAll?.('img[data-scale]') || [])];
-      imgs.forEach(img => {
-        const px = scaleOf(img.dataset.scale);
-        img.width  = px;
-        img.height = px;
-        img.style.width  = px + 'px';
-        img.style.height = px + 'px';
-      });
-    });
-  });
-});
-// Start observing immediately — script is at bottom so body exists
-_scaleObserver.observe(document.body, { childList: true, subtree: true });
-document.addEventListener('DOMContentLoaded', () => {
-  // Re-run in case anything was missed
-  applyStaticScales();
-});
-
 // ── SPRITE HELPER ─────────────────────────────────────────────────────────────
+// Known sprites that exist (or should exist) in /sprites/
+// Only these get an onerror fallback. Everything else stays as text/emoji.
 const KNOWN_SPRITES = new Set([
   'coinIcon.png','shopButtonIcon.png','gameButtonIcon.png','closeIcon.png',
   'warningIcon.png','lockIcon.png','slotsIcon.png','diceIcon.png',
@@ -965,16 +858,17 @@ const KNOWN_SPRITES = new Set([
   'onlineUsersButtonIcon.png','settingsButtonIcon.png','placeholder.png'
 ]);
 
-// si(file, scaleKey, alt)
-// scaleKey is a key from SPRITE_SCALE. Pass null/undefined to use base 32px.
-function si(file, scaleKey, alt) {
-  const key = scaleKey || null;
-  const px = key ? scaleOf(key) : BASE_PX;
-  const ds = key ? ` data-scale="${key}"` : '';
+// Returns an img HTML string. Only adds onerror fallback for known sprites.
+function si(file, w, h, alt) {
+  w = w || 20; h = h || 20; alt = alt || '';
   const fallback = KNOWN_SPRITES.has(file) ? ` onerror="this.onerror=null;this.src='/sprites/placeholder.png'"` : '';
-  return `<img class="sprite"${ds} src="/sprites/${file}" width="${px}" height="${px}" style="width:${px}px;height:${px}px" alt="${alt||''}"${fallback}>`;
+  return `<img class="sprite" src="/sprites/${file}" width="${w}" height="${h}" alt="${alt}"${fallback}>`;
 }
 
+// Badge definitions with sprite filenames
+// The server/badge system uses emoji IDs; we map them to sprite files here.
+// If a sprite doesn't exist it falls back to placeholder automatically.
+// Badge sprite mappings — only use sprites from your actual asset list
 const BADGE_SPRITES = {
   lurker_no_more: 'starIcon.png',
   regular:        'starIcon.png',
@@ -989,7 +883,7 @@ const BADGE_SPRITES = {
   mogul:          'trophyIcon.png',
 };
 
-// ── SHOP COLOURS ──────────────────────────────────────────────────────────────
+// ── SHOP COLOURS (for animation effects) ─────────────────────────────────────
 const SHOP_COLORS = {
   '#ffd700': { name: 'Shimmering Gold / Infinity Gold', effect: 'shimmer' },
   '#e5e4e2': { name: 'Platinum Gleam', effect: 'gleam' },
@@ -1014,6 +908,7 @@ function playSound(name, vol) {
   try { a.volume = Math.min(1, Math.max(0, vol || 1)); a.currentTime = 0; a.play().catch(() => {}); } catch(e) {}
 }
 
+// Named shortcuts
 function sfxClick()   { playSound('click', 0.7); }
 function sfxHover()   { playSound('hover', 0.4); }
 function soundMessage() { playSound('message', 0.8); }
@@ -1035,6 +930,7 @@ function toggleSound() {
   btn.classList.toggle('on', soundEnabled);
 }
 
+// Global hover sound — attach once to document, fire on any button/clickable
 document.addEventListener('mouseover', e => {
   const el = e.target.closest('button, .room-btn, .msg-user, .uname, .reaction-pill, .poll-option, .color-swatch, .badge-item, .shop-buy-btn, .bet-preset, .keypad-btn, .theme-btn, .stab, .shop-tab, .games-tab, .auth-tab');
   if (el) sfxHover();
@@ -1159,8 +1055,7 @@ function renderRooms(rooms) {
     if (isPrivate) {
       const lockImg=document.createElement('img');
       lockImg.className='sprite room-private-icon'; lockImg.src='/sprites/lockIcon.png';
-      lockImg.dataset.scale='room_lock_icon';
-      lockImg.width=scaleOf('room_lock_icon'); lockImg.height=scaleOf('room_lock_icon'); lockImg.alt='private';
+      lockImg.width=11; lockImg.height=11; lockImg.alt='private';
       lockImg.onerror=function(){this.onerror=null;this.src='/sprites/placeholder.png';};
       btn.appendChild(lockImg);
       btn.appendChild(document.createTextNode(' '));
@@ -1248,6 +1143,7 @@ function addMessage(html, extraClass, timestamp, msgId) {
   if(msgId) li.dataset.msgId=msgId;
   const ts=timestamp?`<span class="msg-ts">${formatTime(timestamp)}</span>`:'';
   const reactBtn=msgId?`<button class="msg-react-btn" title="React">+<div class="react-picker"><span class="react-emoji" data-emoji="👍">👍</span><span class="react-emoji" data-emoji="❤️">❤️</span><span class="react-emoji" data-emoji="😂">😂</span><span class="react-emoji" data-emoji="😮">😮</span></div></button>`:'';
+  // Check mention
   if (myUsername) {
     const tmp=document.createElement('div'); tmp.innerHTML=html;
     const re=new RegExp('@'+myUsername.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i');
@@ -1316,12 +1212,12 @@ function buildPollHtml(poll) {
     const count=Object.values(poll.votes||{}).filter(v=>v===opt).length,pct=total>0?Math.round((count/total)*100):0;
     const isVoted=myVote===opt,isWinner=concluded&&total>0&&count===topCount;
     const cls=['poll-option',isVoted?'voted':'',concluded?'concluded':'',isWinner?'winner':''].filter(Boolean).join(' ');
-    return `<div class="${cls}" data-poll="${poll.id}" data-opt="${escHtml(opt)}"><span class="poll-opt-label">${isWinner?si('trophyIcon.png','poll_trophy','win')+' ':''}${escHtml(opt)}</span><div class="poll-bar-wrap"><div class="poll-bar" style="width:${pct}%"></div></div><span class="poll-pct">${pct}%</span><span style="font-size:13px;color:var(--text-system)">${count}</span></div>`;
+    return `<div class="${cls}" data-poll="${poll.id}" data-opt="${escHtml(opt)}"><span class="poll-opt-label">${isWinner?si('trophyIcon.png',14,14,'win')+' ':''}${escHtml(opt)}</span><div class="poll-bar-wrap"><div class="poll-bar" style="width:${pct}%"></div></div><span class="poll-pct">${pct}%</span><span style="font-size:13px;color:var(--text-system)">${count}</span></div>`;
   }).join('');
   let timerHtml='';
   if(!concluded&&poll.endsAt) timerHtml=`<span class="poll-timer" data-ends="${new Date(poll.endsAt).getTime()}">...</span>`;
   else if(concluded) timerHtml=`<span style="color:var(--text-system)">concluded</span>`;
-  return `<div class="poll-card${concluded?' poll-concluded':''}"><div class="poll-question">${si('starIcon.png','poll_star','poll')} ${escHtml(poll.question)}</div>${optsHtml}<div class="poll-meta">by ${escHtml(poll.creator)} · ${total} vote${total!==1?'s':''} · ${timerHtml}</div></div>`;
+  return `<div class="poll-card${concluded?' poll-concluded':''}"><div class="poll-question">${si('starIcon.png',14,14,'poll')} ${escHtml(poll.question)}</div>${optsHtml}<div class="poll-meta">by ${escHtml(poll.creator)} · ${total} vote${total!==1?'s':''} · ${timerHtml}</div></div>`;
 }
 
 // ── HISTORY ───────────────────────────────────────────────────────────────────
@@ -1462,15 +1358,17 @@ async function openProfile(username) {
     const res=await fetch(`/profile/${encodeURIComponent(username)}`,{credentials:'include'});
     const d=await res.json(); if(!res.ok){document.getElementById('profile-modal-body').textContent=d.error;return;}
     const ci=SHOP_COLORS[d.color]; const ec=ci?` user-${ci.effect}`:'';
+    // Badge display for profile
     const badgeHtml = d.activeBadge
-      ? `${si(BADGE_SPRITES[d.activeBadge.id]||'placeholder.png','profile_badge_icon',d.activeBadge.name)} ${escHtml(d.activeBadge.name)}`
+      ? `${si(BADGE_SPRITES[d.activeBadge.id]||'placeholder.png',18,18,d.activeBadge.name)} ${escHtml(d.activeBadge.name)}`
       : `<span style="color:var(--text-system)">No badge</span>`;
+    // All earned badges
     const earnedHtml = d.earnedBadges.length
-      ? d.earnedBadges.map(b=>`<span title="${escHtml(b.description)}" style="cursor:help">${si(BADGE_SPRITES[b.id]||'placeholder.png','profile_badge_icon',b.name)}</span>`).join(' ')
+      ? d.earnedBadges.map(b=>`<span title="${escHtml(b.description)}" style="cursor:help">${si(BADGE_SPRITES[b.id]||'placeholder.png',24,24,b.name)}</span>`).join(' ')
       : `<span style="color:var(--text-system);font-size:14px">No badges yet</span>`;
     document.getElementById('profile-modal-body').innerHTML=`
       <div class="profile-header">
-        <img class="profile-avatar-img sprite" data-scale="profile_avatar" src="/sprites/profileAvatar.png" alt="Avatar" onerror="this.onerror=null;this.src='/sprites/placeholder.png'">
+        <img class="profile-avatar-img sprite" src="/sprites/profileAvatar.png" alt="Avatar" onerror="this.onerror=null;this.src='/sprites/placeholder.png'">
         <div>
           <div class="profile-name${ec}" style="color:${d.color||'var(--text-main)'}">${escHtml(d.username)}</div>
           <div class="profile-badge-display">${badgeHtml}</div>
@@ -1478,7 +1376,7 @@ async function openProfile(username) {
       </div>
       <div class="profile-stats">
         <div class="stat-row"><span class="stat-label">Joined</span><span class="stat-value">${formatDate(d.createdAt)}</span></div>
-        <div class="stat-row"><span class="stat-label">Coins</span><span class="stat-value">${si('coinIcon.png','profile_stat_coin','coin')} ${fmtNum(d.coins)}</span></div>
+        <div class="stat-row"><span class="stat-label">Coins</span><span class="stat-value">${si('coinIcon.png',14,14,'coin')} ${fmtNum(d.coins)}</span></div>
         <div class="stat-row"><span class="stat-label">Messages sent</span><span class="stat-value">${d.messagesSent}</span></div>
         <div class="stat-row"><span class="stat-label">Time online</span><span class="stat-value">${formatSeconds(d.timeOnlineSeconds)}</span></div>
       </div>
@@ -1580,7 +1478,7 @@ async function loadBadges() {
       const div=document.createElement('div');
       div.className='badge-item'+(earned?' earned':'  locked')+(isActive?' active-badge':'');
       const spriteFile=BADGE_SPRITES[b.id]||'placeholder.png';
-      div.innerHTML=`<img class="badge-icon sprite" data-scale="profile_badge_icon" src="/sprites/${spriteFile}" alt="${escHtml(b.name)}" onerror="this.onerror=null;this.src='/sprites/placeholder.png'"><div class="badge-name">${escHtml(b.name)}</div><div class="badge-desc">${escHtml(b.description)}</div>${isActive?'<div class="badge-active-label">* Active showcase</div>':''}`;
+      div.innerHTML=`<img class="badge-icon sprite" src="/sprites/${spriteFile}" alt="${escHtml(b.name)}" onerror="this.onerror=null;this.src='/sprites/placeholder.png'"><div class="badge-name">${escHtml(b.name)}</div><div class="badge-desc">${escHtml(b.description)}</div>${isActive?'<div class="badge-active-label">* Active showcase</div>':''}`;
       if(earned) div.onclick=()=>{sfxClick();setActiveBadge(b.id,data.activeBadge?.id);};
       grid.appendChild(div);
     });
@@ -1605,12 +1503,12 @@ async function loadStats() {
     el.innerHTML=`
       <div class="stat-row"><span class="stat-label">Username</span><span class="stat-value" style="color:${myColor}">${escHtml(d.username)}</span></div>
       <div class="stat-row"><span class="stat-label">Member since</span><span class="stat-value">${formatDate(d.createdAt)}</span></div>
-      <div class="stat-row"><span class="stat-label">Current coins</span><span class="stat-value">${si('coinIcon.png','stats_coin','coin')} ${fmtNum(d.coins)}</span></div>
-      <div class="stat-row"><span class="stat-label">Total earned</span><span class="stat-value">${si('coinIcon.png','stats_coin','coin')} ${fmtNum(d.coinsEarned)}</span></div>
-      <div class="stat-row"><span class="stat-label">Total spent</span><span class="stat-value">${si('coinIcon.png','stats_coin','coin')} ${fmtNum(d.coinsSpent)}</span></div>
+      <div class="stat-row"><span class="stat-label">Current coins</span><span class="stat-value">${si('coinIcon.png',32,32,'coin')} ${fmtNum(d.coins)}</span></div>
+      <div class="stat-row"><span class="stat-label">Total earned</span><span class="stat-value">${si('coinIcon.png',32,32,'coin')} ${fmtNum(d.coinsEarned)}</span></div>
+      <div class="stat-row"><span class="stat-label">Total spent</span><span class="stat-value">${si('coinIcon.png',32,32,'coin')} ${fmtNum(d.coinsSpent)}</span></div>
       <div class="stat-row"><span class="stat-label">Messages sent</span><span class="stat-value">${d.messagesSent}</span></div>
       <div class="stat-row"><span class="stat-label">Time online</span><span class="stat-value">${formatSeconds(d.timeOnlineSeconds)}</span></div>
-      <div class="stat-row"><span class="stat-label">Badges earned</span><span class="stat-value">${si('trophyIcon.png','stats_trophy','trophy')} ${d.earnedBadges.length}</span></div>
+      <div class="stat-row"><span class="stat-label">Badges earned</span><span class="stat-value">${si('trophyIcon.png',14,14,'trophy')} ${d.earnedBadges.length}</span></div>
       <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Stats tracked from Feb 2026</div>`;
   } catch { el.textContent='Error loading stats.'; }
 }
@@ -1637,7 +1535,7 @@ function renderShopColors() { document.getElementById('shop-colors').innerHTML=`
 function shopItemHtml(item) {
   const priceHtml=item.price===0
     ?`<span class="shop-item-price free">FREE</span>`
-    :`<span class="shop-item-price">${si('coinIcon.png','inline_coin','coin')} ${fmtNum(item.price)}</span>`;
+    :`<span class="shop-item-price">${si('coinIcon.png',13,13,'coin')} ${fmtNum(item.price)}</span>`;
   const badge=item.owned?`<span class="shop-item-owned-badge">OWNED</span>`:'';
   const btn=item.owned
     ?`<button class="shop-buy-btn" disabled>Owned</button>`
@@ -1672,6 +1570,7 @@ function switchGame(name) {
 }
 function setBet(game,amount) { document.getElementById(game+'-bet').value=amount; }
 
+// SLOT SYMBOLS as sprite filenames (falls back to placeholder if missing)
 const SLOT_SYMBOLS = {
   '🍒':'cherryIcon.png','🍋':'lemonIcon.png','🍊':'orangeIcon.png',
   '⭐':'starIcon.png','💎':'diamondIcon.png','7️⃣':'sevenIcon.png'
@@ -1679,7 +1578,7 @@ const SLOT_SYMBOLS = {
 function reelSymbolHtml(sym) {
   const f=SLOT_SYMBOLS[sym];
   return f
-    ? `<img class="sprite" data-scale="games_slot_reel" src="/sprites/${f}" width="${scaleOf('games_slot_reel')}" height="${scaleOf('games_slot_reel')}" style="width:${scaleOf(\'games_slot_reel\')}px;height:${scaleOf(\'games_slot_reel\')}px" alt="${sym}" onerror="this.onerror=null;this.src='/sprites/placeholder.png'">`
+    ? `<img class="sprite" src="/sprites/${f}" width="40" height="40" alt="${sym}" onerror="this.onerror=null;this.src='/sprites/placeholder.png'">`
     : sym;
 }
 
@@ -1715,8 +1614,8 @@ async function playDice() {
   const bet=parseInt(document.getElementById('dice-bet').value,10);
   if(!bet||bet<1||bet>50000){document.getElementById('dice-result').innerHTML='<span class="result-lose">Bet must be 1-50000</span>';return;}
   diceRolling=true; const btn=document.getElementById('dice-roll-btn'); btn.disabled=true;
-  document.getElementById('dice-player').innerHTML=`<img class="sprite" data-scale="games_dice_loading" src="/sprites/diceIcon.png" width="${scaleOf('games_dice_loading')}" height="${scaleOf('games_dice_loading')}" style="width:${scaleOf(\'games_dice_loading\')}px;height:${scaleOf(\'games_dice_loading\')}px" alt="..." onerror="this.src='/sprites/placeholder.png'">`;
-  document.getElementById('dice-house').innerHTML=`<img class="sprite" data-scale="games_dice_loading" src="/sprites/diceIcon.png" width="${scaleOf('games_dice_loading')}" height="${scaleOf('games_dice_loading')}" style="width:${scaleOf(\'games_dice_loading\')}px;height:${scaleOf(\'games_dice_loading\')}px" alt="..." onerror="this.src='/sprites/placeholder.png'">`;
+  document.getElementById('dice-player').innerHTML=`<img class="sprite" src="/sprites/diceIcon.png" width="36" height="36" alt="..." onerror="this.src='/sprites/placeholder.png'">`;
+  document.getElementById('dice-house').innerHTML=`<img class="sprite" src="/sprites/diceIcon.png" width="36" height="36" alt="..." onerror="this.src='/sprites/placeholder.png'">`;
   document.getElementById('dice-result').textContent='';
   await new Promise(r=>setTimeout(r,500));
   try {
@@ -1743,7 +1642,7 @@ async function playRoulette(betType) {
   if(betType==='number'&&selectedRouletteNumber===null){document.getElementById('roulette-result').innerHTML='<span class="result-lose">Select a number first!</span>';return;}
   rouletteSpinning=true;
   const spinEl=document.getElementById('roulette-spin');
-  spinEl.innerHTML=`<img class="sprite" data-scale="games_roulette_spin" src="/sprites/rouletteIcon.png" width="${scaleOf('games_roulette_spin')}" height="${scaleOf('games_roulette_spin')}" alt="spinning" style="animation:spin 2s linear 1" onerror="this.src='/sprites/placeholder.png'">`;
+  spinEl.innerHTML=`<img class="sprite" src="/sprites/rouletteIcon.png" width="40" height="40" alt="spinning" style="animation:spin 2s linear 1" onerror="this.src='/sprites/placeholder.png'">`;
   document.getElementById('roulette-result').textContent='';
   await new Promise(r=>setTimeout(r,2000));
   try {
@@ -1777,9 +1676,9 @@ async function loadLeaderboard() {
     const medals=['goldMedal.png','silverMedal.png','bronzeMedal.png'];
     container.innerHTML=data.map((row,i)=>{
       const rank=i<3
-        ?`<img class="sprite" data-scale="games_leaderboard_medal" src="/sprites/${medals[i]}" width="${scaleOf('games_leaderboard_medal')}" height="${scaleOf('games_leaderboard_medal')}" style="width:${scaleOf(\'games_leaderboard_medal\')}px;height:${scaleOf(\'games_leaderboard_medal\')}px" alt="#${i+1}" onerror="this.onerror=null;this.src='/sprites/placeholder.png'">`
+        ?`<img class="sprite" src="/sprites/${medals[i]}" width="20" height="20" alt="#${i+1}" onerror="this.onerror=null;this.src='/sprites/placeholder.png'">`
         :`#${i+1}`;
-      return `<div class="lb-row"><span class="lb-rank">${rank}</span><span class="lb-name">${escHtml(row.username)}</span><span class="lb-coins">${si('coinIcon.png','games_leaderboard_coin','coin')} ${fmtNum(row.coins)}</span></div>`;
+      return `<div class="lb-row"><span class="lb-rank">${rank}</span><span class="lb-name">${escHtml(row.username)}</span><span class="lb-coins">${si('coinIcon.png',32,32,'coin')} ${fmtNum(row.coins)}</span></div>`;
     }).join('');
   } catch { container.innerHTML='<div style="color:#cc0000;text-align:center;padding:12px;">Error loading.</div>'; }
 }
