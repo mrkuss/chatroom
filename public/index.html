@@ -106,6 +106,7 @@
     .icon-btn.danger { background:#800000;color:white;border-color:#ff8080 #400000 #400000 #ff8080; }
     .icon-btn[title]:hover::after { content:attr(title);position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);background:#000;color:#fff;font-size:12px;padding:2px 6px;white-space:nowrap;z-index:100;pointer-events:none;border:1px solid #555; }
     #user-count-btn { width:auto;padding:0 8px;font-size:14px; }
+    .pixel-icon { width:16px;height:16px;image-rendering:pixelated;image-rendering:-moz-crisp-edges;image-rendering:crisp-edges;margin-right:4px; }
 
     /* ── RECONNECT BANNER ── */
     #reconnect-banner { display:none;background:#cc6600;color:white;font-size:14px;text-align:center;padding:4px 8px;flex-shrink:0;letter-spacing:1px; }
@@ -409,11 +410,10 @@
     <div id="titlebar-right">
       <span id="logged-in-as"></span>
       <span id="coin-display">🪙 0</span>
-      <button id="user-count-btn" class="icon-btn" onclick="toggleUsers()" title="Online users">👤 0</button>
-      <button id="sound-btn" class="icon-btn on" onclick="toggleSound()" title="Toggle SFX">🔊</button>
-      <button class="icon-btn" onclick="openShop()" title="Shop">🛒</button>
-      <button class="icon-btn" onclick="openGames()" title="Games">🎮</button>
-      <button class="icon-btn" onclick="openSettings()" title="Settings">⚙</button>
+      <button id="user-count-btn" class="icon-btn" onclick="toggleUsers()" title="Online users"><img src="/sprites/onlineUsersButtonIcon.png" alt="Users" class="pixel-icon"> <span id="user-count-text">0</span></button>
+      <button class="icon-btn" onclick="openShop()" title="Shop"><img src="/sprites/shopButtonIcon.png" alt="Shop" class="pixel-icon"></button>
+      <button class="icon-btn" onclick="openGames()" title="Games"><img src="/sprites/gameButtonIcon.png" alt="Games" class="pixel-icon"></button>
+      <button class="icon-btn" onclick="openSettings()" title="Settings"><img src="/sprites/settingsButtonIcon.png" alt="Settings" class="pixel-icon"></button>
       <button class="icon-btn danger" onclick="doLogout()" title="Exit">✕</button>
     </div>
   </div>
@@ -538,6 +538,10 @@
         <button class="stab" onclick="switchSettingsTab('help')">Help</button>
       </div>
       <div id="stab-appearance" class="stab-panel active">
+        <div class="settings-section">
+          <span class="settings-label">Sound Effects</span>
+          <button id="sound-toggle-btn" class="icon-btn on" onclick="toggleSound()" title="Toggle SFX">🔊 Enabled</button>
+        </div>
         <div class="settings-section">
           <span class="settings-label">Theme</span>
           <div class="settings-note">Only owned themes shown. Buy more in the 🛒 Shop.</div>
@@ -774,7 +778,7 @@ function soundLose(){playTone(400,'sawtooth',0.1,0.12);playTone(300,'sawtooth',0
 function soundCoin(){playTone(1318,'sine',0.08,0.12);playTone(1568,'sine',0.12,0.14,0.08)}
 function soundClaim(){playTone(880,'sine',0.08,0.2);playTone(1046,'sine',0.08,0.2,0.1);playTone(1318,'sine',0.15,0.2,0.2);playTone(1568,'sine',0.3,0.25,0.35)}
 function soundKeypad(){playTone(1000,'square',0.04,0.08)}
-function toggleSound(){ soundEnabled=!soundEnabled; const btn=document.getElementById('sound-btn'); btn.textContent=soundEnabled?'🔊':'🔇'; btn.classList.toggle('on',soundEnabled); }
+function toggleSound(){ soundEnabled=!soundEnabled; const btn=document.getElementById('sound-toggle-btn'); btn.textContent=soundEnabled?'🔊 Enabled':'🔇 Disabled'; btn.classList.toggle('on',soundEnabled); }
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 // Socket configured with aggressive reconnection so silent drops are recovered
@@ -1218,7 +1222,7 @@ socket.on('poll update',poll=>renderPoll(poll));
 socket.on('poll concluded',({pollId})=>{if(polls[pollId]){polls[pollId].concluded=true;const el=document.getElementById(`poll-${pollId}`);if(el)el.innerHTML=buildPollHtml(polls[pollId]);soundPollEnd()}});
 
 socket.on('user list',list=>{
-  document.getElementById('user-count-btn').textContent=`👤 ${list.length}`;
+  document.getElementById('user-count-text').textContent=list.length;
   const panel=document.getElementById('users-panel');panel.innerHTML='';
   list.forEach(({username,color,joinedAt,idle})=>{
     const entry=document.createElement('span');entry.className='user-entry';entry.dataset.joinedAt=joinedAt;
