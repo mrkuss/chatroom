@@ -94,8 +94,11 @@
     #logged-in-as { font-size:22px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:8px; }
     #logged-in-as span { color:white !important;text-shadow:0 1px 2px rgba(0,0,0,0.12); }
     #coin-display { font-size:14px;color:#ffd700;white-space:nowrap;margin-right:4px;text-shadow:0 0 4px rgba(255,215,0,0.5);display:flex;align-items:center;gap:3px; }
+    #coin-display #coin-amount { font-weight:bold;font-size:16px;text-shadow:1px 1px 0 rgba(160,100,0,0.7),0 0 6px rgba(255,215,0,0.4); }
     body.theme-amber #coin-display,body.theme-dark #coin-display { color:#ffcc00; }
     body.theme-rose #coin-display { color:#ffaa44; }
+    .shop-balance #shop-balance-amt,
+    .game-balance span { font-weight:bold;text-shadow:1px 1px 0 rgba(140,80,0,0.65),0 0 5px rgba(255,215,0,0.3); }
 
     .icon-btn { font-family:'VT323',monospace;font-size:16px;background:var(--btn-bg);color:var(--text-main);border:2px solid;border-color:var(--btn-border);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;padding:0;line-height:1;position:relative; }
     .icon-btn:active { border-color:var(--border-inset) white white var(--border-inset); }
@@ -855,18 +858,21 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 const SPRITE_SCALE = {
   // ── Titlebar / top bar ────────────────────────────────────────────────────
-  titlebar_coin:          0.55,  // coin icon next to coin balance in top bar
+  titlebar_coin:          0.75,  // coin icon next to coin balance in top bar
   titlebar_buttons:       1.0,   // shop / games / users / settings / exit buttons
 
   // ── Reconnect banner ──────────────────────────────────────────────────────
   reconnect_warning:      0.5,   // warning icon in the reconnect banner
 
+  // ── Rooms sidebar ─────────────────────────────────────────────────────────
+  room_lock_icon:         0.5,   // lock icon next to private room names
+
   // ── Modal titlebars ───────────────────────────────────────────────────────
-  modal_titlebar_icon:    0.35,  // lock/warning icons inside modal title bars
+  modal_titlebar_icon:    0.75,  // lock/warning icons inside modal title bars
 
   // ── Shop modal ────────────────────────────────────────────────────────────
   shop_titlebar_icon:     1.0,   // shop icon in the shop modal titlebar
-  shop_balance_coin:      0.75,  // coin next to balance in shop header
+  shop_balance_coin:      0.5,   // coin next to balance in shop header
 
   // ── Games modal ───────────────────────────────────────────────────────────
   games_titlebar_icon:    0.75,  // gamepad icon in games modal titlebar
@@ -886,21 +892,21 @@ const SPRITE_SCALE = {
   announcement_icon:      1.0,   // warning icon in announcement modal
 
   // ── Stats panel (inside settings) ────────────────────────────────────────
-  stats_coin:             0.35,   // coin icons in stats rows
-  stats_trophy:           0.335,   // trophy icon on badges earned row
+  stats_coin:             0.5,   // coin icons in stats rows
+  stats_trophy:           0.5,   // trophy icon on badges earned row
 
   // ── Profile modal ─────────────────────────────────────────────────────────
   profile_avatar:         1.5,   // avatar image in profile header
-  profile_badge_icon:     0.5,  // active badge icon in profile header
-  profile_earned_badge:   0.45,  // earned badge icons in the badge strip
-  profile_stat_coin:      0.35,   // coin icon in stats rows inside profile
+  profile_badge_icon:     0.75,  // active badge icon in profile header
+  profile_earned_badge:   0.75,  // earned badge icons in the badge strip
+  profile_stat_coin:      0.5,   // coin icon in stats rows inside profile
 
   // ── Poll messages ─────────────────────────────────────────────────────────
   poll_star:              0.5,   // star icon before poll question
   poll_trophy:            0.5,   // trophy icon on winning poll option
 
   // ── Inline chat / leaderboard coins ──────────────────────────────────────
-  inline_coin:            0.25,   // coin in shop price tags, lb coins, etc.
+  inline_coin:            0.5,   // coin in shop price tags, lb coins, etc.
 };
 
 // ─── Helper: resolve px size from a scale key (falls back to 1.0 = 32px) ────
@@ -1146,7 +1152,8 @@ function renderRooms(rooms) {
     if (isPrivate) {
       const lockImg=document.createElement('img');
       lockImg.className='sprite room-private-icon'; lockImg.src='/sprites/lockIcon.png';
-      lockImg.width=32; lockImg.height=32; lockImg.alt='private';
+      lockImg.dataset.scale='room_lock_icon';
+      lockImg.width=scaleOf('room_lock_icon'); lockImg.height=scaleOf('room_lock_icon'); lockImg.alt='private';
       lockImg.onerror=function(){this.onerror=null;this.src='/sprites/placeholder.png';};
       btn.appendChild(lockImg);
       btn.appendChild(document.createTextNode(' '));
