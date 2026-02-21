@@ -112,9 +112,9 @@ router.post('/game/slots', async (req, res) => {
   broadcastCoins(req.session.username, finalCoins);
 
   if (winAmount > 0) {
-    await broadcastGambling(`🎰 ${req.session.username} won ${formatNumber(winAmount)} coins on slots! [${reels.join('')}] ${multiplier}x bet of ${formatNumber(betAmount)}`);
+    await broadcastGambling(`${req.session.username} won ${formatNumber(winAmount)} coins on slots! [${reels.join('')}] ${multiplier}x bet of ${formatNumber(betAmount)}`);
   } else {
-    await broadcastGambling(`🎰 ${req.session.username} lost ${formatNumber(betAmount)} coins on slots [${reels.join('')}]`);
+    await broadcastGambling(`${req.session.username} lost ${formatNumber(betAmount)} coins on slots [${reels.join('')}]`);
   }
   res.json({ reels, multiplier, winAmount, coins: finalCoins });
 });
@@ -146,11 +146,11 @@ router.post('/game/dice', async (req, res) => {
   broadcastCoins(req.session.username, finalCoins);
 
   if (result === 'win') {
-    await broadcastGambling(`🎲 ${req.session.username} won ${formatNumber(winAmount)} coins on dice! (rolled ${playerRoll} vs house ${houseRoll})`);
+    await broadcastGambling(`${req.session.username} won ${formatNumber(winAmount)} coins on dice! (rolled ${playerRoll} vs house ${houseRoll})`);
   } else if (result === 'tie') {
-    await broadcastGambling(`🎲 ${req.session.username} tied on dice (both rolled ${playerRoll}), bet of ${formatNumber(betAmount)} returned`);
+    await broadcastGambling(`${req.session.username} tied on dice (both rolled ${playerRoll}), bet of ${formatNumber(betAmount)} returned`);
   } else {
-    await broadcastGambling(`🎲 ${req.session.username} lost ${formatNumber(betAmount)} coins on dice (rolled ${playerRoll} vs house ${houseRoll})`);
+    await broadcastGambling(`${req.session.username} lost ${formatNumber(betAmount)} coins on dice (rolled ${playerRoll} vs house ${houseRoll})`);
   }
   res.json({ playerRoll, houseRoll, result, winAmount, coins: finalCoins });
 });
@@ -208,12 +208,12 @@ router.post('/game/roulette', async (req, res) => {
   await recordGambleStats(req.session.username, winAmount);
   broadcastCoins(req.session.username, finalCoins);
 
-  const spinColor = spin === 0 ? '🟢' : redNumbers.includes(spin) ? '🔴' : '⚫';
+  const spinColor = spin === 0 ? 'GREEN' : redNumbers.includes(spin) ? 'RED' : 'BLACK';
   if (result === 'win') {
     const betLabel = isNumberBet ? `#${betNumber}` : betType;
-    await broadcastGambling(`🎡 ${req.session.username} won ${formatNumber(winAmount)} coins on roulette! (${betLabel} hits: ${spinColor} ${spin})`);
+    await broadcastGambling(`${req.session.username} won ${formatNumber(winAmount)} coins on roulette! (${betLabel} hits: ${spinColor} ${spin})`);
   } else {
-    await broadcastGambling(`🎡 ${req.session.username} lost ${formatNumber(betAmount)} coins on roulette (spin: ${spinColor} ${spin})`);
+    await broadcastGambling(`${req.session.username} lost ${formatNumber(betAmount)} coins on roulette (spin: ${spinColor} ${spin})`);
   }
 
   res.json({ spin, spinColor, result, winAmount, coins: finalCoins, betType });

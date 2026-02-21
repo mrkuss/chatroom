@@ -694,6 +694,57 @@
   </div>
 </div>
 
+<!-- Announcement Modal -->
+<div id="announcement-modal" class="modal-overlay">
+  <div style="background:var(--bg-input);padding:24px;border-radius:4px;max-width:500px;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
+    <div style="font-weight:bold;font-size:18px;margin-bottom:12px;">Server Announcement</div>
+    <div id="announcement-content" style="color:var(--text-primary);margin-bottom:20px;line-height:1.5;"></div>
+    <button class="game-btn" onclick="closeAnnouncement()" style="width:100%;">Close</button>
+  </div>
+</div>
+
+<!-- Patch Notes Modal -->
+<div id="patchnotes-modal" class="modal-overlay">
+  <div style="background:var(--bg-input);padding:24px;border-radius:4px;max-width:600px;max-height:80vh;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
+    <div style="font-weight:bold;font-size:18px;margin-bottom:16px;">Patch Notes</div>
+    <div id="patchnotes-content" style="color:var(--text-primary);line-height:1.6;font-size:14px;">
+      <div style="margin-bottom:16px;">
+        <div style="font-weight:bold;margin-bottom:8px;">Latest Updates</div>
+        <ul style="margin:0;padding-left:20px;">
+          <li>Removed emojis from system messages for cleaner chat</li>
+          <li>Added /flip command - 50/50 coinflip to double your coins or lose them</li>
+          <li>Added 10-minute cooldown to /rob command</li>
+          <li>Added /announcement command for admins to broadcast messages</li>
+          <li>Premium colors now display correctly without emoji names</li>
+          <li>Improved shop and settings UI clarity</li>
+        </ul>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div style="font-weight:bold;margin-bottom:8px;">Game Balance</div>
+        <ul style="margin:0;padding-left:20px;">
+          <li>Slots: Increased winning odds with adjusted multipliers</li>
+          <li>Dice: 1.9x payout on wins</li>
+          <li>Roulette: 1.8x for color/even/odd bets, 50x for number bets (1-36)</li>
+          <li>/duel: Coinflip for doubled stakes</li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-weight:bold;margin-bottom:8px;">Premium Colors</div>
+        <ul style="margin:0;padding-left:20px;">
+          <li>1k: Shimmering Gold (shimmer effect)</li>
+          <li>2.5k: Platinum Gleam (gleam effect)</li>
+          <li>5k: Diamond Sparkle (sparkle effect)</li>
+          <li>10k: Aurora Borealis (rainbow effect)</li>
+          <li>50k: Cosmic Nebula (nebula effect)</li>
+          <li>100k: Infinity Gold (infinity effect)</li>
+          <li>500k: Prismatic Legend (prism effect)</li>
+        </ul>
+      </div>
+    </div>
+    <button class="game-btn" onclick="closePatchNotes()" style="width:100%;margin-top:16px;">Close</button>
+  </div>
+</div>
+
 <script src="/socket.io/socket.io.js"></script>
 <script>
 // ── SHOP CATALOGUE (for color effects) ────────────────────────────────────────
@@ -1143,6 +1194,13 @@ socket.on('system message',msg=>{
   else{addMessage(`<span class="msg-system">*** ${msg} ***</span>`);if(/has joined/.test(msg))soundJoin();else if(/has left/.test(msg))soundLeave();}
 });
 
+socket.on('announcement',({from,message})=>{
+  document.getElementById('announcement-content').textContent=message;
+  if(from&&from.toLowerCase()==='mce')document.getElementById('announcement-content').textContent=`Admin: ${message}`;
+  document.getElementById('announcement-modal').classList.add('open');
+  soundClaim();
+});
+
 socket.on('dm',data=>addDmMessage(data));
 socket.on('coins update',({coins})=>{myCoins=coins;updateCoinDisplay();updateGameBalances()});
 
@@ -1369,6 +1427,9 @@ document.getElementById('shop-overlay').addEventListener('click',e=>{if(e.target
 // ── GAMES ─────────────────────────────────────────────────────────────────────
 function openGames(){updateGameBalances();document.getElementById('games-overlay').classList.add('open');loadLeaderboard()}
 function closeGames(){document.getElementById('games-overlay').classList.remove('open')}
+function openPatchNotes(){document.getElementById('patchnotes-modal').classList.add('open')}
+function closePatchNotes(){document.getElementById('patchnotes-modal').classList.remove('open')}
+function closeAnnouncement(){document.getElementById('announcement-modal').classList.remove('open')}
 function switchGame(name){document.querySelectorAll('.game-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.games-tab').forEach(t=>t.classList.remove('active'));document.getElementById('game-'+name).classList.add('active');document.querySelectorAll('.games-tab').forEach(t=>{if(t.textContent.toLowerCase().includes(name==='leaderboard'?'board':name))t.classList.add('active')});if(name==='leaderboard')loadLeaderboard();if(name==='roulette')initRouletteNumbers();updateGameBalances()}
 function updateGameBalances(){['slots','dice','roulette'].forEach(g=>{const el=document.getElementById(g+'-balance');if(el)el.textContent=`Balance: 🪙 ${formatNumber(myCoins)}`})}
 function setBet(game,amount){document.getElementById(game+'-bet').value=amount}

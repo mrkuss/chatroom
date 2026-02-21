@@ -13,6 +13,7 @@ const typingTimeouts  = {};
 const typingByRoom    = {};
 const pendingDuels    = {};
 const sessionStartTimes = {};
+const robCooldowns    = {}; // username -> Date of last rob
 
 // privateRoomAccess is now ONLY an in-session cache; the source of truth is the DB.
 // We populate it on join from the DB, and write to DB whenever access is granted.
@@ -388,6 +389,7 @@ function initChat(io) {
           '/duel username amount — challenge to coinflip',
           '/flip amount — 50/50 coin flip (double or lose it)',
           '/rob username percentage — attempt to steal coins (risky!)',
+          '/announcement message (admin only) — broadcast announcement',
           '/accept — accept a duel',
           '/decline — decline a duel',
           '/create roomname code — create private room (digits only)',
@@ -566,10 +568,10 @@ function initChat(io) {
           targetSocket.leave(room);
           targetSocket.join('general');
           targetSocket.emit('room changed', 'general');
-          targetSocket.emit('system message', `👢 You were kicked from #${room} by ${user.username}.`);
+          targetSocket.emit('system message', `You were kicked from #${room} by ${user.username}.`);
           await sendRoomsList(targetSocket, targetUser.username, privateRoomAccess[targetSocketId] || new Set());
         }
-        io.to(room).emit('system message', `👢 ${targetName} was kicked from #${room}.`);
+        io.to(room).emit('system message', `${targetName} was kicked from #${room}.`);
         broadcastUserList(io, room);
         broadcastUserList(io, 'general');
         return;
@@ -612,14 +614,14 @@ function initChat(io) {
             targetSocket.leave(room);
             targetSocket.join('general');
             targetSocket.emit('room changed', 'general');
-            targetSocket.emit('system message', `🚫 You have been banned from #${room} by ${user.username}.`);
+            targetSocket.emit('system message', `You have been banned from #${room} by ${user.username}.`);
             await sendRoomsList(targetSocket, targetUser.username, privateRoomAccess[targetSocketId] || new Set());
           }
           // Revoke from their in-memory access even if not in the room currently
           privateRoomAccess[targetSocketId]?.delete(room);
         }
 
-        io.to(room).emit('system message', `🚫 ${realTargetName} has been banned from #${room}.`);
+        io.to(room).emit('system message', `${realTargetName} has been banned from #${room}.`);
         broadcastUserList(io, room);
         broadcastUserList(io, 'general');
         return;
@@ -688,7 +690,7 @@ function initChat(io) {
         if (challengerCoins < amount) { socket.emit('system message', `You only have ${formatNumber(challengerCoins)} coins.`); return; }
         const targetUser = connectedUsers[targetSocketId];
         pendingDuels[targetName.toLowerCase()] = { from: user.username, fromSocketId: socket.id, amount, expiresAt: Date.now() + 30000 };
-        io.to(room).emit('system message', `🎲 ${user.username} challenges ${targetUser.username} to a coinflip for ${amount} coins! Type /accept or /decline (30s)`);
+        io.to(room).emit('system message', `${user.username} challenges ${targetUser.username} to a coinflip for ${amount} coins! Type /accept or /decline (30s)`);
         return;
       }
 
@@ -713,7 +715,7 @@ function initChat(io) {
         broadcastCoins(winner, winnerCoins);
         const loserCoins = await getCoins(loser);
         broadcastCoins(loser, loserCoins);
-        io.to(room).emit('system message', `🎲 COINFLIP: ${winner} wins ${formatNumber(prize)} coins from ${loser}! 🏆`);
+        io.to(room).emit('system message', `COINFLIP: ${winner} wins ${formatNumber(prize)} coins from ${loser}!`);
         await broadcastGambling(`🎲 COINFLIP: ${winner} beat ${loser} for ${formatNumber(prize)} coins!`);
         return;
       }
@@ -747,7 +749,7 @@ function initChat(io) {
         const newTargetBal = await addCoins(targetUsername, amount);
         broadcastCoins(user.username, newSenderBal);
         broadcastCoins(targetUsername, newTargetBal);
-        io.to(room).emit('system message', `💸 ${user.username} gave ${formatNumber(amount)} coins to ${targetUsername}!`);
+        io.to(room).emit('system message', `${user.username} gave ${formatNumber(amount)} coins to ${targetUsername}!`);
         return;
       }
 
@@ -767,12 +769,12 @@ function initChat(io) {
             // Win: add the amount (double their bet)
             const newBal = await addCoins(user.username, amount);
             broadcastCoins(user.username, newBal);
-            io.to(room).emit('system message', `🪙 ${user.username} flipped a coin and WON! +${formatNumber(amount)} coins! 🎉`);
+            io.to(room).emit('system message', `${user.username} flipped a coin and WON! +${formatNumber(amount)} coins!`);
           } else {
             // Lose: deduct the amount
             const newBal = await deductCoins(user.username, amount);
             broadcastCoins(user.username, newBal);
-            io.to(room).emit('system message', `🪙 ${user.username} flipped a coin and LOST! -${formatNumber(amount)} coins... 😢`);
+            io.to(room).emit('system message', `${user.username} flipped a coin and LOST! -${formatNumber(amount)} coins...`);
           }
         } catch (err) {
           console.error('Flip error:', err);
@@ -781,7 +783,7 @@ function initChat(io) {
         return;
       }
 
-      // ── /rob (username) (percentage) ───────────────────────────────────────
+      // ── /rob (username) (percentage) with cooldown ─────────────────────────
       if (raw.startsWith('/rob ')) {
         const parts = raw.slice(5).trim().split(/\s+/);
         if (parts.length < 2) { socket.emit('system message', 'Usage: /rob username percentage'); return; }
@@ -789,6 +791,15 @@ function initChat(io) {
         const percentage = parseInt(parts[1], 10);
         if (isNaN(percentage) || percentage < 1 || percentage > 100) { socket.emit('system message', 'Percentage must be 1-100.'); return; }
         if (targetName.toLowerCase() === user.username.toLowerCase()) { socket.emit('system message', 'You cannot rob yourself.'); return; }
+        
+        // Check cooldown (10 minutes = 600000 ms)
+        const lastRobTime = robCooldowns[user.username.toLowerCase()];
+        if (lastRobTime && Date.now() - lastRobTime < 600000) {
+          const remainingMs = 600000 - (Date.now() - lastRobTime);
+          const remainingMins = Math.ceil(remainingMs / 60000);
+          socket.emit('system message', `You must wait ${remainingMins} minute(s) before robbing again.`);
+          return;
+        }
         
         try {
           const targetRes = await db.query('SELECT username, coins FROM users WHERE LOWER(username) = LOWER($1)', [targetName]);
@@ -804,11 +815,12 @@ function initChat(io) {
           
           if (success) {
             // Rob succeeds: robber gains robAmount, victim loses robAmount
+            robCooldowns[user.username.toLowerCase()] = Date.now();
             const robberNewBal = await addCoins(user.username, robAmount);
             const victimNewBal = await deductCoins(targetUser.username, robAmount);
             broadcastCoins(user.username, robberNewBal);
             broadcastCoins(targetUser.username, victimNewBal);
-            io.to(room).emit('system message', `🏴 ${user.username} robbed ${formatNumber(robAmount)} coins from ${targetUser.username}! 💰`);
+            io.to(room).emit('system message', `${user.username} robbed ${formatNumber(robAmount)} coins from ${targetUser.username}!`);
           } else {
             // Rob fails: robber loses 2x the amount they tried to rob (doubled), victim gains it
             const penalty = robAmount * 2;
@@ -817,15 +829,26 @@ function initChat(io) {
               socket.emit('system message', `You don't have enough coins to cover the penalty!`);
               return;
             }
+            robCooldowns[user.username.toLowerCase()] = Date.now();
             const victimNewBal = await addCoins(targetUser.username, penalty);
             broadcastCoins(user.username, robberNewBal);
             broadcastCoins(targetUser.username, victimNewBal);
-            io.to(room).emit('system message', `🚔 ${user.username} failed to rob ${targetUser.username}! Penalty: ${formatNumber(penalty)} coins to victim! 👮`);
+            io.to(room).emit('system message', `${user.username} failed to rob ${targetUser.username}! Penalty: ${formatNumber(penalty)} coins to victim!`);
           }
         } catch (err) {
           console.error('Rob error:', err);
           socket.emit('system message', 'Error executing /rob command.');
         }
+        return;
+      }
+
+      // ── /announcement (admin only) ────────────────────────────────────────
+      if (raw.startsWith('/announcement ')) {
+        if (user.username.toLowerCase() !== 'mce') { socket.emit('system message', 'You do not have permission to use that command.'); return; }
+        const message = raw.slice(14).trim();
+        if (!message) { socket.emit('system message', 'Usage: /announcement message'); return; }
+        io.emit('announcement', { from: user.username, message, timestamp: Date.now() });
+        socket.emit('system message', 'Announcement sent to all users.');
         return;
       }
 
