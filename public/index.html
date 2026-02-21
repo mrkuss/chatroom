@@ -847,17 +847,30 @@
 <script>
 
 // ── SPRITE HELPER ─────────────────────────────────────────────────────────────
-// Returns an img HTML string with automatic placeholder fallback
+// Known sprites that exist (or should exist) in /sprites/
+// Only these get an onerror fallback. Everything else stays as text/emoji.
+const KNOWN_SPRITES = new Set([
+  'coinIcon.png','shopButtonIcon.png','gameButtonIcon.png','closeIcon.png',
+  'warningIcon.png','lockIcon.png','slotsIcon.png','diceIcon.png',
+  'rouletteIcon.png','cherryIcon.png','lemonIcon.png','orangeIcon.png',
+  'starIcon.png','diamondIcon.png','sevenIcon.png','trophyIcon.png',
+  'profileAvatar.png','goldMedal.png','silverMedal.png','bronzeMedal.png',
+  'onlineUsersButtonIcon.png','settingsButtonIcon.png','placeholder.png'
+]);
+
+// Returns an img HTML string. Only adds onerror fallback for known sprites.
 function si(file, w, h, alt) {
   w = w || 20; h = h || 20; alt = alt || '';
-  return `<img class="sprite" src="/sprites/${file}" width="${w}" height="${h}" alt="${alt}" onerror="this.onerror=null;this.src='/sprites/placeholder.png'">`;
+  const fallback = KNOWN_SPRITES.has(file) ? ` onerror="this.onerror=null;this.src='/sprites/placeholder.png'"` : '';
+  return `<img class="sprite" src="/sprites/${file}" width="${w}" height="${h}" alt="${alt}"${fallback}>`;
 }
 
 // Badge definitions with sprite filenames
 // The server/badge system uses emoji IDs; we map them to sprite files here.
 // If a sprite doesn't exist it falls back to placeholder automatically.
+// Badge sprite mappings — only use sprites from your actual asset list
 const BADGE_SPRITES = {
-  lurker_no_more: 'coinIcon.png',      // placeholder mapping - swap to your actual badge sprites
+  lurker_no_more: 'starIcon.png',
   regular:        'starIcon.png',
   chatterbox:     'starIcon.png',
   motormouth:     'starIcon.png',
@@ -883,7 +896,7 @@ const SHOP_COLORS = {
 // ── SOUNDS ────────────────────────────────────────────────────────────────────
 let soundEnabled = true;
 const _sounds = {};
-['listclick','hover','message','join','leave','dm','pollEnd','win','lose','coin','claim','keypad','spin','roll','bet','notify'].forEach(n => {
+['click','hover','message','join','leave','dm','pollEnd','win','lose','coin','claim','keypad','spin','roll','bet','notify'].forEach(n => {
   const a = new Audio(`/sounds/${n}.wav`);
   a.preload = 'auto';
   _sounds[n] = a;
@@ -896,7 +909,7 @@ function playSound(name, vol) {
 }
 
 // Named shortcuts
-function sfxClick()   { playSound('listclick', 0.7); }
+function sfxClick()   { playSound('click', 0.7); }
 function sfxHover()   { playSound('hover', 0.4); }
 function soundMessage() { playSound('message', 0.8); }
 function soundJoin()    { playSound('join', 0.9); }
