@@ -108,7 +108,7 @@
     #user-count-btn { width:auto;padding:0 8px;font-size:14px;gap:4px; }
     .pixel-icon { width:100%;height:100%;image-rendering:pixelated;image-rendering:-moz-crisp-edges;image-rendering:crisp-edges;object-fit:contain; }
     /* sprite used inline (badges, profile, etc.) */
-    .sprite { image-rendering:pixelated;image-rendering:-moz-crisp-edges;image-rendering:crisp-edges;object-fit:contain;vertical-align:middle;width:32px;height:32px; }
+    .sprite { image-rendering:pixelated;image-rendering:-moz-crisp-edges;image-rendering:crisp-edges;object-fit:contain;vertical-align:middle; }
 
     #reconnect-banner { display:none;background:#cc6600;color:white;font-size:14px;text-align:center;padding:4px 8px;flex-shrink:0;letter-spacing:1px; }
     #reconnect-banner.visible { display:block; }
@@ -294,7 +294,7 @@
 
     #profile-modal .modal-box { max-width:340px; }
     .profile-header { display:flex;align-items:center;gap:10px;margin-bottom:12px; }
-    .profile-avatar-img { width:32px;height:32px; }
+    .profile-avatar-img { }
     .profile-name { font-size:24px;font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,0.12); }
     .profile-badge-display { font-size:16px;margin-top:2px;color:var(--text-system);display:flex;align-items:center;gap:4px; }
     .profile-stats { margin-bottom:12px; }
@@ -758,7 +758,7 @@
         <div style="text-align:center;">
           <label style="font-size:12px;color:var(--text-system);">Spin</label>
           <div style="font-size:28px;margin-top:4px;" id="roulette-spin">
-            <img class="sprite" data-scale="games_roulette_spin" src="/sprites/rouletteIcon.png" width="${scaleOf('games_roulette_spin')}" height="${scaleOf('games_roulette_spin')}" alt="Roulette" onerror="this.src='/sprites/placeholder.png'">
+            <img class="sprite" data-scale="games_roulette_spin" src="/sprites/rouletteIcon.png" width="32" height="32" alt="Roulette" onerror="this.src='/sprites/placeholder.png'">
           </div>
         </div>
       </div>
@@ -881,7 +881,7 @@ const SPRITE_SCALE = {
   games_slot_reel:        1.5,   // slot reel symbols (bigger = more dramatic)
   games_dice_loading:     1.0,   // dice icon shown while rolling
   games_roulette_spin:    1.5,   // roulette icon in the spin area
-  games_leaderboard_coin: 0.26,   // coin next to each leaderboard score
+  games_leaderboard_coin: 0.5,   // coin next to each leaderboard score
   games_leaderboard_medal:1.0,   // gold/silver/bronze medals
 
   // ── Daily reward modal ────────────────────────────────────────────────────
@@ -892,21 +892,21 @@ const SPRITE_SCALE = {
   announcement_icon:      1.0,   // warning icon in announcement modal
 
   // ── Stats panel (inside settings) ────────────────────────────────────────
-  stats_coin:             0.25,   // coin icons in stats rows
-  stats_trophy:           0.25,   // trophy icon on badges earned row
+  stats_coin:             0.5,   // coin icons in stats rows
+  stats_trophy:           0.5,   // trophy icon on badges earned row
 
   // ── Profile modal ─────────────────────────────────────────────────────────
   profile_avatar:         1.5,   // avatar image in profile header
-  profile_badge_icon:     0.45,  // active badge icon in profile header
-  profile_earned_badge:   0.25,  // earned badge icons in the badge strip
-  profile_stat_coin:      0.25,   // coin icon in stats rows inside profile
+  profile_badge_icon:     0.75,  // active badge icon in profile header
+  profile_earned_badge:   0.75,  // earned badge icons in the badge strip
+  profile_stat_coin:      0.5,   // coin icon in stats rows inside profile
 
   // ── Poll messages ─────────────────────────────────────────────────────────
-  poll_star:              0.25,   // star icon before poll question
-  poll_trophy:            0.25,   // trophy icon on winning poll option
+  poll_star:              0.5,   // star icon before poll question
+  poll_trophy:            0.5,   // trophy icon on winning poll option
 
   // ── Inline chat / leaderboard coins ──────────────────────────────────────
-  inline_coin:            0.08,   // coin in shop price tags, lb coins, etc.
+  inline_coin:            0.5,   // coin in shop price tags, lb coins, etc.
 };
 
 // ─── Helper: resolve px size from a scale key (falls back to 1.0 = 32px) ────
@@ -926,9 +926,11 @@ function applyStaticScales() {
     img.style.height = px + 'px';
   });
 }
+// Script is at bottom of page so DOM is ready — run immediately AND on DOMContentLoaded as safety net
+applyStaticScales();
 document.addEventListener('DOMContentLoaded', applyStaticScales);
 
-// Watch for dynamically inserted imgs with data-scale (e.g. slot reels, dice icons)
+// Watch for dynamically inserted imgs with data-scale (e.g. slot reels, dice icons, profile modal)
 const _scaleObserver = new MutationObserver(mutations => {
   mutations.forEach(m => {
     m.addedNodes.forEach(node => {
@@ -946,8 +948,11 @@ const _scaleObserver = new MutationObserver(mutations => {
     });
   });
 });
+// Start observing immediately — script is at bottom so body exists
+_scaleObserver.observe(document.body, { childList: true, subtree: true });
 document.addEventListener('DOMContentLoaded', () => {
-  _scaleObserver.observe(document.body, { childList: true, subtree: true });
+  // Re-run in case anything was missed
+  applyStaticScales();
 });
 
 // ── SPRITE HELPER ─────────────────────────────────────────────────────────────
@@ -963,9 +968,11 @@ const KNOWN_SPRITES = new Set([
 // si(file, scaleKey, alt)
 // scaleKey is a key from SPRITE_SCALE. Pass null/undefined to use base 32px.
 function si(file, scaleKey, alt) {
-  const px = scaleKey ? scaleOf(scaleKey) : BASE_PX;
+  const key = scaleKey || null;
+  const px = key ? scaleOf(key) : BASE_PX;
+  const ds = key ? ` data-scale="${key}"` : '';
   const fallback = KNOWN_SPRITES.has(file) ? ` onerror="this.onerror=null;this.src='/sprites/placeholder.png'"` : '';
-  return `<img class="sprite" src="/sprites/${file}" width="${px}" height="${px}" alt="${alt||''}"${fallback}>`;
+  return `<img class="sprite"${ds} src="/sprites/${file}" width="${px}" height="${px}" style="width:${px}px;height:${px}px" alt="${alt||''}"${fallback}>`;
 }
 
 const BADGE_SPRITES = {
@@ -1672,7 +1679,7 @@ const SLOT_SYMBOLS = {
 function reelSymbolHtml(sym) {
   const f=SLOT_SYMBOLS[sym];
   return f
-    ? `<img class="sprite" data-scale="games_slot_reel" src="/sprites/${f}" width="${scaleOf('games_slot_reel')}" height="${scaleOf('games_slot_reel')}" alt="${sym}" onerror="this.onerror=null;this.src='/sprites/placeholder.png'">`
+    ? `<img class="sprite" data-scale="games_slot_reel" src="/sprites/${f}" width="${scaleOf('games_slot_reel')}" height="${scaleOf('games_slot_reel')}" style="width:${scaleOf(\'games_slot_reel\')}px;height:${scaleOf(\'games_slot_reel\')}px" alt="${sym}" onerror="this.onerror=null;this.src='/sprites/placeholder.png'">`
     : sym;
 }
 
@@ -1708,8 +1715,8 @@ async function playDice() {
   const bet=parseInt(document.getElementById('dice-bet').value,10);
   if(!bet||bet<1||bet>50000){document.getElementById('dice-result').innerHTML='<span class="result-lose">Bet must be 1-50000</span>';return;}
   diceRolling=true; const btn=document.getElementById('dice-roll-btn'); btn.disabled=true;
-  document.getElementById('dice-player').innerHTML=`<img class="sprite" data-scale="games_dice_loading" src="/sprites/diceIcon.png" width="${scaleOf('games_dice_loading')}" height="${scaleOf('games_dice_loading')}" alt="..." onerror="this.src='/sprites/placeholder.png'">`;
-  document.getElementById('dice-house').innerHTML=`<img class="sprite" data-scale="games_dice_loading" src="/sprites/diceIcon.png" width="${scaleOf('games_dice_loading')}" height="${scaleOf('games_dice_loading')}" alt="..." onerror="this.src='/sprites/placeholder.png'">`;
+  document.getElementById('dice-player').innerHTML=`<img class="sprite" data-scale="games_dice_loading" src="/sprites/diceIcon.png" width="${scaleOf('games_dice_loading')}" height="${scaleOf('games_dice_loading')}" style="width:${scaleOf(\'games_dice_loading\')}px;height:${scaleOf(\'games_dice_loading\')}px" alt="..." onerror="this.src='/sprites/placeholder.png'">`;
+  document.getElementById('dice-house').innerHTML=`<img class="sprite" data-scale="games_dice_loading" src="/sprites/diceIcon.png" width="${scaleOf('games_dice_loading')}" height="${scaleOf('games_dice_loading')}" style="width:${scaleOf(\'games_dice_loading\')}px;height:${scaleOf(\'games_dice_loading\')}px" alt="..." onerror="this.src='/sprites/placeholder.png'">`;
   document.getElementById('dice-result').textContent='';
   await new Promise(r=>setTimeout(r,500));
   try {
@@ -1770,7 +1777,7 @@ async function loadLeaderboard() {
     const medals=['goldMedal.png','silverMedal.png','bronzeMedal.png'];
     container.innerHTML=data.map((row,i)=>{
       const rank=i<3
-        ?`<img class="sprite" data-scale="games_leaderboard_medal" src="/sprites/${medals[i]}" width="${scaleOf('games_leaderboard_medal')}" height="${scaleOf('games_leaderboard_medal')}" alt="#${i+1}" onerror="this.onerror=null;this.src='/sprites/placeholder.png'">`
+        ?`<img class="sprite" data-scale="games_leaderboard_medal" src="/sprites/${medals[i]}" width="${scaleOf('games_leaderboard_medal')}" height="${scaleOf('games_leaderboard_medal')}" style="width:${scaleOf(\'games_leaderboard_medal\')}px;height:${scaleOf(\'games_leaderboard_medal\')}px" alt="#${i+1}" onerror="this.onerror=null;this.src='/sprites/placeholder.png'">`
         :`#${i+1}`;
       return `<div class="lb-row"><span class="lb-rank">${rank}</span><span class="lb-name">${escHtml(row.username)}</span><span class="lb-coins">${si('coinIcon.png','games_leaderboard_coin','coin')} ${fmtNum(row.coins)}</span></div>`;
     }).join('');
