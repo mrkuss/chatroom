@@ -56,7 +56,7 @@ router.get('/profile/:username', async (req, res) => {
   try {
     const r = await db.query(
       `SELECT username, created_at, coins, coins_earned, messages_sent,
-              time_online_seconds, first_gamble, active_badge
+              time_online_seconds, first_gamble, active_badge, color
        FROM users WHERE LOWER(username) = LOWER($1)`,
       [req.params.username]
     );
@@ -67,6 +67,7 @@ router.get('/profile/:username', async (req, res) => {
     const activeBadge = u.active_badge ? getBadgeById(u.active_badge) : null;
     res.json({
       username: u.username,
+      color: u.color || '#000080',
       createdAt: u.created_at,
       coins: u.coins,
       coinsEarned: u.coins_earned,
