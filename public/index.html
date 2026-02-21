@@ -95,7 +95,7 @@
     #titlebar { background:var(--bg-titlebar);color:var(--text-titlebar);padding:0 8px;display:flex;justify-content:space-between;align-items:center;font-size:18px;letter-spacing:1px;flex-shrink:0;height:40px;gap:8px; }
     #titlebar-title { font-size:18px;letter-spacing:2px;flex-shrink:0; }
     #titlebar-right { display:flex;align-items:center;gap:5px;margin-left:auto; }
-    #logged-in-as { font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:2px; }
+    #logged-in-as { font-size:22px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:8px; }
     #coin-display { font-size:14px;color:#ffd700;white-space:nowrap;margin-right:4px;text-shadow:0 0 4px rgba(255,215,0,0.5); }
     body.theme-amber #coin-display,body.theme-dark #coin-display { color:#ffcc00; }
     body.theme-rose #coin-display { color:#ffaa44; }
@@ -410,9 +410,9 @@
     <div id="titlebar-right">
       <span id="logged-in-as"></span>
       <span id="coin-display">🪙 0</span>
-      <button id="user-count-btn" class="icon-btn" onclick="toggleUsers()" title="Online users"><img src="/sprites/onlineUsersButtonIcon.png" alt="Users" class="pixel-icon"> <span id="user-count-text">0</span></button>
       <button class="icon-btn" onclick="openShop()" title="Shop"><img src="/sprites/shopButtonIcon.png" alt="Shop" class="pixel-icon"></button>
       <button class="icon-btn" onclick="openGames()" title="Games"><img src="/sprites/gameButtonIcon.png" alt="Games" class="pixel-icon"></button>
+      <button id="user-count-btn" class="icon-btn" onclick="toggleUsers()" title="Online users"><img src="/sprites/onlineUsersButtonIcon.png" alt="Users" class="pixel-icon"> <span id="user-count-text">0</span></button>
       <button class="icon-btn" onclick="openSettings()" title="Settings"><img src="/sprites/settingsButtonIcon.png" alt="Settings" class="pixel-icon"></button>
       <button class="icon-btn danger" onclick="doLogout()" title="Exit">✕</button>
     </div>
