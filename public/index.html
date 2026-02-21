@@ -95,8 +95,8 @@
     #titlebar { background:var(--bg-titlebar);color:var(--text-titlebar);padding:0 8px;display:flex;justify-content:space-between;align-items:center;font-size:18px;letter-spacing:1px;flex-shrink:0;height:40px;gap:8px; }
     #titlebar-title { font-size:18px;letter-spacing:2px;flex-shrink:0; }
     #titlebar-right { display:flex;align-items:center;gap:5px;margin-left:auto; }
-    #logged-in-as { font-size:22px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:8px; text-shadow:0 0 3px rgba(0,0,0,0.9); }
-    #logged-in-as span { color:white !important; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; }
+    #logged-in-as { font-size:22px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:8px; }
+    #logged-in-as span { color:white !important; text-shadow: 0 1px 2px rgba(0,0,0,0.12); }
     #coin-display { font-size:14px;color:#ffd700;white-space:nowrap;margin-right:4px;text-shadow:0 0 4px rgba(255,215,0,0.5); }
     body.theme-amber #coin-display,body.theme-dark #coin-display { color:#ffcc00; }
     body.theme-rose #coin-display { color:#ffaa44; }
@@ -115,7 +115,7 @@
 
     #users-panel { display:none;flex-wrap:wrap;gap:4px 16px;padding:6px 8px;background:var(--bg-users-panel);border-bottom:2px inset var(--border-inset);font-size:15px;flex-shrink:0; }
     #users-panel.visible { display:flex; }
-    .user-entry .uname { font-weight:bold;cursor:pointer; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; }
+    .user-entry .uname { font-weight:bold;cursor:pointer; text-shadow: 0 1px 2px rgba(0,0,0,0.12); }
     .user-entry .uname:hover { text-decoration:underline; }
     .user-entry .utime { color:var(--text-system);font-size:13px;margin-left:4px; }
     .user-entry .uidle { color:#aa6600;font-size:13px;margin-left:2px; }
@@ -141,7 +141,7 @@
     .msg-row:hover .msg-ts { display:inline; }
     .msg-row:hover .msg-react-btn { display:inline-flex; }
     .msg-ts { display:none;font-size:12px;color:var(--text-system);margin-left:8px; }
-    .msg-user { cursor:pointer; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; }
+    .msg-user { cursor:pointer; text-shadow: 0 1px 2px rgba(0,0,0,0.12); }
     .msg-user:hover { text-decoration:underline; }
 
     /* ── REACTIONS ── */
@@ -309,7 +309,7 @@
     #profile-modal .modal-box { max-width:340px; }
     .profile-header { display:flex;align-items:center;gap:10px;margin-bottom:12px; }
     .profile-avatar { font-size:40px; }
-    .profile-name { font-size:24px;font-weight:bold; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; }
+    .profile-name { font-size:24px;font-weight:bold; text-shadow: 0 1px 2px rgba(0,0,0,0.12); }
     .profile-badge-display { font-size:16px;margin-top:2px;color:var(--text-system); }
     .profile-stats { margin-bottom:12px; }
 
