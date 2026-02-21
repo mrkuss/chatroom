@@ -219,4 +219,68 @@ router.post('/game/roulette', async (req, res) => {
   res.json({ spin, spinColor, result, winAmount, coins: finalCoins, betType });
 });
 
+// ─── Coin Clicker ──────────────────────────────────────────────────────────────
+router.post('/game/coin-clicker', async (req, res) => {
+  if (!req.session.username) return res.status(401).json({ error: 'Not logged in' });
+
+  try {
+    const username = req.session.username;
+    const now = new Date();
+    
+    // Get or create tracker entry for this user
+    let tracker = await db.query(
+      'SELECT * FROM coin_breaker_tracker WHERE LOWER(username) = LOWER($1)',
+      [username]
+    );
+    
+    let row = tracker.rows[0];
+    let breaksCount = 0;
+    
+    // If tracker exists and reset time has passed, reset the counter
+    if (row) {
+      if (new Date(row.reset_at) <= now) {
+        // Reset counter: it's been 24 hours
+        await db.query(
+          'UPDATE coin_breaker_tracker SET breaks_count = 0, reset_at = $1 WHERE LOWER(username) = LOWER($2)',
+          [new Date(now.getTime() + 24 * 60 * 60 * 1000), username]
+        );
+        breaksCount = 0;
+      } else {
+        breaksCount = row.breaks_count;
+      }
+    } else {
+      // Create new tracker entry with 24-hour reset time
+      await db.query(
+        'INSERT INTO coin_breaker_tracker (username, breaks_count, reset_at) VALUES ($1, 0, $2)',
+        [username, new Date(now.getTime() + 24 * 60 * 60 * 1000)]
+      );
+      breaksCount = 0;
+    }
+    
+    // Check if user has hit the 1000 breaks limit
+    if (breaksCount >= 1000) {
+      return res.status(400).json({ error: 'ran out of coins!' });
+    }
+    
+    // Generate random coins earned (1-3)
+    const coinsEarned = Math.floor(Math.random() * 3) + 1;
+    
+    // Add coins to user
+    const result = await addCoins(username, coinsEarned);
+    
+    // Update breaks count
+    await db.query(
+      'UPDATE coin_breaker_tracker SET breaks_count = breaks_count + 1 WHERE LOWER(username) = LOWER($1)',
+      [username]
+    );
+    
+    broadcastCoins(username, result);
+    
+    res.json({ ok: true, coinsEarned, coins: result });
+  } catch (err) {
+    console.error('Coin clicker error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = { router, initGambling, broadcastGambling };

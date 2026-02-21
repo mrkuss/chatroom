@@ -363,6 +363,15 @@
     .dice-side label { display:block;margin-bottom:4px;color:var(--text-system); }
     .dice-value { font-size:48px;min-width:60px;height:60px;background:var(--bg-messages);border:3px inset var(--border-inset);display:flex;align-items:center;justify-content:center; }
     .dice-vs { font-size:20px;color:var(--text-system); }
+    
+    /* ── COIN CLICKER ── */
+    .coin-clicker-container { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;margin:20px 0; }
+    .coin-clicker-coin { font-size:80px;cursor:pointer;padding:20px;border-radius:8px;border:3px solid #ffd700;background:rgba(255,215,0,0.1);transition:transform 0.1s,box-shadow 0.1s;user-select:none; }
+    .coin-clicker-coin:hover { transform:scale(1.05);box-shadow:0 0 12px rgba(255,215,0,0.6); }
+    .coin-clicker-coin:active { transform:scale(0.95); }
+    .coin-clicker-info { font-size:16px;color:var(--text-main);text-align:center;min-height:40px; }
+    .coin-clicker-status { font-size:14px;color:var(--text-system);margin-top:8px; }
+    
     .lb-row { display:flex;justify-content:space-between;padding:4px 8px;border-bottom:1px solid var(--border-inset);font-size:16px; }
     .lb-row:nth-child(odd) { background:var(--poll-bg); }
     .lb-rank { color:var(--text-system);width:30px; }
@@ -646,6 +655,7 @@
         <button class="games-tab active" onclick="switchGame('slots')">🎰 Slots</button>
         <button class="games-tab" onclick="switchGame('dice')">🎲 Dice</button>
         <button class="games-tab" onclick="switchGame('roulette')">🎡 Roulette</button>
+        <button class="games-tab" onclick="switchGame('coin-clicker')">🪙 Clicker</button>
         <button class="games-tab" onclick="switchGame('leaderboard')">🏆 Board</button>
       </div>
     </div>
@@ -685,6 +695,16 @@
       <div id="roulette-number-grid"></div>
       <div class="game-result" id="roulette-result"></div>
       <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Red/Black/Even/Odd = 1.8x · Number = 50x. Spin 0 is green (house win)</div>
+    </div>
+    <div id="game-coin-clicker" class="game-panel" style="padding:0 16px 16px;">
+      <div class="game-balance" id="coin-clicker-balance">Balance: 🪙 0</div>
+      <div class="coin-clicker-container">
+        <div class="coin-clicker-coin" id="coin-clicker-coin" onclick="clickCoin()">💰</div>
+        <div class="coin-clicker-info" id="coin-clicker-info">Click the coin repeatedly!</div>
+        <div class="coin-clicker-status" id="coin-clicker-status"></div>
+      </div>
+      <div class="game-result" id="coin-clicker-result"></div>
+      <div style="font-size:12px;color:var(--text-system);margin-top:8px;text-align:center;">Tap the coin 2-5 times to break it and earn 1-3 coins! Limit: 1000 breaks per day</div>
     </div>
     <div id="game-leaderboard" class="game-panel" style="padding:0 16px 16px;">
       <div class="lb-header"><span>Rank</span><span>Player</span><span>Coins</span></div>
@@ -1432,8 +1452,8 @@ function closeGames(){document.getElementById('games-overlay').classList.remove(
 function openPatchNotes(){document.getElementById('patchnotes-modal').classList.add('open')}
 function closePatchNotes(){document.getElementById('patchnotes-modal').classList.remove('open')}
 function closeAnnouncement(){document.getElementById('announcement-modal').classList.remove('open')}
-function switchGame(name){document.querySelectorAll('.game-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.games-tab').forEach(t=>t.classList.remove('active'));document.getElementById('game-'+name).classList.add('active');document.querySelectorAll('.games-tab').forEach(t=>{if(t.textContent.toLowerCase().includes(name==='leaderboard'?'board':name))t.classList.add('active')});if(name==='leaderboard')loadLeaderboard();if(name==='roulette')initRouletteNumbers();updateGameBalances()}
-function updateGameBalances(){['slots','dice','roulette'].forEach(g=>{const el=document.getElementById(g+'-balance');if(el)el.textContent=`Balance: 🪙 ${formatNumber(myCoins)}`})}
+function switchGame(name){document.querySelectorAll('.game-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.games-tab').forEach(t=>t.classList.remove('active'));document.getElementById('game-'+name).classList.add('active');document.querySelectorAll('.games-tab').forEach(t=>{if(t.textContent.toLowerCase().includes(name==='leaderboard'?'board':name==='coin-clicker'?'clicker':name))t.classList.add('active')});if(name==='leaderboard')loadLeaderboard();if(name==='roulette')initRouletteNumbers();if(name==='coin-clicker')initCoinClicker();updateGameBalances()}
+function updateGameBalances(){['slots','dice','roulette','coin-clicker'].forEach(g=>{const el=document.getElementById(g+'-balance');if(el)el.textContent=`Balance: 🪙 ${formatNumber(myCoins)}`})}
 function setBet(game,amount){document.getElementById(game+'-bet').value=amount}
 
 let slotsSpinning=false;
@@ -1498,6 +1518,23 @@ async function loadLeaderboard(){
   if(!res.ok){container.innerHTML='<div style="color:#cc0000;text-align:center;padding:12px;">Error loading.</div>';return}
   container.innerHTML=data.map((row,i)=>`<div class="lb-row"><span class="lb-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`}</span><span class="lb-name">${escHtml(row.username)}</span><span class="lb-coins">🪙 ${formatNumber(row.coins)}</span></div>`).join('')}
   catch{container.innerHTML='<div style="color:#cc0000;text-align:center;padding:12px;">Error loading.</div>'}
+}
+
+// ── COIN CLICKER ──────────────────────────────────────────────────────────────
+let clickerState={nextClickTime:0,tapCount:0,requiredTaps:0,coinActive:true};
+function initCoinClicker(){clickerState={nextClickTime:0,tapCount:0,requiredTaps:3,coinActive:true};updateClickerDisplay()}
+function updateClickerDisplay(){const info=document.getElementById('coin-clicker-info');const status=document.getElementById('coin-clicker-status');if(clickerState.requiredTaps>0){info.textContent=`Taps needed: ${clickerState.requiredTaps}`;status.textContent=`Taps so far: ${clickerState.tapCount}/${clickerState.requiredTaps}`}else{info.textContent='Ready for next coin!';status.textContent=''}}
+async function clickCoin(){
+  const now=Date.now();if(now<clickerState.nextClickTime)return;clickerState.nextClickTime=now+80;
+  if(clickerState.requiredTaps===0){
+    try{const res=await fetch('/game/coin-clicker',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});const data=await res.json();
+    if(!res.ok){document.getElementById('coin-clicker-result').innerHTML=`<span class="result-lose">${data.error}</span>`;clickerState.coinActive=false;return}
+    myCoins=data.coins;updateCoinDisplay();updateGameBalances();const earned=data.coinsEarned;document.getElementById('coin-clicker-result').innerHTML=`<span class="result-win">💥 Coin broken! +${earned} coins!</span>`;soundCoin();clickerState.requiredTaps=Math.floor(Math.random()*4)+2;clickerState.tapCount=0;updateClickerDisplay()}
+    catch{document.getElementById('coin-clicker-result').innerHTML='<span class="result-lose">Error. Try again.</span>'}
+  }else{
+    clickerState.tapCount++;if(clickerState.tapCount>=clickerState.requiredTaps){clickerState.requiredTaps=0;document.getElementById('coin-clicker-result').innerHTML='<span class="result-win">One more! Click to break it!</span>'}
+    updateClickerDisplay()
+  }
 }
 
 // ── TICKERS ───────────────────────────────────────────────────────────────────
